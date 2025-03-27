@@ -24,7 +24,6 @@ return new class extends Migration
             ['id' => 2, 'name' => 'coach', 'description' => 'Coach with special privileges'],
             ['id' => 3, 'name' => 'member', 'description' => 'Regular member (default role)'],
 
-            ['id' => 4, 'name' => 'visiteur', 'description' => 'Visitor with limited access'],
         ]);
     }
 

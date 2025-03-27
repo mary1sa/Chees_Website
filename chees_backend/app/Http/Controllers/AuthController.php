@@ -91,8 +91,7 @@ public function login(Request $request)
                 'token' => $token,
                 'user' => [
                     'id' => $user->id,
-    'role_id' => $user->role_id,
-    'role' => $user->role->slug, 
+    'role' => $user->role->name, 
     'username' => $user->username,
     'email' => $user->email,
     'first_name' => $user->first_name,
