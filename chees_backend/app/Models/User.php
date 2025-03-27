@@ -18,20 +18,32 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'role_id', 'username', 'email', 'password',
+        'first_name', 'last_name', 'profile_picture',
+        'chess_rating', 'bio', 'phone', 'date_of_birth',
+        'address', 'is_active', 'email_verified_at', 'remember_token',"city"
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', 'remember_token',
     ];
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
 
     /**
      * Get the attributes that should be cast.
