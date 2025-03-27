@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->foreignId('role_id')
-                ->constrained('roles')
-                ->onDelete('cascade');
+            ->default(3)
+            ->constrained('roles')
+            ->onDelete('cascade');
+            
               
             $table->string('username', 50)->unique();
             $table->string('email', 255)->unique();
