@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from './config/axiosInstance';
-
+import { FaUser, FaLock, FaEyeSlash, FaEye } from "react-icons/fa";
+import "./Login.css"
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -14,6 +17,25 @@ const Login = () => {
     setLoading(true);
     setError('');
 
+
+
+
+    if (!email.trim()) {
+      setError("L'e-mail est requis.");
+      setLoading(false);
+      return;
+    }
+    if (!password.trim()) {
+      setError("Le mot de passe est requis.");
+      setLoading(false);
+      return;
+    }
+    if (password.length < 6) {
+      setError("Le mot de passe doit contenir au moins 6 caractères.");
+      setLoading(false);
+      return;
+    }
+    
     try {
       console.log("Making login request with:", { email, password });
 
@@ -40,8 +62,13 @@ console.log(user)
       }
 
     } catch (err) {
-      console.error("Login error:", err);
-      setError(err.response?.data?.error || err.message || "Login failed");
+      if (err.response?.status === 401) {
+        setError("Email or password is incorrect.");
+      } else {
+        setError(err.response?.data?.error || "Login failed. Please try again.");
+      }
+            setLoading(false);
+
     } finally {
       setLoading(false);
     }
@@ -49,36 +76,51 @@ console.log(user)
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
-      {error && <div className="alert alert-danger">{error}</div>}
+      <div className="login-box">
+      <div className="image-container">
+      <img src="./loginchees.jpg" alt="" className="login-image"/>
+      </div>
+      <div className='login-form-container'>
+<h2>Login</h2>   
+   {error && <div className="alert alert-danger">{error}</div>}
       
       <form onSubmit={handleLogin}>
         <div className="form-group">
-          <label>Email</label>
-          <input
+          <label htmlFor="">Email</label>
+        <div className='form-container'>
+        <FaUser className="input-icon" /> 
+        <input
             type="email"
-            className="form-control"
+            className="input-field"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+ </div>
         </div>
         
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength="6"
-          />
-        </div>
+       <div className="form-group ">
+       <label htmlFor="">Password</label>
+
+        <div className='form-container'>
+       <span 
+       className="input-icon"
+        onClick={() => setShowPassword(!showPassword)}
+    >
+        {showPassword ? <FaEyeSlash /> : <FaEye />}
+    </span>    <input
+        type={showPassword ? "text" : "password"} 
+        className="input-field"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+    />
+ </div>
+</div>
         
         <button 
           type="submit" 
-          className="btn btn-primary"
+          className="login-button"
           disabled={loading}
         >
           {loading ? (
@@ -89,6 +131,9 @@ console.log(user)
           ) : 'Login'}
         </button>
       </form>
+      <p className="signup-text">Don't have an account? <a href="/register">Sign Up here</a></p>
+      </div>
+    </div>
     </div>
   );
 };
