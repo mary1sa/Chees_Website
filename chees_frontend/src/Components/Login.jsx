@@ -84,23 +84,25 @@ console.log(user)
 <h2>Login</h2>   
    {error && <div className="alert alert-danger">{error}</div>}
       
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleLogin} className='login-form'>
         <div className="form-group">
-          <label htmlFor="">Email</label>
+          <label  className="labellogin" htmlFor="">Email</label>
         <div className='form-container'>
         <FaUser className="input-icon" /> 
+        <hr className='line' />
         <input
             type="email"
             className="input-field"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            placeholder='Entere Email'
           />
  </div>
         </div>
         
        <div className="form-group ">
-       <label htmlFor="">Password</label>
+       <label className="labellogin" htmlFor="">Password</label>
 
         <div className='form-container'>
        <span 
@@ -108,12 +110,16 @@ console.log(user)
         onClick={() => setShowPassword(!showPassword)}
     >
         {showPassword ? <FaEyeSlash /> : <FaEye />}
-    </span>    <input
+    </span>  
+    <hr className='line' />
+      <input
         type={showPassword ? "text" : "password"} 
         className="input-field"
         value={password}
+        placeholder='Enterer Password'
         onChange={(e) => setPassword(e.target.value)}
         required
+
     />
  </div>
 </div>
@@ -131,7 +137,7 @@ console.log(user)
           ) : 'Login'}
         </button>
       </form>
-      <p className="signup-text">Don't have an account? <a href="/register">Sign Up here</a></p>
+      <p className="signup-link">Don't have an account? <a href="/register">Sign Up here</a></p>
       </div>
     </div>
     </div>
