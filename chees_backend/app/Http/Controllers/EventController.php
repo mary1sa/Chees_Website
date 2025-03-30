@@ -6,19 +6,35 @@ use App\Models\Event;
 use App\Models\EventType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class EventController extends Controller
 {
+    /**
+     * Get all events with optional filtering
+     */
     public function index(Request $request)
     {
-        $query = Event::with('type');
+        $validator = Validator::make($request->all(), [
+            'type_id' => 'nullable|exists:event_types,id',
+            'status' => 'nullable|in:active,featured,upcoming,past,registration_open',
+            'search' => 'nullable|string',
+            'order' => 'nullable|string|in:title,start_date,end_date,created_at',
+            'direction' => 'nullable|string|in:asc,desc',
+            'per_page' => 'nullable|integer|min:1|max:100'
+        ]);
 
-        // Filter by type
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $query = Event::with('type')->withCount(['registrations', 'rounds']);
+
+        // Apply filters
         if ($request->has('type_id')) {
             $query->where('type_id', $request->type_id);
         }
 
-        // Filter by status
         if ($request->has('status')) {
             switch ($request->status) {
                 case 'active':
@@ -33,12 +49,30 @@ class EventController extends Controller
                 case 'past':
                     $query->past();
                     break;
+                case 'registration_open':
+                    $query->where(function($q) {
+                        $q->whereNull('registration_deadline')
+                          ->orWhere('registration_deadline', '>=', now());
+                    });
+                    break;
             }
         }
 
-        return $query->paginate(15);
+        if ($request->has('search')) {
+            $query->where('title', 'like', '%'.$request->search.'%');
+        }
+
+        // Apply sorting
+        $order = $request->input('order', 'start_date');
+        $direction = $request->input('direction', 'asc');
+        $query->orderBy($order, $direction);
+
+        return $query->paginate($request->input('per_page', 15));
     }
 
+    /**
+     * Create a new event
+     */
     public function store(Request $request)
     {
         $validated = $this->validateEventRequest($request);
@@ -48,16 +82,29 @@ class EventController extends Controller
             $validated['image'] = $request->file('image')->store('events', 'public');
         }
 
+        // Set defaults
+        $validated['is_active'] = $validated['is_active'] ?? true;
+        $validated['is_featured'] = $validated['is_featured'] ?? false;
+
         $event = Event::create($validated);
 
-        return response()->json($event, 201);
+        return response()->json([
+            'message' => 'Event created successfully',
+            'data' => $event->load('type')
+        ], 201);
     }
 
+    /**
+     * Get a specific event
+     */
     public function show(Event $event)
     {
-        return $event->load('type', 'registrations.user', 'rounds.matches');
+        return $event->load('type');
     }
 
+    /**
+     * Update an existing event
+     */
     public function update(Request $request, Event $event)
     {
         $validated = $this->validateEventRequest($request, $event);
@@ -73,11 +120,24 @@ class EventController extends Controller
 
         $event->update($validated);
 
-        return response()->json($event);
+        return response()->json([
+            'message' => 'Event updated successfully',
+            'data' => $event->load('type')
+        ]);
     }
 
+    /**
+     * Delete an event
+     */
     public function destroy(Event $event)
     {
+        // Only delete if no dependent records exist
+        if ($event->registrations()->exists() || $event->rounds()->exists()) {
+            return response()->json([
+                'message' => 'Cannot delete event with existing registrations or rounds'
+            ], 422);
+        }
+
         // Delete associated image if exists
         if ($event->image) {
             Storage::disk('public')->delete($event->image);
@@ -88,16 +148,39 @@ class EventController extends Controller
         return response()->json(null, 204);
     }
 
-    public function registrations(Event $event)
+    /**
+     * Get registration status for an event
+     */
+    public function registrationStatus(Event $event)
     {
-        return $event->registrations()->with('user')->paginate(15);
+        return response()->json([
+            'is_registration_open' => $event->isRegistrationOpen(),
+            'registration_deadline' => $event->registration_deadline,
+            'current_time' => now()->toDateTimeString(),
+            'available_slots' => $event->availableSlots(),
+            'max_participants' => $event->max_participants,
+            'registered_participants' => $event->registrations()->count()
+        ]);
     }
+    /**
+ * Get all rounds for a specific event
+ */
+public function rounds(Event $event)
+{
+    $rounds = $event->rounds()->with(['matches' => function($query) {
+        $query->with(['player1', 'player2']);
+    }])->orderBy('round_number')->get();
 
-    public function rounds(Event $event)
-    {
-        return $event->rounds()->with('matches')->paginate(15);
-    }
+    return response()->json([
+        'event_id' => $event->id,
+        'event_title' => $event->title,
+        'rounds' => $rounds
+    ]);
+}
 
+    /**
+     * Validate event request data
+     */
     protected function validateEventRequest(Request $request, $event = null)
     {
         return $request->validate([

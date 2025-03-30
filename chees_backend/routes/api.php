@@ -35,8 +35,9 @@ Route::apiResource('event-types', EventTypeController::class);
 
 // Events
 Route::apiResource('events', EventController::class);
-Route::get('events/{event}/registrations', [EventController::class, 'registrations'])
-    ->middleware('auth:sanctum');
+
+Route::get('events/{event}/registration-status', [EventController::class,'registrationStatus']);
+
 Route::get('events/{event}/rounds', [EventController::class, 'rounds']);
 
 // Event Registrations
