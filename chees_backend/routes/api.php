@@ -41,15 +41,18 @@ Route::get('events/{event}/registration-status', [EventController::class,'regist
 Route::get('events/{event}/rounds', [EventController::class, 'rounds']);
 
 // Event Registrations
-// Route::apiResource('registrations', EventRegistrationController::class)
-//     ->middleware('auth:sanctum');
-// Route::post('events/{event}/register', [EventRegistrationController::class, 'register'])
-//     ->middleware('auth:sanctum');
-// Route::post('registrations/{registration}/cancel', [EventRegistrationController::class, 'cancel'])
-//     ->middleware('auth:sanctum');
-// Route::post('registrations/{registration}/confirm-payment', [EventRegistrationController::class, 'confirmPayment'])
-//     ->middleware('auth:sanctum');
+// Route::apiResource('registrations', EventRegistrationController::class);
+// Route::post('events/{event}/register', [EventRegistrationController::class, 'register']);
+// Route::post('registrations/{registration}/cancel', [EventRegistrationController::class, 'cancel']);
+// Route::post('registrations/{registration}/confirm-payment', [EventRegistrationController::class, 'confirmPayment']);
 
+// Event Registrations
+Route::apiResource('registrations', EventRegistrationController::class)->except(['store']);
+Route::post('events/{event}/register', [EventRegistrationController::class, 'register']);
+Route::post('registrations/{registration}/cancel', [EventRegistrationController::class, 'cancel']);
+Route::post('registrations/{registration}/confirm-payment', [EventRegistrationController::class, 'confirmPayment']);
+Route::get('users/{user}/registrations', [EventRegistrationController::class, 'userRegistrations']);
+Route::get('events/{event}/registrations', [EventRegistrationController::class, 'getEventRegistrations']);
 // Tournament Management
 // Route::post('events/{event}/create-rounds', [TournamentController::class, 'createRounds'])
 //     ->middleware('auth:sanctum');

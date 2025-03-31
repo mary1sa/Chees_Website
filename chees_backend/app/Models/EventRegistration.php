@@ -10,8 +10,14 @@ class EventRegistration extends Model
     use HasFactory;
 
     protected $fillable = [
-        'event_id', 'user_id', 'registration_number', 'status',
-        'payment_status', 'transaction_id', 'paid_amount', 'notes'
+        'event_id', 
+        'user_id', 
+        'registration_number', 
+        'status',
+        'payment_status', 
+        'transaction_id', 
+        'paid_amount', 
+        'notes'
     ];
 
     protected $casts = [
