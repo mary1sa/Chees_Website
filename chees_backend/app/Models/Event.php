@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\TournamentRound;
+use App\Models\EventRegistration;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Event extends Model
 {
@@ -79,4 +81,20 @@ class Event extends Model
 
         return $this->max_participants - $this->registrations()->where('status', 'confirmed')->count();
     }
+
+    
+    // Add this relationship
+    public function tournamentRounds()
+    {
+        return $this->hasMany(TournamentRound::class);
+    }
+
+    // app/Models/Event.php
+public function hasEnoughPlayers()
+{
+    return $this->registrations()->where('status', 'confirmed')->count() >= 2;
+}
+
+
+    
 }

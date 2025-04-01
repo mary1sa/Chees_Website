@@ -18,12 +18,20 @@ class TournamentRound extends Model
         'end_datetime' => 'datetime',
     ];
 
-    // Relationships
+    // // Relationships
+    // public function event()
+    // {
+    //     return $this->belongsTo(Event::class);
+    // }
     public function event()
     {
         return $this->belongsTo(Event::class);
     }
 
+    public function tournamentMatches()
+    {
+        return $this->hasMany(TournamentMatch::class, 'round_id');
+    }
     public function matches()
     {
         return $this->hasMany(TournamentMatch::class, 'round_id');
