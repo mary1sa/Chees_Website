@@ -14,20 +14,9 @@ use App\Http\Controllers\EventRegistrationController;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-
+// authentification
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
-
-
-
-
-
-
-
-
-
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -37,9 +26,7 @@ Route::apiResource('event-types', EventTypeController::class);
 
 // Events
 Route::apiResource('events', EventController::class);
-
 Route::get('events/{event}/registration-status', [EventController::class,'registrationStatus']);
-
 Route::get('events/{event}/rounds', [EventController::class, 'rounds']);
 
 // Event Registrations
@@ -49,14 +36,6 @@ Route::post('registrations/{registration}/cancel', [EventRegistrationController:
 Route::post('registrations/{registration}/confirm-payment', [EventRegistrationController::class, 'confirmPayment']);
 Route::get('users/{user}/registrations', [EventRegistrationController::class, 'userRegistrations']);
 Route::get('events/{event}/registrations', [EventRegistrationController::class, 'getEventRegistrations']);
-// Tournament Management
-// Route::post('events/{event}/create-rounds', [TournamentController::class, 'createRounds'])
-//     ->middleware('auth:sanctum');
-// Route::post('events/{event}/rounds/{round}/generate-pairings', [TournamentController::class, 'generatePairings'])
-//     ->middleware('auth:sanctum');
-// Route::post('matches/{match}/record-result', [TournamentController::class, 'recordMatchResult'])
-//     ->middleware('auth:sanctum');
-// Route::get('events/{event}/standings', [TournamentController::class, 'standings']);
 
 // Tournament Rounds
 Route::get('events/{event}/rounds', [TournamentRoundController::class, 'index']);
