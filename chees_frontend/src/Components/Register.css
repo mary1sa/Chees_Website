@@ -17,7 +17,7 @@
     left: 0;
     width: 8px;
     height: 100%;
-    background: linear-gradient(to bottom, #113c0b, #2a6e1f);
+    background: linear-gradient(to bottom, #228B22, #2a6e1f);
 }
 
 .register-container h2 {
@@ -35,7 +35,7 @@
     display: block;
     width: 60px;
     height: 4px;
-    background: #113c0b;
+    background: #228B22;
     margin: 0.8rem auto 0;
     border-radius: 2px;
 }
@@ -76,7 +76,7 @@
 }
 
 .form-control:focus {
-    border-color: #113c0b;
+    border-color: #228B22;
     background: white;
     box-shadow: 0 0 0 3px rgba(17, 60, 11, 0.1);
     outline: none;
@@ -90,7 +90,7 @@ textarea.form-control {
 .form-group.profile-upload {
     margin-bottom: 2rem;
     text-align: center;
-    border: 2px dashed rgba(17, 60, 11, 0.3);
+    border: 2px dashed #228B22(17, 60, 11, 0.3);
     border-radius: 12px;
     padding: 1.5rem;
     transition: all 0.3s ease;
@@ -100,7 +100,7 @@ textarea.form-control {
 }
 
 .form-group.profile-upload:hover {
-    border-color: #113c0b;
+    border-color: #228B22;
     background-color: rgba(17, 60, 11, 0.03);
 }
 
