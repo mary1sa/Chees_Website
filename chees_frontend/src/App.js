@@ -11,6 +11,7 @@ import Home from './Components/VisiteurPage/Home';
 import Login from './Components/Login';
 import Register from './Components/Register';
 import MemberProfile from './Components/MemberDashboard/MemberProfile';
+import EventTypes from './Components/Event/EventTypes';
 
 function App() {
   return (
@@ -56,6 +57,12 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+        path='/EventTypes'
+        element={<EventTypes />}
+
+       > 
+        </Route>
         
         
       </Routes>
