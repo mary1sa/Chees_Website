@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   FiMenu, FiX, FiHome, FiUsers, FiUserPlus,
-  FiDollarSign, FiCalendar, FiSettings,
+  FiDollarSign, FiCalendar, FiSettings, FiKey,
   FiLogOut, FiBell, FiSearch, FiSun, FiMoon,
   FiChevronDown, FiChevronRight, FiChevronLeft,
-  FiCreditCard,
-  FiFileText
+  FiCreditCard, FiFileText, FiList
 } from 'react-icons/fi';
 import './AdminDashboard.css';
 
@@ -14,13 +13,32 @@ const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [activeMenu, setActiveMenu] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const adminData = {
     name: "Admin Name",
     avatar: "/admin-avatar.jpg",
     role: "Super Admin"
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 992;
+      setIsMobile(mobile);
+      
+      if (mobile && sidebarOpen) {
+        setSidebarOpen(false);
+      }
+      if (!mobile && !sidebarOpen) {
+        setSidebarOpen(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [sidebarOpen]);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const toggleDarkMode = () => setDarkMode(!darkMode);
@@ -30,6 +48,12 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     navigate('/login');
+  };
+
+  const closeSidebar = () => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
   };
 
   const menuItems = [
@@ -42,10 +66,21 @@ const AdminDashboard = () => {
       title: "User Management",
       icon: <FiUsers />,
       submenus: [
-        { title: "All Users", path: "/admin/users" },
-        { title: "Add User", path: "/admin/users/add",  icon: <FiUserPlus className="submenu-icon" />
+        { 
+          title: "All Users", 
+          path: "/admin/users",
+          icon: <FiList className="submenu-icon" />
         },
-        { title: "Roles", path: "/admin/users/roles" }
+        { 
+          title: "Add User", 
+          path: "/admin/users/add",
+          icon: <FiUserPlus className="submenu-icon" />
+        },
+        { 
+          title: "Roles", 
+          path: "/admin/users/roles",
+          icon: <FiKey className="submenu-icon" />
+        }
       ]
     },
     {
@@ -73,20 +108,15 @@ const AdminDashboard = () => {
 
   return (
     <div className={`admin-container ${darkMode ? 'dark' : ''}`}>
-      <nav className="admin-navbar">
+      <nav className={`admin-navbar ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
         <div className="navbar-left">
-          <button className="menu-toggle mobile-only" onClick={toggleSidebar}>
-            {sidebarOpen ? <FiX /> : <FiMenu />}
-          </button>
+          {isMobile && (
+            <button className="mobile-menu-toggle" onClick={toggleSidebar}>
+              <FiMenu />
+            </button>
+          )}
           <h1 className="brand-name">Admin Panel</h1>
         </div>
-
-        {/* <div className="navbar-center">
-          <div className="search-bar">
-            <FiSearch className="search-icon" />
-            <input type="text" placeholder="Search..." />
-          </div>
-        </div> */}
 
         <div className="navbar-right">
           <button className="theme-toggle" onClick={toggleDarkMode}>
@@ -112,55 +142,64 @@ const AdminDashboard = () => {
 
       <aside className={`admin-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
-          <button className="sidebar-toggle desktop-only" onClick={toggleSidebar}>
-            {sidebarOpen ? <FiChevronLeft /> : <FiChevronRight />}
+          <button className="menu-toggle" onClick={toggleSidebar}>
+            {sidebarOpen ? <FiX /> : <FiMenu />}
           </button>
+          {sidebarOpen && <h2 className="sidebar-brand">Admin Panel</h2>}
         </div>
         
         <div className="sidebar-menu">
-          {menuItems.map((item, index) => (
-            <div key={index} className="menu-group">
-              {item.path ? (
-                <Link
-                  to={item.path}
-                  className={`menu-item ${activeMenu === item.title ? 'active' : ''}`}
-                  onClick={() => setActiveMenu(item.title)}
-                >
-                  <span className="menu-icon">{item.icon}</span>
-                  <span className="menu-text">{item.title}</span>
-                </Link>
-              ) : (
-                <>
-                  <div
-                    className={`menu-item ${activeMenu === item.title ? 'active' : ''}`}
-                    onClick={() => toggleMenu(item.title)}
+          <div className="menu-items-container">
+            {menuItems.map((item, index) => (
+              <div key={index} className="menu-group">
+                {item.path ? (
+                  <Link
+                    to={item.path}
+                    className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveMenu(item.title);
+                      if (isMobile) setSidebarOpen(false);
+                    }}
                   >
                     <span className="menu-icon">{item.icon}</span>
                     <span className="menu-text">{item.title}</span>
-                    <span className="menu-arrow">
-                      {activeMenu === item.title ? <FiChevronDown /> : <FiChevronRight />}
-                    </span>
-                  </div>
-                  
-                  {activeMenu === item.title && (
-        <div className="submenu">
-          {item.submenus.map((sub, subIndex) => (
-            <Link
-              key={subIndex}
-              to={sub.path}
-              className="submenu-item"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <span className="submenu-icon">{sub.icon}</span>
-              <span className="submenu-text">{sub.title}</span>
-            </Link>
-          ))}
-        </div>
-      )}
-                </>
-              )}
-            </div>
-          ))}
+                  </Link>
+                ) : (
+                  <>
+                    <div
+                      className={`menu-item ${activeMenu === item.title ? 'active' : ''}`}
+                      onClick={() => toggleMenu(item.title)}
+                    >
+                      <span className="menu-icon">{item.icon}</span>
+                      <span className="menu-text">{item.title}</span>
+                      <span className="menu-arrow">
+                        {activeMenu === item.title ? <FiChevronDown /> : <FiChevronRight />}
+                      </span>
+                    </div>
+                    
+                    {activeMenu === item.title && (
+                      <div className="submenu">
+                        {item.submenus.map((sub, subIndex) => (
+                          <Link
+                            key={subIndex}
+                            to={sub.path}
+                            className={`submenu-item ${location.pathname === sub.path ? 'active' : ''}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isMobile) setSidebarOpen(false);
+                            }}
+                          >
+                            <span className="submenu-icon">{sub.icon}</span>
+                            <span className="submenu-text">{sub.title}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
           
           <div className="menu-group logout-group">
             <button className="menu-item logout" onClick={handleLogout}>
@@ -171,7 +210,11 @@ const AdminDashboard = () => {
         </div>
       </aside>
 
-      <main className="admin-content">
+      {isMobile && sidebarOpen && (
+        <div className="sidebar-overlay" onClick={closeSidebar} />
+      )}
+
+      <main className={`admin-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
         <div className="content-wrapper">
           <Outlet />
         </div>
