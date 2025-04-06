@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../../config/axiosInstance';
 import { useNavigate } from 'react-router-dom';
-import GetRegistrations from './GetRegistrations';
+import GetRegistrations from './GettingRegistrations';
 
 const AdminEventRegistrations = () => {
   const [registrations, setRegistrations] = useState([]);

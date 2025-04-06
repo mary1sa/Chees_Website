@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../config/axiosInstance';
 import EventRegistrationStatus from './EventRegistrationStatus';
 import EventRounds from './EventRounds';
+import TournamentRoundsManager from './TournamentRoundsManager';
 
 const ViewEvent = ({ eventId, onClose }) => {
   const [event, setEvent] = useState(null);
@@ -79,9 +80,9 @@ const ViewEvent = ({ eventId, onClose }) => {
         <div style={{ marginBottom: '30px' }}>
         <EventRegistrationStatus eventId={eventId} />
       </div>
-      
+      <hr />
       <div>
-        <EventRounds eventId={eventId} />
+        <TournamentRoundsManager eventId={eventId} />
       </div>
       </div>
     </div>

@@ -15,6 +15,7 @@ import EventTypes from './Components/Event/EventTypes/EventTypes';
 import EventList from './Components/Event/Events/EventList';
 // import EventRegistration from './Components/Event/Registration/User/Registration';
 import AdminEventRegistrations from './Components/Event/Registration/Admin/AdminEventRegistrations';
+// import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
 
 function App() {
   return (
@@ -84,6 +85,12 @@ function App() {
 
         >
         </Route>
+        {/* <Route
+          path='/TournamentRoundsManager'
+          element={<TournamentRoundsManager />}
+
+        >
+        </Route> */}
 
       </Routes>
     </Router>

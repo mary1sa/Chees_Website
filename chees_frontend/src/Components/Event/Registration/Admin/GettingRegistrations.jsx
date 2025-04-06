@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../../config/axiosInstance';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const GetRegistrations = () => {
+const GettingRegistrations = () => {
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'event', 'user'
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -201,4 +201,4 @@ const GetRegistrations = () => {
   );
 };
 
-export default GetRegistrations;
+export default GettingRegistrations;
