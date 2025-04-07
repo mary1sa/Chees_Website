@@ -68,12 +68,12 @@ const AdminDashboard = () => {
       submenus: [
         { 
           title: "All Users", 
-          path: "/admin/users",
+          path: "fetchusers",
           icon: <FiList className="submenu-icon" />
         },
         { 
           title: "Add User", 
-          path: "/admin/users/add",
+          path: "createuser",
           icon: <FiUserPlus className="submenu-icon" />
         },
         { 
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
               <FiMenu />
             </button>
           )}
-          <h1 className="brand-name">Admin Panel</h1>
+          <h1 className="brand-name">RAJA CLUB INZGANE DES ECHECS</h1>
         </div>
 
         <div className="navbar-right">

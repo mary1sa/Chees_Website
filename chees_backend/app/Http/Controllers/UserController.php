@@ -47,7 +47,6 @@ class UserController extends Controller
             'date_of_birth' => 'nullable|date',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:100',
-            'is_active' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -92,7 +91,6 @@ class UserController extends Controller
             'date_of_birth' => 'nullable|date',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:100',
-            'is_active' => 'boolean',
         ]);
 
         if ($validator->fails()) {

@@ -11,6 +11,11 @@ import Home from './Components/VisiteurPage/Home';
 import Login from './Components/Login';
 import Register from './Components/Register';
 import MemberProfile from './Components/MemberDashboard/MemberProfile';
+import FetchUsers from './Components/AdminDashboard/FetchUsers';
+import ShowUser from './Components/AdminDashboard/ShowUser';
+import UpdateUser from './Components/AdminDashboard/UpdateUser';
+import CreateUser from './Components/AdminDashboard/CreateUser';
+
 import EventTypes from './Components/Event/EventTypes/EventTypes';
 import EventList from './Components/Event/Events/EventList';
 // import EventRegistration from './Components/Event/Registration/User/Registration';
@@ -33,7 +38,15 @@ function App() {
             </ProtectedRoute>
           }
         >
-        </Route>
+
+         <Route path="fetchusers" element={<FetchUsers />} />
+         <Route path="createuser" element={<CreateUser />} />
+
+         <Route path="updateuser/:id" element={<UpdateUser />} />
+
+         <Route path="showuser/:id" element={<ShowUser />} />
+         </Route>
+       
 
         <Route path="/member/dashboard" element={<ProtectedRoute roles={['member']}><MemberDashboard /></ProtectedRoute>}>
           <Route path="profile" element={<MemberProfile />} />
