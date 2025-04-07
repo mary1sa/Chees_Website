@@ -115,7 +115,7 @@ const AdminDashboard = () => {
               <FiMenu />
             </button>
           )}
-          <h1 className="brand-name">Admin Panel</h1>
+          <h1 className="brand-name">RAJA CLUB INZGANE DES ECHECS</h1>
         </div>
 
         <div className="navbar-right">

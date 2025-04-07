@@ -115,8 +115,8 @@ const MemberDashboard = () => {
               <FiMenu />
             </button>
           )}
-          <h1 className="brand-name">Welcome Member</h1>
-        </div>
+          <h1 className="brand-name">RAJA CLUB INZGANE DES ECHECS</h1>
+          </div>
 
         <div className="navbar-right">
           <button className="theme-toggle" onClick={toggleDarkMode}>
