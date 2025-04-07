@@ -333,6 +333,7 @@ const TournamentRoundsManager = ({eventId}) => {
       {selectedRound && (
   <TournamentMatchesManager
     roundId={selectedRound} 
+    eventId={eventId}
     onClose={() => setSelectedRound(null)}
   />
 )}

@@ -67,3 +67,8 @@ Route::delete('matches/{match}', [TournamentMatchController::class, 'destroy']);
 Route::post('matches/{match}/start', [TournamentMatchController::class, 'startMatch']);
 Route::post('matches/{match}/result', [TournamentMatchController::class, 'recordResult']);
 Route::get('players/{player}/matches', [TournamentMatchController::class, 'playerMatches']);
+
+// Add this to your routes/api.php file, probably with the other event-related routes
+// routes/api.php
+Route::get('events/{event}/confirmed-players', [EventController::class, 'getConfirmedPlayers'])
+    ->where('event', '[0-9]+'); // Ensure the parameter is numeric// 
