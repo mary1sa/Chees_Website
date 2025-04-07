@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//roles
+
+Route::get('/roles', [RoleController::class, 'index']);
+
+Route::get('/roles/{id}', [RoleController::class, 'show']);
+
+Route::post('/roles', [RoleController::class, 'store']);
+
+Route::put('/roles/{id}', [RoleController::class, 'update']);
+
+Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
 
 //User 
 
@@ -29,7 +41,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/users', [UserController::class, 'getAllUsers']);
 Route::get('/users/{id}', [UserController::class, 'getUserById']);
 Route::post('/users', [UserController::class, 'createUser']);
-Route::post('/users/{id}', [UserController::class, 'updateUser']);
+Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
 

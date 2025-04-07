@@ -68,12 +68,12 @@ const AdminDashboard = () => {
       submenus: [
         { 
           title: "All Users", 
-          path: "/admin/users",
+          path: "fetchusers",
           icon: <FiList className="submenu-icon" />
         },
         { 
           title: "Add User", 
-          path: "/admin/users/add",
+          path: "createuser",
           icon: <FiUserPlus className="submenu-icon" />
         },
         { 

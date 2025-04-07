@@ -12,6 +12,10 @@ import Login from './Components/Login';
 import Register from './Components/Register';
 import MemberProfile from './Components/MemberDashboard/MemberProfile';
 import EventTypes from './Components/Event/EventTypes';
+import FetchUsers from './Components/AdminDashboard/FetchUsers';
+import ShowUser from './Components/AdminDashboard/ShowUser';
+import UpdateUser from './Components/AdminDashboard/UpdateUser';
+import CreateUser from './Components/AdminDashboard/CreateUser';
 
 function App() {
   return (
@@ -29,6 +33,12 @@ function App() {
             </ProtectedRoute>
           }
         >
+         <Route path="fetchusers" element={<FetchUsers />} />
+         <Route path="createuser" element={<CreateUser />} />
+
+         <Route path="updateuser/:id" element={<UpdateUser />} />
+
+         <Route path="showuser/:id" element={<ShowUser />} />
          </Route>
         
         <Route path="/member/dashboard" element={<ProtectedRoute roles={['member']}><MemberDashboard /></ProtectedRoute>}>
