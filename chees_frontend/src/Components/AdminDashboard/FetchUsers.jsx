@@ -3,6 +3,7 @@ import axiosInstance from '../config/axiosInstance';
 import { Link } from 'react-router-dom';
 import { FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import './UserTable.css';
+import PageLoading from '../PageLoading/PageLoading';
 
 const FetchUsers = () => {
   const [users, setUsers] = useState([]);
@@ -10,6 +11,8 @@ const FetchUsers = () => {
   const [firstNameFilter, setFirstNameFilter] = useState('');
   const [lastNameFilter, setLastNameFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+
   const [uniqueRoles, setUniqueRoles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -44,6 +47,7 @@ const FetchUsers = () => {
   }, [users, firstNameFilter, lastNameFilter, roleFilter]);
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
       const response = await axiosInstance.get('/users');
       setUsers(response.data);
@@ -53,6 +57,8 @@ const FetchUsers = () => {
       setUniqueRoles(roles);
     } catch (error) {
       console.error('Error fetching users:', error);
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -60,6 +66,7 @@ const FetchUsers = () => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
 
     try {
+      setLoading(true);
       await axiosInstance.delete(`/users/${id}`);
       setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
       setFilteredUsers(prevUsers => prevUsers.filter(user => user.id !== id));
@@ -67,6 +74,8 @@ const FetchUsers = () => {
     } catch (error) {
       console.error('Error deleting user:', error);
       alert('Failed to delete user');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -155,8 +164,13 @@ const FetchUsers = () => {
     );
   };
 
+  if (loading) return <PageLoading/>;
+
+  
+  
   return (
     <div className="table-container">
+      
       <h1 className="table-title">Users List</h1>
       
       <div className="filter-controls">
