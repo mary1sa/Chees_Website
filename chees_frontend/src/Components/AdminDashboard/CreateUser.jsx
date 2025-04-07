@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../config/axiosInstance';
-
+import"./CreateUser.css"
+import PageLoading from '../PageLoading/PageLoading';
 const CreateUser = () => {
   const [userForm, setUserForm] = useState({
     username: '',
@@ -22,6 +23,7 @@ const CreateUser = () => {
   const [roles, setRoles] = useState([]);
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -43,9 +45,21 @@ const CreateUser = () => {
     }
   };
 
+ 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setUserForm({ ...userForm, profile_picture: file });
+    if (file) {
+      setUserForm({
+        ...userForm,
+        profile_picture: file
+      });
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const validateForm = () => {
@@ -146,8 +160,9 @@ const CreateUser = () => {
   };
 
   return (
+
     <div className="create-user-container">
-      <h1 className="create-user-title">Créer un Utilisateur</h1>
+      {/* <h1 className="create-user-title">Créer un Utilisateur</h1> */}
       {successMessage && (
         <div className="alert alert-success">
           {successMessage}
@@ -159,6 +174,38 @@ const CreateUser = () => {
         </div>
       )}
       <form onSubmit={handleCreateUser} className="create-user-form">
+
+      <div className="image-upload-section">
+  <label 
+    htmlFor="profile_picture" 
+    className={`file-label ${previewImage ? 'has-image' : ''}`}
+  >
+    <input
+      type="file"
+      name="profile_picture"
+      id="profile_picture"
+      onChange={handleFileChange}
+      className="file-input"
+      accept="image/*"
+    />
+    
+    {/* Default anonymous image */}
+    {!previewImage && (
+      <div className="default-avatar">
+        <svg className="anonymous-icon" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+        </svg>
+      </div>
+    )}
+
+    {/* Uploaded image preview */}
+    {previewImage && (
+      <div className="image-preview">
+        <img src={previewImage} alt="Preview" />
+      </div>
+    )}
+  </label>
+</div>
         <div className="form-group">
           <input
             type="text"
@@ -196,7 +243,7 @@ const CreateUser = () => {
         </div>
 
         <div className="form-group">
-          <select
+         <select
             name="role_id"
             value={userForm.role_id}
             onChange={handleChange}
@@ -236,21 +283,7 @@ const CreateUser = () => {
           />
         </div>
 
-        <div className="form-group">
-          <div className="file-input-container">
-            <label className="file-input-label">
-              Photo de profil
-              <input
-                type="file"
-                name="profile_picture"
-                onChange={handleFileChange}
-                className="file-input"
-              />
-              <img src={userForm.profile_picture} alt=""                      style={{ maxWidth: '200px', maxHeight: '200px' }} 
-              />
-            </label>
-          </div>
-        </div>
+       
 
         <div className="form-group">
           <input
