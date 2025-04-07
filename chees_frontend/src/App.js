@@ -11,28 +11,34 @@ import Home from './Components/VisiteurPage/Home';
 import Login from './Components/Login';
 import Register from './Components/Register';
 import MemberProfile from './Components/MemberDashboard/MemberProfile';
-import EventTypes from './Components/Event/EventTypes';
 import FetchUsers from './Components/AdminDashboard/FetchUsers';
 import ShowUser from './Components/AdminDashboard/ShowUser';
 import UpdateUser from './Components/AdminDashboard/UpdateUser';
 import CreateUser from './Components/AdminDashboard/CreateUser';
+
+import EventTypes from './Components/Event/EventTypes/EventTypes';
+import EventList from './Components/Event/Events/EventList';
+// import EventRegistration from './Components/Event/Registration/User/Registration';
+import AdminEventRegistrations from './Components/Event/Registration/Admin/AdminEventRegistrations';
+// import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} /> 
+        <Route path="/register" element={<Register />} />
         {/* <Route path="/unauthorized" element={<UnauthorizedPage />} /> */}
-        
+
         <Route
           path="/admin/dashboard"
           element={
             <ProtectedRoute roles={['admin']}>
-              <AdminDashboard/>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         >
+
          <Route path="fetchusers" element={<FetchUsers />} />
          <Route path="createuser" element={<CreateUser />} />
 
@@ -41,13 +47,16 @@ function App() {
          <Route path="showuser/:id" element={<ShowUser />} />
          </Route>
         
+
+     
+
         <Route path="/member/dashboard" element={<ProtectedRoute roles={['member']}><MemberDashboard /></ProtectedRoute>}>
           <Route path="profile" element={<MemberProfile />} />
-        
+
         </Route>
 
 
-<Route
+        <Route
           path="/coatch/dashboard"
           element={
             <ProtectedRoute roles={['coatch']}>
@@ -55,10 +64,10 @@ function App() {
             </ProtectedRoute>
           }
         >
-         </Route>
+        </Route>
 
 
-         
+
         <Route
           path="/"
           element={
@@ -68,13 +77,36 @@ function App() {
           }
         />
         <Route
-        path='/EventTypes'
-        element={<EventTypes />}
+          path='/EventTypes'
+          element={<EventTypes />}
 
-       > 
+        >
         </Route>
-        
-        
+        <Route
+          path='/EventList'
+          element={<EventList />}
+
+        >
+        </Route>
+        {/* <Route
+          path='/EventRegistration'
+          element={<EventRegistration />}
+
+        >
+        </Route> */}
+        <Route
+          path='/AdminEventRegistrations'
+          element={<AdminEventRegistrations />}
+
+        >
+        </Route>
+        {/* <Route
+          path='/TournamentRoundsManager'
+          element={<TournamentRoundsManager />}
+
+        >
+        </Route> */}
+
       </Routes>
     </Router>
   );

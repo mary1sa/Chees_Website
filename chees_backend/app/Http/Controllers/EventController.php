@@ -78,8 +78,8 @@ class EventController extends Controller
         $validated = $this->validateEventRequest($request);
 
         // Handle image upload
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('events', 'public');
+        if ($request->has('image')) {
+            $validated['image'] = $this->handleBase64Image($request->image);
         }
 
         // Set defaults
@@ -110,12 +110,13 @@ class EventController extends Controller
         $validated = $this->validateEventRequest($request, $event);
 
         // Handle image upload/update
-        if ($request->hasFile('image')) {
+         // Handle image upload/update
+         if ($request->has('image')) {
             // Delete old image if exists
             if ($event->image) {
                 Storage::disk('public')->delete($event->image);
             }
-            $validated['image'] = $request->file('image')->store('events', 'public');
+            $validated['image'] = $this->handleBase64Image($request->image);
         }
 
         $event->update($validated);
@@ -142,6 +143,8 @@ class EventController extends Controller
         if ($event->image) {
             Storage::disk('public')->delete($event->image);
         }
+
+
 
         $event->delete();
 
@@ -187,7 +190,7 @@ public function rounds(Event $event)
             'type_id' => 'required|exists:event_types,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|string', // Changed from image upload to base64 string
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'start_time' => 'nullable|date_format:H:i',
@@ -208,4 +211,23 @@ public function rounds(Event $event)
             'is_active' => 'boolean',
         ]);
     }
+    private function handleBase64Image($base64Image)
+    {
+        if (!$base64Image) {
+            return null;
+        }
+
+        // Decode the base64 image
+        $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64Image));
+
+        // Generate a unique filename
+        $extension = 'png'; // or detect from mime type
+        $filename = 'events/' . uniqid() . '.' . $extension;
+
+        // Save the image to storage
+        Storage::disk('public')->put($filename, $imageData);
+
+        return $filename;
+    }
+
 }

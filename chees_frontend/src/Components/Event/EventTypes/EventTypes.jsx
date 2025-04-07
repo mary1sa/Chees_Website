@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../config/axiosInstance';
+import axiosInstance from '../../config/axiosInstance';
 
 const EventTypes = () => {
   const [eventTypes, setEventTypes] = useState([]);

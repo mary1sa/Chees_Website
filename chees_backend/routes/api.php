@@ -51,10 +51,10 @@ Route::apiResource('event-types', EventTypeController::class);
 // Events
 Route::apiResource('events', EventController::class);
 Route::get('events/{event}/registration-status', [EventController::class,'registrationStatus']);
-Route::get('events/{event}/rounds', [EventController::class, 'rounds']);
+// Route::get('events/{event}/rounds', [EventController::class, 'rounds']);
 
 // Event Registrations
-Route::apiResource('registrations', EventRegistrationController::class)->except(['store']);
+Route::apiResource('registrations', controller: EventRegistrationController::class)->except(['store']);
 Route::post('events/{event}/register', [EventRegistrationController::class, 'register']);
 Route::post('registrations/{registration}/cancel', [EventRegistrationController::class, 'cancel']);
 Route::post('registrations/{registration}/confirm-payment', [EventRegistrationController::class, 'confirmPayment']);
