@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../../config/axiosInstance';
 import { useNavigate } from 'react-router-dom';
-import GetRegistrations from './GettingRegistrations';
+import { FiEdit, FiTrash2, FiEye, FiCheck, FiX, FiChevronLeft, FiChevronRight, FiSearch } from 'react-icons/fi';
+import '../../../AdminDashboard/CreateUser.css';
+import PageLoading from '../../../PageLoading/PageLoading';
+import ConfirmDelete from '../../../Confirm/ConfirmDelete';
+import GettingRegistrations from './GettingRegistrations';
 
 const AdminEventRegistrations = () => {
   const [registrations, setRegistrations] = useState([]);
+  const [filteredRegistrations, setFilteredRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
   const [editModal, setEditModal] = useState({
     show: false,
     registration: null,
@@ -17,16 +26,22 @@ const AdminEventRegistrations = () => {
       notes: ''
     }
   });
+  
   const [detailView, setDetailView] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [registrationToDelete, setRegistrationToDelete] = useState(null);
   const navigate = useNavigate();
 
   // Fetch registrations
   const fetchRegistrations = async () => {
     try {
+      setLoading(true);
       const response = await axiosInstance.get('/registrations');
       
       if (response.data && response.data.data) {
-        setRegistrations(response.data.data.data || []);
+        const regs = response.data.data.data || [];
+        setRegistrations(regs);
+        setFilteredRegistrations(regs);
         setPagination({
           current_page: response.data.data.current_page,
           total: response.data.data.total,
@@ -39,6 +54,28 @@ const AdminEventRegistrations = () => {
       setLoading(false);
     }
   };
+
+  // Filter registrations based on search term
+  useEffect(() => {
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      const filtered = registrations.filter(reg => {
+        return (
+          (reg.id && reg.id.toString().includes(term)) ||
+          (reg.event?.title && reg.event.title.toLowerCase().includes(term)) ||
+          (reg.user?.name && reg.user.name.toLowerCase().includes(term)) ||
+          (reg.user?.first_name && `${reg.user.first_name} ${reg.user.last_name}`.toLowerCase().includes(term)) ||
+          (reg.status && reg.status.toLowerCase().includes(term)) ||
+          (reg.payment_status && reg.payment_status.toLowerCase().includes(term)) ||
+          (reg.registration_number && reg.registration_number.toLowerCase().includes(term))
+        );
+      });
+      setFilteredRegistrations(filtered);
+    } else {
+      setFilteredRegistrations(registrations);
+    }
+    setCurrentPage(1);
+  }, [searchTerm, registrations]);
 
   // Handle API errors
   const handleApiError = (err) => {
@@ -62,15 +99,18 @@ const AdminEventRegistrations = () => {
   };
 
   // Delete registration
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this registration?')) {
-      try {
-        setLoading(true);
-        await axiosInstance.delete(`/registrations/${id}`);
-        await fetchRegistrations();
-      } catch (err) {
-        handleApiError(err);
-      }
+  const confirmDeleteRegistration = async () => {
+    if (!registrationToDelete) return;
+  
+    try {
+      setLoading(true);
+      await axiosInstance.delete(`/registrations/${registrationToDelete.id}`);
+      await fetchRegistrations();
+    } catch (err) {
+      handleApiError(err);
+    } finally {
+      setShowDeleteModal(false);
+      setRegistrationToDelete(null);
     }
   };
 
@@ -113,7 +153,8 @@ const AdminEventRegistrations = () => {
   };
 
   // Submit updated registration
-  const handleUpdate = async () => {
+  const handleUpdate = async (e) => {
+    e.preventDefault();
     try {
       setLoading(true);
       await axiosInstance.put(
@@ -127,173 +168,408 @@ const AdminEventRegistrations = () => {
     }
   };
 
+  // Clear search
+  const clearSearch = () => {
+    setSearchTerm('');
+  };
+
+  // Pagination functions
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredRegistrations.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredRegistrations.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const renderPagination = () => {
+    const pages = [];
+    const visiblePages = 3;
+
+    if (totalPages > 0) {
+      pages.push(
+        <button
+          key={1}
+          onClick={() => paginate(1)}
+          className={`pagination-button ${currentPage === 1 ? 'active' : ''}`}
+        >
+          1
+        </button>
+      );
+    }
+
+    if (currentPage > visiblePages + 1) {
+      pages.push(<span key="start-ellipsis" className="pagination-ellipsis">...</span>);
+    }
+
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      if (i > 1 && i < totalPages) {
+        pages.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`pagination-button ${currentPage === i ? 'active' : ''}`}
+          >
+            {i.toString().padStart(2, '0')}
+          </button>
+        );
+      }
+    }
+
+    if (currentPage < totalPages - visiblePages) {
+      pages.push(<span key="end-ellipsis" className="pagination-ellipsis">...</span>);
+    }
+
+    if (totalPages > 1) {
+      pages.push(
+        <button
+          key={totalPages}
+          onClick={() => paginate(totalPages)}
+          className={`pagination-button ${currentPage === totalPages ? 'active' : ''}`}
+        >
+          {totalPages.toString().padStart(2, '0')}
+        </button>
+      );
+    }
+
+    return (
+      <div className="pagination">
+        <button 
+          onClick={() => paginate(currentPage - 1)} 
+          disabled={currentPage === 1}
+          className="pagination-button pagination-nav"
+        >
+          <FiChevronLeft className="icon" />
+          <span>Previous</span>
+        </button>
+        
+        {pages}
+        
+        <button 
+          onClick={() => paginate(currentPage + 1)} 
+          disabled={currentPage === totalPages}
+          className="pagination-button pagination-nav"
+        >
+          <span>Next</span>
+          <FiChevronRight className="icon" />
+        </button>
+      </div>
+    );
+  };
+
   useEffect(() => {
     fetchRegistrations();
   }, []);
 
-  if (loading) return <div>Loading registrations...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <PageLoading />;
+  if (error) return <div className="error-message">Error: {error}</div>;
 
   return (
-    <div>
-      <h1>Admin Registration Management</h1>
-      <h2>All Registrations ({pagination.total || registrations.length})</h2>
+    <div className="table-container">
+
+      <GettingRegistrations></GettingRegistrations>
+      <ConfirmDelete
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDeleteRegistration}
+        itemName={registrationToDelete ? `registration #${registrationToDelete.id}` : 'this registration'}
+      />
+
+      {/* <h1 className="table-title">Registration Management</h1> */}
       
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Event</th>
-            <th>User</th>
-            <th>Status</th>
-            <th>Payment</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {registrations.map(reg => (
-            <tr key={reg.id}>
-              <td>{reg.id}</td>
-              <td>{reg.event?.title}</td>
-              <td>{reg.user?.first_name} {reg.user?.last_name}</td>
-              <td>{reg.status}</td>
-              <td>{reg.payment_status}</td>
-              <td>
-                <button onClick={() => showDetails(reg.id)}>Details</button>
-                <button onClick={() => openEditModal(reg)}>Edit</button>
-                <button onClick={() => handleDelete(reg.id)}>Delete</button>
+      <div className="filter-controls">
+        <div className="search-container">
+          <FiSearch className="search-icon" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search registrations..."
+            className="search-input"
+          />
+          {searchTerm && (
+            <button 
+              type="button" 
+              onClick={clearSearch}
+              className="clear-search-btn"
+            >
+              <FiX />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="results-count">
+        Showing {filteredRegistrations.length} of {pagination.total || registrations.length} registrations
+      </div>
+
+      <div className="data-table">
+        <div className="table-header">
+          <div className="header-cell">ID</div>
+          <div className="header-cell">Event</div>
+          <div className="header-cell">User</div>
+          <div className="header-cell">Status</div>
+          <div className="header-cell">Payment</div>
+          <div className="header-cell actions-header">Actions</div>
+        </div>
+        
+        {currentItems.length > 0 ? (
+          currentItems.map(reg => (
+            <div key={reg.id} className="table-row">
+              <div className="table-cell">
+                <span className="type-id">#{reg.id}</span>
+              </div>
+              <div className="table-cell">{reg.event?.title || 'N/A'}</div>
+              <div className="table-cell">
+                {reg.user?.name || `${reg.user?.first_name || ''} ${reg.user?.last_name || ''}`.trim() || 'N/A'}
+              </div>
+              <div className="table-cell">
+                <span className={`status-badge ${reg.status?.toLowerCase()}`}>
+                  {reg.status}
+                </span>
+              </div>
+              <div className="table-cell">
+                <span className={`payment-badge ${reg.payment_status?.toLowerCase()}`}>
+                  {reg.payment_status}
+                </span>
+              </div>
+              <div className="table-cell actions">
+                <button 
+                  onClick={() => showDetails(reg.id)} 
+                  className="action-btn view-btn"
+                  title="View Details"
+                >
+                  <FiEye className="icon" />
+                </button>
+                <button 
+                  onClick={() => openEditModal(reg)} 
+                  className="action-btn update-btn"
+                  title="Edit"
+                >
+                  <FiEdit className="icon" />
+                </button>
+                <button 
+                  onClick={() => {
+                    setRegistrationToDelete(reg);
+                    setShowDeleteModal(true);
+                  }}
+                  className="action-btn delete-btn"
+                  title="Delete"
+                >
+                  <FiTrash2 className="icon" />
+                </button>
                 {reg.payment_status === 'pending' && (
-                  <button onClick={() => handleConfirmPayment(reg.id)}>
-                    Confirm Payment
+                  <button 
+                    onClick={() => handleConfirmPayment(reg.id)}
+                    className="action-btn confirm-btn"
+                    title="Confirm Payment"
+                  >
+                    <FiCheck className="icon" />
                   </button>
                 )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="no-results">
+            No registrations found matching your criteria
+          </div>
+        )}
+      </div>
+      
+      {filteredRegistrations.length > itemsPerPage && renderPagination()}
 
       {/* Detail View Modal */}
       {detailView && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '5px',
-            maxWidth: '600px',
-            width: '90%'
-          }}>
-            <h2>Registration Details #{detailView.id}</h2>
-            
-            <div style={{ marginBottom: '15px' }}>
-              <h3>Event Information</h3>
-              <p><strong>Title:</strong> {detailView.event?.title}</p>
-              <p><strong>Date:</strong> {new Date(detailView.event?.start_date).toLocaleDateString()}</p>
-              <p><strong>Venue:</strong> {detailView.event?.venue}</p>
+        <div className="modal-overlay">
+          <div className="modal view-modal">
+            <div className="modal-header">
+              <h3>Registration Details #{detailView.id}</h3>
+              <button 
+                onClick={() => setDetailView(null)} 
+                className="modal-close-btn"
+              >
+                &times;
+              </button>
             </div>
-            
-            <div style={{ marginBottom: '15px' }}>
-              <h3>User Information</h3>
-              <p><strong>Name:</strong> {detailView.user?.first_name} {detailView.user?.last_name}</p>
-              <p><strong>Email:</strong> {detailView.user?.email}</p>
+            <div className="modal-body">
+              <div className="detail-card">
+                <div className="detail-section">
+                  <h4>Event Information</h4>
+                  <div className="detail-item">
+                    <span className="detail-label">Title:</span>
+                    <span className="detail-value">{detailView.event?.title || 'N/A'}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Date:</span>
+                    <span className="detail-value">
+                      {detailView.event?.start_date ? 
+                        new Date(detailView.event.start_date).toLocaleDateString() : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Venue:</span>
+                    <span className="detail-value">{detailView.event?.venue || 'N/A'}</span>
+                  </div>
+                </div>
+
+                <div className="detail-section">
+                  <h4>User Information</h4>
+                  <div className="detail-item">
+                    <span className="detail-label">Name:</span>
+                    <span className="detail-value">
+                      {detailView.user?.name || 
+                       `${detailView.user?.first_name || ''} ${detailView.user?.last_name || ''}`.trim() || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Email:</span>
+                    <span className="detail-value">{detailView.user?.email || 'N/A'}</span>
+                  </div>
+                </div>
+
+                <div className="detail-section">
+                  <h4>Registration Details</h4>
+                  <div className="detail-item">
+                    <span className="detail-label">Status:</span>
+                    <span className={`detail-value status-badge ${detailView.status?.toLowerCase()}`}>
+                      {detailView.status}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Payment Status:</span>
+                    <span className={`detail-value payment-badge ${detailView.payment_status?.toLowerCase()}`}>
+                      {detailView.payment_status}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Registration Number:</span>
+                    <span className="detail-value">{detailView.registration_number || 'N/A'}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Registration Date:</span>
+                    <span className="detail-value">
+                      {detailView.registration_date ? 
+                        new Date(detailView.registration_date).toLocaleString() : 'N/A'}
+                    </span>
+                  </div>
+                  {detailView.notes && (
+                    <div className="detail-item">
+                      <span className="detail-label">Notes:</span>
+                      <div className="detail-text">{detailView.notes}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-            
-            <div style={{ marginBottom: '15px' }}>
-              <h3>Registration Details</h3>
-              <p><strong>Status:</strong> {detailView.status}</p>
-              <p><strong>Payment Status:</strong> {detailView.payment_status}</p>
-              <p><strong>Registration Number:</strong> {detailView.registration_number}</p>
-              <p><strong>Registration Date:</strong> {new Date(detailView.registration_date).toLocaleString()}</p>
-              {detailView.notes && <p><strong>Notes:</strong> {detailView.notes}</p>}
+            <div className="modal-footer">
+              <button 
+                onClick={() => {
+                  setDetailView(null);
+                  openEditModal(detailView);
+                }}
+                className="btn btn-edit"
+              >
+                <FiEdit className="icon" /> Edit
+              </button>
+              <button 
+                onClick={() => setDetailView(null)}
+                className="btn btn-close"
+              >
+                Close
+              </button>
             </div>
-            
-            <button onClick={() => setDetailView(null)}>Close</button>
           </div>
         </div>
       )}
 
       {/* Edit Modal */}
       {editModal.show && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '5px'
-          }}>
-            <h3>Edit Registration #{editModal.registration.id}</h3>
-            
-            <div style={{ marginBottom: '10px' }}>
-              <label>Status:</label>
-              <select
-                name="status"
-                value={editModal.formData.status}
-                onChange={handleInputChange}
+        <div className="modal-overlay">
+          <div className="modal edit-modal">
+            <div className="modal-header">
+              <h3>Edit Registration #{editModal.registration.id}</h3>
+              <button 
+                onClick={() => setEditModal({ show: false, registration: null, formData: {} })} 
+                className="modal-close-btn"
               >
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="cancelled">Cancelled</option>
-                <option value="attended">Attended</option>
-              </select>
-            </div>
-            
-            <div style={{ marginBottom: '10px' }}>
-              <label>Payment Status:</label>
-              <select
-                name="payment_status"
-                value={editModal.formData.payment_status}
-                onChange={handleInputChange}
-              >
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-                <option value="failed">Failed</option>
-                <option value="refunded">Refunded</option>
-              </select>
-            </div>
-            
-            <div style={{ marginBottom: '10px' }}>
-              <label>Notes:</label>
-              <textarea
-                name="notes"
-                value={editModal.formData.notes}
-                onChange={handleInputChange}
-                rows="3"
-                style={{ width: '100%' }}
-              />
-            </div>
-            
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={handleUpdate}>Save</button>
-              <button onClick={() => setEditModal({ show: false, registration: null, formData: {} })}>
-                Cancel
+                &times;
               </button>
             </div>
+            <form onSubmit={handleUpdate} className="modal-form">
+              <div className="form-group form-groupp">
+                <label className="form-label">Status *</label>
+                <select
+                  name="status"
+                  value={editModal.formData.status}
+                  onChange={handleInputChange}
+                  required
+                  className="form-select"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="cancelled">Cancelled</option>
+                  <option value="attended">Attended</option>
+                </select>
+              </div>
+              
+              <div className="form-group form-groupp">
+                <label className="form-label">Payment Status *</label>
+                <select
+                  name="payment_status"
+                  value={editModal.formData.payment_status}
+                  onChange={handleInputChange}
+                  required
+                  className="form-select"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                  <option value="failed">Failed</option>
+                  <option value="refunded">Refunded</option>
+                </select>
+              </div>
+              
+              <div className="form-group form-groupp">
+                <label className="form-label">Notes</label>
+                <textarea
+                  name="notes"
+                  value={editModal.formData.notes}
+                  onChange={handleInputChange}
+                  rows="3"
+                  className="form-textarea"
+                  placeholder="Additional notes..."
+                />
+              </div>
+              
+              <div className="modal-footer form-groupp">
+                <button 
+                  type="button" 
+                  onClick={() => setEditModal({ show: false, registration: null, formData: {} })}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  disabled={loading}
+                >
+                  {loading ?
+                              <p>  <span className="loading-spinner"></span> Updating...</p>
+                                            : 'Save Changes'}
+
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
-      <GetRegistrations></GetRegistrations>
-
     </div>
   );
 };
-
 export default AdminEventRegistrations;
+
+
+
