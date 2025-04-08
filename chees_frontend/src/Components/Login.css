@@ -58,7 +58,7 @@
     margin-bottom: 20px;
   }
   
-  .form-group {
+  .form-group-login {
  display: flex;
  flex-direction: column;
  gap: 6px;
