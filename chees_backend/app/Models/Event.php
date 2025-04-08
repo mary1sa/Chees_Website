@@ -13,10 +13,28 @@ class Event extends Model
     use HasFactory;
 
     protected $fillable = [
-        'type_id', 'title', 'description', 'image', 'start_date', 'end_date',
-        'start_time', 'end_time', 'venue', 'address', 'city', 'region',
-        'country', 'postal_code', 'latitude', 'longitude', 'max_participants',
-        'registration_fee', 'registration_deadline', 'prize_pool', 'is_featured', 'is_active'
+        'type_id',
+        'title',
+        'description',
+        'image', 
+        'start_date', 
+        'end_date',
+        'start_time', 
+        'end_time', 
+        'venue', 
+        'address', 
+        'city', 
+        'region',
+        'country', 
+        'postal_code', 
+        'latitude', 
+        'longitude', 
+        'max_participants',
+        'registration_fee', 
+        'registration_deadline', 
+        'prize_pool', 
+        'is_featured', 
+        'is_active'
     ];
 
     protected $casts = [
