@@ -7,6 +7,7 @@ use App\Models\EventType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Models\EventRegistration;
 
 class EventController extends Controller
 {
@@ -230,4 +231,34 @@ public function rounds(Event $event)
         return $filename;
     }
 
+    public function getConfirmedPlayers($eventId)
+{
+    // First try to find the event
+    $event = Event::find($eventId);
+    
+    if (!$event) {
+        return response()->json([
+            'error' => 'Event not found'
+        ], 404);
+    }
+
+    $confirmedPlayers = EventRegistration::with(['user:id,first_name,last_name,email,chess_rating'])
+        ->where('event_id', $event->id)
+        ->where('status', 'confirmed')
+        ->get()
+        ->map(function ($registration) {
+            return [
+                'id' => $registration->user->id,
+                'first_name' => $registration->user->first_name,
+                'last_name' => $registration->user->last_name,
+                'full_name' => $registration->user->first_name . ' ' . $registration->user->last_name,
+                'email' => $registration->user->email,
+                'chess_rating' => $registration->user->chess_rating,
+                'registration_id' => $registration->id,
+                'registration_number' => $registration->registration_number
+            ];
+        });
+
+    return response()->json($confirmedPlayers);
+}
 }
