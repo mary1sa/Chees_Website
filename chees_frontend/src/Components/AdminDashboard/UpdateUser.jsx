@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../config/axiosInstance';
+import"./CreateUser.css"
+import PageLoading from '../PageLoading/PageLoading';
+import SuccessAlert from '../Alerts/SuccessAlert';
+import ErrorAlert from '../Alerts/ErrorAlert';
 
 const UpdateUser = () => {
   const { id } = useParams();
@@ -26,7 +30,8 @@ const UpdateUser = () => {
   const [previewImage, setPreviewImage] = useState('');
   const [roles, setRoles] = useState([]);
   const [errors, setErrors] = useState({});
-
+  const [showAlert, setShowAlert] = useState(true);
+const navigate=useNavigate()
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,7 +48,7 @@ const UpdateUser = () => {
           role_id: user.role_id || '',
           first_name: user.first_name || '',
           last_name: user.last_name || '',
-          profile_picture: null,
+          profile_picture: user.profile_picture,
           chess_rating: user.chess_rating || '',
           bio: user.bio || '',
           phone: user.phone || '',
@@ -158,7 +163,7 @@ const UpdateUser = () => {
 
       setSuccessMessage('User updated successfully!');
       setErrors({});
-
+navigate("/admin/dashboard/fetchusers")
       if (response.data.user.profile_picture) {
         setPreviewImage(`${axiosInstance.defaults.baseURL}/storage/${response.data.user.profile_picture}`);
       }
@@ -189,81 +194,94 @@ const UpdateUser = () => {
       setIsSubmitting(false);
     }
   };
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+  if (loading) return <PageLoading/>; 
+   return (
+    <div className="create-user-container">
+      <h1 className="create-user-title">Modifier l'Utilisateur</h1>
+      
+      {successMessage && <SuccessAlert message={successMessage}  onClose={handleCloseAlert}           iconType="check"
+ />}
+{errors.form && <ErrorAlert message={errors.form}  onClose={handleCloseAlert}         
+/>}
 
-  if (loading) return <div className="loading">Loading user data...</div>;
-
-  return (
-    <div className="container mt-4">
-      <div className="card">
-        <div className="card-header">
-          <h2 className="mb-0">Update User</h2>
-        </div>
-        <div className="card-body">
-          {successMessage && (
-            <div className="alert alert-success">
-              {successMessage}
-            </div>
-          )}
+      <form onSubmit={handleSubmit} className="create-user-form" encType="multipart/form-data">
+        <div className="image-upload-section">
+          <label 
+            htmlFor="profile_picture" 
+            className={`file-label ${previewImage ? 'has-image' : ''}`}
+          >
+            <input
+              type="file"
+              name="profile_picture"
+              id="profile_picture"
+              onChange={handleFileChange}
+              className="file-input"
+              accept="image/*"
+            />
+            
+            
+              <div className="image-preview">
+              <img
+       src={
+        userForm.profile_picture
+          ? `http://localhost:8000/storage/${userForm.profile_picture}`
+          : '/anony.jpg'
+      }
+      alt={`${userForm.first_name} ${userForm.last_name}`}
+      className="profile-image"
+    />
+              </div>
           
-          {errors.form && (
-            <div className="alert alert-danger">
-              {errors.form}
-            </div>
-          )}
 
-          <form onSubmit={handleSubmit} encType="multipart/form-data">
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">Username *</label>
-                  <input
-                    type="text"
-                    name="username"
-                    className={`form-control ${errors.username ? 'is-invalid' : ''}`}
-                    value={userForm.username}
-                    onChange={handleChange}
-                    required
-                  />
-                  {errors.username && <div className="error-message">{errors.username}</div>}
-                </div>
+            {previewImage && (
+              <div className="image-preview">
+                <img src={previewImage} alt="Preview" />
               </div>
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">Email *</label>
-                  <input
-                    type="email"
-                    name="email"
-                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                    value={userForm.email}
-                    onChange={handleChange}
-                    required
-                  />
-                  {errors.email && <div className="error-message">{errors.email}</div>}
-                </div>
-              </div>
-            </div>
+            )}
+          </label>
+        </div>
 
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">Password (leave empty to keep current)</label>
-                  <input
-                    type="password"
-                    name="password"
-                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                    value={userForm.password}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    minLength="6"
-                  />
-                  {errors.password && <div className="error-message">{errors.password}</div>}
-                  <small className="form-text text-muted">Minimum 6 characters</small>
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">Role *</label>
-                  <select
+        <div className="form-group">
+          <input
+            type="text"
+            name="username"
+            placeholder="Nom d'utilisateur"
+            value={userForm.username}
+            onChange={handleChange}
+            className={`form-input ${errors.username ? 'is-invalid' : ''}`}
+          />
+          {errors.username && <div className="error-message">{errors.username}</div>}
+        </div>
+
+        <div className="form-group">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={userForm.email}
+            onChange={handleChange}
+            className={`form-input ${errors.email ? 'is-invalid' : ''}`}
+          />
+          {errors.email && <div className="error-message">{errors.email}</div>}
+        </div>
+
+        <div className="form-group">
+          <input
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            value={userForm.password}
+            onChange={handleChange}
+            className={`form-input ${errors.password ? 'is-invalid' : ''}`}
+          />
+          {errors.password && <div className="error-message">{errors.password}</div>}
+        </div>
+
+        <div className="form-group">
+          <select
             name="role_id"
             value={userForm.role_id}
             onChange={handleChange}
@@ -278,180 +296,121 @@ const UpdateUser = () => {
                 </option>
               ))}
           </select>
-                  {errors.role_id && <div className="error-message">{errors.role_id}</div>}
-                </div>
-              </div>
-            </div>
-
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">First Name</label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    className="form-control"
-                    value={userForm.first_name}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">Last Name</label>
-                  <input
-                    type="text"
-                    name="last_name"
-                    className="form-control"
-                    value={userForm.last_name}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">Chess Rating</label>
-                  <input
-                    type="number"
-                    name="chess_rating"
-                    className="form-control"
-                    value={userForm.chess_rating}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">Phone</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    className="form-control"
-                    value={userForm.phone}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-3">
-              <div className="form-group">
-                <label className="form-label">Bio</label>
-                <textarea
-                  name="bio"
-                  className="form-control"
-                  value={userForm.bio}
-                  onChange={handleChange}
-                  rows="3"
-                />
-              </div>
-            </div>
-
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">Date of Birth</label>
-                  <input
-                    type="date"
-                    name="date_of_birth"
-                    className="form-control"
-                    value={userForm.date_of_birth}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">Address</label>
-                  <input
-                    type="text"
-                    name="address"
-                    className="form-control"
-                    value={userForm.address}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">City</label>
-                  <input
-                    type="text"
-                    name="city"
-                    className="form-control"
-                    value={userForm.city}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label className="form-label">Active Status</label>
-                  <div className="form-check form-switch mt-2">
-                    <input
-                      type="checkbox"
-                      name="is_active"
-                      className="form-check-input"
-                      checked={userForm.is_active}
-                      onChange={handleChange}
-                      role="switch"
-                      id="isActiveSwitch"
-                    />
-                    <label className="form-check-label" htmlFor="isActiveSwitch">
-                      {userForm.is_active ? 'Active' : 'Inactive'}
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-3">
-              <div className="form-group">
-                <label className="form-label">Profile Picture</label>
-                {previewImage && (
-                  <div className="mb-2">
-                    <img 
-                      src={previewImage} 
-                      alt="Profile preview" 
-                      className="img-thumbnail"
-                      style={{ maxWidth: '200px', maxHeight: '200px' }} 
-                    />
-                  </div>
-                )}
-                <input
-                  type="file"
-                  name="profile_picture"
-                  className="form-control"
-                  onChange={handleFileChange}
-                  accept="image/*"
-                />
-                <small className="form-text text-muted">Accepted formats: JPEG, PNG, JPG, GIF (Max 2MB)</small>
-              </div>
-            </div>
-
-            <div className="d-grid gap-2">
-              <button 
-                type="submit" 
-                className="btn btn-primary"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Updating...
-                  </>
-                ) : 'Update User'}
-              </button>
-            </div>
-          </form>
+          {errors.role_id && <div className="error-message">{errors.role_id}</div>}
         </div>
-      </div>
+
+        <div className="form-group">
+          <input
+            type="text"
+            name="first_name"
+            placeholder="Prénom"
+            value={userForm.first_name}
+            onChange={handleChange}
+            className="form-input"
+          />
+        </div>
+
+        <div className="form-group">
+          <input
+            type="text"
+            name="last_name"
+            placeholder="Nom"
+            value={userForm.last_name}
+            onChange={handleChange}
+            className="form-input"
+          />
+        </div>
+
+        <div className="form-group">
+          <input
+            type="number"
+            name="chess_rating"
+            placeholder="Classement aux échecs"
+            value={userForm.chess_rating}
+            onChange={handleChange}
+            className="form-input"
+          />
+        </div>
+
+        <div className="form-group">
+          <textarea
+            name="bio"
+            placeholder="Biographie"
+            value={userForm.bio}
+            onChange={handleChange}
+            className="form-textarea"
+          />
+        </div>
+
+        <div className="form-group">
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Téléphone"
+            value={userForm.phone}
+            onChange={handleChange}
+            className="form-input"
+          />
+        </div>
+
+        <div className="form-group">
+          <input
+            type="date"
+            name="date_of_birth"
+            value={userForm.date_of_birth}
+            onChange={handleChange}
+            className="form-input"
+          />
+        </div>
+
+        <div className="form-group">
+          <input
+            type="text"
+            name="address"
+            placeholder="Adresse"
+            value={userForm.address}
+            onChange={handleChange}
+            className="form-input"
+          />
+        </div>
+
+        <div className="form-group">
+          <input
+            type="text"
+            name="city"
+            placeholder="Ville"
+            value={userForm.city}
+            onChange={handleChange}
+            className="form-input"
+          />
+        </div>
+
+        <div className="form-group full-width">
+          <label className="form-switch">
+            <input
+              type="checkbox"
+              name="is_active"
+              checked={userForm.is_active}
+              onChange={handleChange}
+            />
+            <span className="slider round"></span>
+            <span className="switch-label">Utilisateur actif</span>
+          </label>
+        </div>
+
+        <button 
+          type="submit" 
+          className="submit-button"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <span className="spinner_button"></span>
+              Mise à jour...
+            </>
+          ) : 'Mettre à jour'}
+        </button>
+      </form>
     </div>
   );
 };

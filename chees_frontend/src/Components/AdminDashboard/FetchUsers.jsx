@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import './UserTable.css';
 import PageLoading from '../PageLoading/PageLoading';
+import ConfirmDelete from '../Confirm/ConfirmDelete';
 
 const FetchUsers = () => {
   const [users, setUsers] = useState([]);
@@ -12,7 +13,8 @@ const FetchUsers = () => {
   const [lastNameFilter, setLastNameFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [loading, setLoading] = useState(true);
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [uniqueRoles, setUniqueRoles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -62,22 +64,23 @@ const FetchUsers = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
-
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
+  
     try {
       setLoading(true);
-      await axiosInstance.delete(`/users/${id}`);
-      setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
-      setFilteredUsers(prevUsers => prevUsers.filter(user => user.id !== id));
-      alert('User deleted successfully');
+      await axiosInstance.delete(`/users/${userToDelete.id}`);
+      setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
+      setFilteredUsers(prev => prev.filter(u => u.id !== userToDelete.id));
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('Failed to delete user');
     } finally {
+      setShowDeleteModal(false);
+      setUserToDelete(null);
       setLoading(false);
     }
   };
+  
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -170,7 +173,13 @@ const FetchUsers = () => {
   
   return (
     <div className="table-container">
-      
+      <ConfirmDelete
+  isOpen={showDeleteModal}
+  onClose={() => setShowDeleteModal(false)}
+  onConfirm={confirmDeleteUser}
+  itemName={userToDelete ? `${userToDelete.first_name} ${userToDelete.last_name}` : 'this user'}
+/>
+
       <h1 className="table-title">Users List</h1>
       
       <div className="filter-controls">
@@ -261,8 +270,11 @@ const FetchUsers = () => {
                   <FiEdit className="icon" />
                 </Link>
                 <button 
-                  onClick={() => handleDelete(user.id)} 
-                  className="action-btn delete-btn"
+onClick={() => {
+  setUserToDelete(user); 
+  setShowDeleteModal(true); 
+}}                 
+ className="action-btn delete-btn"
                   title="Delete"
                 >
                   <FiTrash2 className="icon" />

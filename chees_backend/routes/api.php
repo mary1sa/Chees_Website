@@ -163,3 +163,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/my-enrollments', [EnrollmentController::class, 'myEnrollments']);
     Route::put('/my-courses/{course}/progress', [EnrollmentController::class, 'updateMyProgress']);
 });
+
+// Event players
+Route::get('events/{event}/confirmed-players', [EventController::class, 'getConfirmedPlayers'])
+    ->where('event', '[0-9]+'); // Ensure the parameter is numeric

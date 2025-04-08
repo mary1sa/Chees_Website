@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './Components/ProtectedRoute';
 
-
 import AdminDashboard from './Components/AdminDashboard/AdminDashboard';
 import MemberDashboard from './Components/MemberDashboard/MemberDashboard';
 import CoatchDashboard from './Components/CoatchDashboard/CoatchDashboard';
@@ -18,9 +17,10 @@ import CreateUser from './Components/AdminDashboard/CreateUser';
 
 import EventTypes from './Components/Event/EventTypes/EventTypes';
 import EventList from './Components/Event/Events/EventList';
-// import EventRegistration from './Components/Event/Registration/User/Registration';
 import AdminEventRegistrations from './Components/Event/Registration/Admin/AdminEventRegistrations';
-// import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
+import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
+import TournamentMatchesManager from './Components/Event/Events/TournamentMatchesManager';
+// Import other event components as needed
 
 function App() {
   return (
@@ -38,23 +38,29 @@ function App() {
             </ProtectedRoute>
           }
         >
-
-         <Route path="fetchusers" element={<FetchUsers />} />
-         <Route path="createuser" element={<CreateUser />} />
-
-         <Route path="updateuser/:id" element={<UpdateUser />} />
-
-         <Route path="showuser/:id" element={<ShowUser />} />
-         </Route>
-        
-
-     
-
-        <Route path="/member/dashboard" element={<ProtectedRoute roles={['member']}><MemberDashboard /></ProtectedRoute>}>
-          <Route path="profile" element={<MemberProfile />} />
-
+          {/* User Management Routes */}
+          <Route path="fetchusers" element={<FetchUsers />} />
+          <Route path="createuser" element={<CreateUser />} />
+          <Route path="updateuser/:id" element={<UpdateUser />} />
+          <Route path="showuser/:id" element={<ShowUser />} />
+          
+          {/* Event Management Routes */}
+          <Route path="events" element={<EventList />} />
+          <Route path="events/types" element={<EventTypes />} />
+          <Route path="events/registrations" element={<AdminEventRegistrations />} />
+       
         </Route>
 
+        <Route 
+          path="/member/dashboard" 
+          element={
+            <ProtectedRoute roles={['member']}>
+              <MemberDashboard />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="profile" element={<MemberProfile />} />
+        </Route>
 
         <Route
           path="/coatch/dashboard"
@@ -66,8 +72,6 @@ function App() {
         >
         </Route>
 
-
-
         <Route
           path="/"
           element={
@@ -76,37 +80,11 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path='/EventTypes'
-          element={<EventTypes />}
 
-        >
-        </Route>
-        <Route
-          path='/EventList'
-          element={<EventList />}
-
-        >
-        </Route>
-        {/* <Route
-          path='/EventRegistration'
-          element={<EventRegistration />}
-
-        >
-        </Route> */}
-        <Route
-          path='/AdminEventRegistrations'
-          element={<AdminEventRegistrations />}
-
-        >
-        </Route>
-        {/* <Route
-          path='/TournamentRoundsManager'
-          element={<TournamentRoundsManager />}
-
-        >
-        </Route> */}
-
+        {/* Remove these standalone event routes as they're now nested under admin dashboard */}
+        {/* <Route path='/EventTypes' element={<EventTypes />} /> */}
+        {/* <Route path='/EventList' element={<EventList />} /> */}
+        {/* <Route path='/AdminEventRegistrations' element={<AdminEventRegistrations />} /> */}
       </Routes>
     </Router>
   );

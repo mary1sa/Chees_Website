@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../config/axiosInstance';
+import "../../AdminDashboard/CreateUser.css";
+import PageLoading from '../../PageLoading/PageLoading';
 
 const EditEvent = ({ eventId, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -29,8 +31,9 @@ const EditEvent = ({ eventId, onSave, onCancel }) => {
 
   const [eventTypes, setEventTypes] = useState([]);
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const [currentImagePath, setCurrentImagePath] = useState(null);
 
   useEffect(() => {
@@ -86,12 +89,12 @@ const EditEvent = ({ eventId, onSave, onCancel }) => {
 
           if (eventData.image) {
             setCurrentImagePath(eventData.image);
-            setImagePreview(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/storage/${eventData.image}`);
+            setPreviewImage(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/storage/${eventData.image}`);
           }
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-        setErrors({ general: ['Failed to load required data.'] });
+        setErrors({ general: ['Failed to load  data.'] });
       }
     };
 
@@ -106,31 +109,22 @@ const EditEvent = ({ eventId, onSave, onCancel }) => {
     }));
   };
 
-  const handleTimeChange = (e) => {
-    const { name, value } = e.target;
-    // Ensure time is in HH:MM format
-    const formattedValue = value.padStart(5, '0');
-    setFormData(prev => ({
-      ...prev,
-      [name]: formattedValue
-    }));
-  };
-
-  const handleImageChange = (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setFormData(prev => ({
+        ...prev,
+        image: file
+      }));
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result);
-        setFormData(prev => ({
-          ...prev,
-          image: reader.result
-        }));
+        setPreviewImage(reader.result);
       };
       reader.readAsDataURL(file);
     } else {
       // If file input is cleared, reset to original image
-      setImagePreview(currentImagePath ? 
+      setPreviewImage(currentImagePath ? 
         `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/storage/${currentImagePath}` : 
         null
       );
@@ -144,31 +138,41 @@ const EditEvent = ({ eventId, onSave, onCancel }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
+    setSuccessMessage('');
     setIsSubmitting(true);
 
     try {
-      const dataToSend = {
-        ...formData,
-        // If no new image was uploaded, keep the existing image path
-        image: formData.image ? 
-          (formData.image.startsWith('data:image') ? formData.image : null) : 
-          currentImagePath
-      };
+      const formDataToSend = new FormData();
 
-      let response;
-      if (eventId) {
-        response = await axiosInstance.put(`/events/${eventId}`, dataToSend);
-      } else {
-        response = await axiosInstance.post('/events', dataToSend);
+      Object.keys(formData).forEach(key => {
+        if (key !== 'image') {
+          if (key === 'is_featured' || key === 'is_active') {
+            formDataToSend.append(key, formData[key] ? '1' : '0');
+          } else if (formData[key] !== null && formData[key] !== '') {
+            formDataToSend.append(key, formData[key]);
+          }
+        }
+      });
+
+      if (formData.image) {
+        formDataToSend.append('image', formData.image);
       }
 
+      const response = await axiosInstance.put(`/events/${eventId}`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      setSuccessMessage('Event updated successfully!');
       if (onSave) onSave(response.data);
+
     } catch (error) {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
         setErrors({ general: ['An unexpected error occurred. Please try again.'] });
-        console.error('Error saving event:', error);
+        console.error('Error updating event:', error);
       }
     } finally {
       setIsSubmitting(false);
@@ -176,342 +180,339 @@ const EditEvent = ({ eventId, onSave, onCancel }) => {
   };
 
   return (
-    <div>
-      <h2>{eventId ? 'Edit Event' : 'Create Event'}</h2>
+    <div className="create-user-container">
+      <h1 className="create-user-title">Edit Event</h1>
       
-      {errors.general && <div>{errors.general[0]}</div>}
+      {successMessage && (
+        <div className="alert alert-success">
+          {successMessage}
+        </div>
+      )}
       
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Event Type:
-            <select 
-              name="type_id" 
-              value={formData.type_id} 
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Event Type</option>
-              {eventTypes.map(type => (
-                <option key={type.id} value={type.id}>{type.name}</option>
-              ))}
-            </select>
-          </label>
-          {errors.type_id && <div>{errors.type_id[0]}</div>}
+      {errors.general && (
+        <div className="alert alert-danger">
+          {errors.general[0]}
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit} className="create-user-form">
+
+<div className="image-upload-edit">
+  <label 
+    htmlFor="edit-image" 
+    className={`edit-file-label ${previewImage ? 'has-edit-image' : ''}`}
+  >
+    <input
+      type="file"
+      name="edit-image"
+      id="edit-image"
+      onChange={handleFileChange}
+      className="edit-file-input"
+      accept="image/*"
+    />
+    
+    {!previewImage ? (
+      <div className="edit-default-preview">
+        {previewImage ? (
+          <img src={previewImage} alt="Current" className="edit-current-image" />
+        ) : (
+          <svg className="edit-placeholder-icon" viewBox="0 0 24 24">
+            <path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2l1.586-1.586a2 2 0 0 1 2.828 0L20 14m-6-6h.01M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/>
+          </svg>
+        )}
+      </div>
+    ) : (
+      <div className="edit-image-preview">
+        <img src={previewImage} alt="Preview" />
+      </div>
+    )}
+    
+    <div className="edit-hover-overlay">
+      <span className="edit-hover-text">Change Image</span>
+    </div>
+  </label>
+  {errors.image && <div className="edit-error-message">{errors.image[0]}</div>}
+</div>
+
+        <div className="form-group">
+          <select
+            name="type_id" 
+            value={formData.type_id} 
+            onChange={handleChange}
+            className={`form-select ${errors.type_id ? 'is-invalid' : ''}`}
+            
+          >
+            <option value="">Select Event Type</option>
+            {eventTypes.map(type => (
+              <option key={type.id} value={type.id}>{type.name}</option>
+            ))}
+          </select>
+          {errors.type_id && <div className="error-message">{errors.type_id[0]}</div>}
         </div>
 
-        <div>
-          <label>
-            Title:
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              maxLength={255}
-            />
-          </label>
-          {errors.title && <div>{errors.title[0]}</div>}
+        <div className="form-group">
+          <input
+            type="text"
+            name="title"
+            placeholder="Event Title"
+            value={formData.title}
+            onChange={handleChange}
+            className={`form-input ${errors.title ? 'is-invalid' : ''}`}
+            
+            maxLength={255}
+          />
+          {errors.title && <div className="error-message">{errors.title[0]}</div>}
         </div>
 
-        <div>
-          <label>
-            Description:
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </label>
-          {errors.description && <div>{errors.description[0]}</div>}
+        <div className="form-group">
+          <textarea
+            name="description"
+            placeholder="Description"
+            value={formData.description}
+            onChange={handleChange}
+            className={`form-textarea ${errors.description ? 'is-invalid' : ''}`}
+            
+          />
+          {errors.description && <div className="error-message">{errors.description[0]}</div>}
         </div>
 
-        <div>
-          <label>
-            Start Date:
-            <input
-              type="date"
-              name="start_date"
-              value={formData.start_date}
-              onChange={handleChange}
-              required
-            />
-          </label>
-          {errors.start_date && <div>{errors.start_date[0]}</div>}
+        <div className="form-group">
+          <input
+            type="date"
+            name="start_date"
+            placeholder="Start Date"
+            value={formData.start_date}
+            onChange={handleChange}
+            className={`form-input ${errors.start_date ? 'is-invalid' : ''}`}
+            
+          />
+          {errors.start_date && <div className="error-message">{errors.start_date[0]}</div>}
         </div>
 
-        <div>
-          <label>
-            End Date:
-            <input
-              type="date"
-              name="end_date"
-              value={formData.end_date}
-              onChange={handleChange}
-              required
-            />
-          </label>
-          {errors.end_date && <div>{errors.end_date[0]}</div>}
+        <div className="form-group">
+          <input
+            type="date"
+            name="end_date"
+            placeholder="End Date"
+            value={formData.end_date}
+            onChange={handleChange}
+            className={`form-input ${errors.end_date ? 'is-invalid' : ''}`}
+            
+          />
+          {errors.end_date && <div className="error-message">{errors.end_date[0]}</div>}
         </div>
 
-        <div>
-          <label>
-            Start Time:
-            <input
-              type="time"
-              name="start_time"
-              value={formData.start_time}
-              onChange={handleTimeChange}
-              step="60"
-              required
-            />
-          </label>
-          {errors.start_time && <div>{errors.start_time[0]}</div>}
+        <div className="form-group">
+          <input
+            type="time"
+            name="start_time"
+            placeholder="Start Time"
+            value={formData.start_time}
+            onChange={handleChange}
+            className="form-input"
+          />
         </div>
 
-        <div>
-          <label>
-            End Time:
-            <input
-              type="time"
-              name="end_time"
-              value={formData.end_time}
-              onChange={handleTimeChange}
-              step="60"
-              required
-            />
-          </label>
-          {errors.end_time && <div>{errors.end_time[0]}</div>}
+        <div className="form-group">
+          <input
+            type="time"
+            name="end_time"
+            placeholder="End Time"
+            value={formData.end_time}
+            onChange={handleChange}
+            className="form-input"
+          />
         </div>
 
-        <div>
-          <label>
-            Venue:
-            <input
-              type="text"
-              name="venue"
-              value={formData.venue}
-              onChange={handleChange}
-              maxLength={255}
-            />
-          </label>
-          {errors.venue && <div>{errors.venue[0]}</div>}
+        <div className="form-group">
+          <input
+            type="text"
+            name="venue"
+            placeholder="Venue"
+            value={formData.venue}
+            onChange={handleChange}
+            className="form-input"
+            maxLength={255}
+          />
         </div>
 
-        <div>
-          <label>
-            Address:
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-            />
-          </label>
-          {errors.address && <div>{errors.address[0]}</div>}
+        <div className="form-group">
+          <input
+            type="text"
+            name="address"
+            placeholder="Address"
+            value={formData.address}
+            onChange={handleChange}
+            className="form-input"
+          />
         </div>
 
-        <div>
-          <label>
-            City:
-            <input
-              type="text"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              maxLength={100}
-            />
-          </label>
-          {errors.city && <div>{errors.city[0]}</div>}
+        <div className="form-group">
+          <input
+            type="text"
+            name="city"
+            placeholder="City"
+            value={formData.city}
+            onChange={handleChange}
+            className="form-input"
+            maxLength={100}
+          />
         </div>
 
-        <div>
-          <label>
-            Region:
-            <input
-              type="text"
-              name="region"
-              value={formData.region}
-              onChange={handleChange}
-              maxLength={100}
-            />
-          </label>
-          {errors.region && <div>{errors.region[0]}</div>}
+        <div className="form-group">
+          <input
+            type="text"
+            name="region"
+            placeholder="Region"
+            value={formData.region}
+            onChange={handleChange}
+            className="form-input"
+            maxLength={100}
+          />
         </div>
 
-        <div>
-          <label>
-            Country:
-            <input
-              type="text"
-              name="country"
-              value={formData.country}
-              onChange={handleChange}
-              maxLength={100}
-            />
-          </label>
-          {errors.country && <div>{errors.country[0]}</div>}
+        <div className="form-group">
+          <input
+            type="text"
+            name="country"
+            placeholder="Country"
+            value={formData.country}
+            onChange={handleChange}
+            className="form-input"
+            maxLength={100}
+          />
         </div>
 
-        <div>
-          <label>
-            Postal Code:
-            <input
-              type="text"
-              name="postal_code"
-              value={formData.postal_code}
-              onChange={handleChange}
-              maxLength={20}
-            />
-          </label>
-          {errors.postal_code && <div>{errors.postal_code[0]}</div>}
+        <div className="form-group">
+          <input
+            type="text"
+            name="postal_code"
+            placeholder="Postal Code"
+            value={formData.postal_code}
+            onChange={handleChange}
+            className="form-input"
+            maxLength={20}
+          />
         </div>
 
-        <div>
-          <label>
-            Latitude:
-            <input
-              type="number"
-              step="any"
-              name="latitude"
-              value={formData.latitude}
-              onChange={handleChange}
-              min="-90"
-              max="90"
-            />
-          </label>
-          {errors.latitude && <div>{errors.latitude[0]}</div>}
+        <div className="form-group">
+          <input
+            type="number"
+            step="any"
+            name="latitude"
+            placeholder="Latitude"
+            value={formData.latitude}
+            onChange={handleChange}
+            className="form-input"
+            min="-90"
+            max="90"
+          />
         </div>
 
-        <div>
-          <label>
-            Longitude:
-            <input
-              type="number"
-              step="any"
-              name="longitude"
-              value={formData.longitude}
-              onChange={handleChange}
-              min="-180"
-              max="180"
-            />
-          </label>
-          {errors.longitude && <div>{errors.longitude[0]}</div>}
+        <div className="form-group">
+          <input
+            type="number"
+            step="any"
+            name="longitude"
+            placeholder="Longitude"
+            value={formData.longitude}
+            onChange={handleChange}
+            className="form-input"
+            min="-180"
+            max="180"
+          />
         </div>
 
-        <div>
-          <label>
-            Max Participants:
-            <input
-              type="number"
-              name="max_participants"
-              value={formData.max_participants}
-              onChange={handleChange}
-              min="1"
-            />
-          </label>
-          {errors.max_participants && <div>{errors.max_participants[0]}</div>}
+        <div className="form-group">
+          <input
+            type="number"
+            name="max_participants"
+            placeholder="Max Participants"
+            value={formData.max_participants}
+            onChange={handleChange}
+            className="form-input"
+            min="1"
+          />
         </div>
 
-        <div>
-          <label>
-            Registration Fee:
-            <input
-              type="number"
-              step="0.01"
-              name="registration_fee"
-              value={formData.registration_fee}
-              onChange={handleChange}
-              min="0"
-            />
-          </label>
-          {errors.registration_fee && <div>{errors.registration_fee[0]}</div>}
+        <div className="form-group">
+          <input
+            type="number"
+            step="0.01"
+            name="registration_fee"
+            placeholder="Registration Fee"
+            value={formData.registration_fee}
+            onChange={handleChange}
+            className="form-input"
+            min="0"
+          />
         </div>
 
-        <div>
-          <label>
-            Registration Deadline:
-            <input
-              type="date"
-              name="registration_deadline"
-              value={formData.registration_deadline}
-              onChange={handleChange}
-            />
-          </label>
-          {errors.registration_deadline && <div>{errors.registration_deadline[0]}</div>}
+        <div className="form-group">
+          <input
+            type="date"
+            name="registration_deadline"
+            placeholder="Registration Deadline"
+            value={formData.registration_deadline}
+            onChange={handleChange}
+            className="form-input"
+          />
         </div>
 
-        <div>
-          <label>
-            Prize Pool:
-            <input
-              type="number"
-              step="0.01"
-              name="prize_pool"
-              value={formData.prize_pool}
-              onChange={handleChange}
-              min="0"
-            />
-          </label>
-          {errors.prize_pool && <div>{errors.prize_pool[0]}</div>}
+        <div className="form-group">
+          <input
+            type="number"
+            step="0.01"
+            name="prize_pool"
+            placeholder="Prize Pool"
+            value={formData.prize_pool}
+            onChange={handleChange}
+            className="form-input"
+            min="0"
+          />
         </div>
 
-        <div>
-          <label>
+        <div className="form-group">
+          <label className="checkbox-label">
             <input
               type="checkbox"
               name="is_featured"
               checked={formData.is_featured}
               onChange={handleChange}
+              className="checkbox-input"
             />
             Featured Event
           </label>
-          {errors.is_featured && <div>{errors.is_featured[0]}</div>}
-        </div>
-
-        <div>
-          <label>
+       
+          <label className="checkbox-label">
             <input
               type="checkbox"
               name="is_active"
               checked={formData.is_active}
               onChange={handleChange}
+              className="checkbox-input"
             />
             Active Event
           </label>
-          {errors.is_active && <div>{errors.is_active[0]}</div>}
         </div>
 
-        <div>
-          <label>
-            Event Image:
-            <input
-              type="file"
-              name="image"
-              onChange={handleImageChange}
-              accept="image/*"
-            />
-          </label>
-          {imagePreview && (
-            <div>
-              <img 
-                src={imagePreview} 
-                alt="Event Preview" 
-                style={{ maxWidth: '200px', maxHeight: '200px' }}
-              />
-            </div>
-          )}
-          {errors.image && <div>{errors.image[0]}</div>}
+        <div className="form-actions">
+          <button 
+            type="submit" 
+            className="submit-button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Updating...' : 'Update Event'}
+          </button>
+          <button 
+            type="button" 
+            className="submit-button cancel-button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
         </div>
-
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : 'Save Event'}
-        </button>
-        <button type="button" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
-        </button>
       </form>
     </div>
   );
