@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('pgn')->nullable();
             $table->integer('table_number')->nullable();
             $table->enum('status', ['scheduled', 'in-progress', 'completed', 'cancelled'])->default('scheduled');
-            $table->timestamps();
+            $table->timestamps();  
         });
     }
 

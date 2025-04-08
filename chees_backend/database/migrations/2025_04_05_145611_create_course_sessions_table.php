@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('course_sessions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('course_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('coach_id')->constrained();
+            $table->foreignId('coach_id')->nullable()->constrained('coaches')->nullOnDelete();
             $table->string('title', 255);
             $table->text('description')->nullable();
             $table->dateTime('start_datetime');
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('zoom_link', 255)->nullable();
             $table->string('meeting_id', 100)->nullable();
             $table->string('meeting_password', 100)->nullable();
-            $table->integer('max_participants');
+            $table->integer('max_participants')->default(20);
             $table->boolean('is_recorded')->default(false);
             $table->string('recording_url', 255)->nullable();
             $table->timestamps();

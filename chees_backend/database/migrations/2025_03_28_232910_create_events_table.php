@@ -32,7 +32,7 @@ return new class extends Migration
             $table->decimal('prize_pool', 10, 2)->default(0.00);
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_active')->default(true);
-            $table->timestamps();
+            $table->timestamps();  
         });
     }
 

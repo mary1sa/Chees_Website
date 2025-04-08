@@ -11,6 +11,16 @@ use App\Http\Controllers\TournamentController;
 use App\Http\Controllers\TournamentMatchController;
 use App\Http\Controllers\TournamentRoundController;
 use App\Http\Controllers\EventRegistrationController;
+use App\Http\Controllers\CourseMaterialController;
+use App\Http\Controllers\CourseMediaController;
+use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseLevelController;
+use App\Http\Controllers\CourseSessionController;
+use App\Http\Controllers\CouponController;
+use App\Http\Controllers\SessionAttendanceController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -19,7 +29,7 @@ use App\Http\Controllers\EventRegistrationController;
 // authentification
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
@@ -43,6 +53,9 @@ Route::get('/users/{id}', [UserController::class, 'getUserById']);
 Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
+
+//Coaches
+//Route::apiResource('coaches', CoachController::class);
 
 
 // Event Types
@@ -79,3 +92,74 @@ Route::delete('matches/{match}', [TournamentMatchController::class, 'destroy']);
 Route::post('matches/{match}/start', [TournamentMatchController::class, 'startMatch']);
 Route::post('matches/{match}/result', [TournamentMatchController::class, 'recordResult']);
 Route::get('players/{player}/matches', [TournamentMatchController::class, 'playerMatches']);
+
+// Course Materials
+Route::apiResource('course-materials', CourseMaterialController::class);
+
+// Course Media
+Route::apiResource('course-media', CourseMediaController::class);
+
+// Enrollments
+Route::apiResource('enrollments', EnrollmentController::class);
+Route::post('enrollments/{enrollment}/courses', [EnrollmentController::class, 'addCourses']);
+Route::delete('enrollments/{enrollment}/courses', [EnrollmentController::class, 'removeCourses']);
+Route::put('enrollments/{enrollment}/courses/{course}/progress', [EnrollmentController::class, 'updateCourseProgress']);
+Route::get('users/{user}/enrollments', [EnrollmentController::class, 'userEnrollments']);
+
+// Payments
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('payments', PaymentController::class);
+    Route::get('users/{user}/payments', [PaymentController::class, 'userPayments']);
+    Route::post('payments/{payment}/verify', [PaymentController::class, 'verifyPayment']);
+});
+
+// Wishlist
+Route::apiResource('wishlists', WishlistController::class);
+Route::get('users/{user}/wishlist', [WishlistController::class, 'userWishlist']);
+Route::post('wishlists/toggle/{course}', [WishlistController::class, 'toggle']);
+
+// Course API routes
+Route::prefix('courses')->group(function () {
+    // Public course routes
+    Route::get('/', [CourseController::class, 'index']);
+    Route::get('/{course}', [CourseController::class, 'show']);
+    
+    // Protected course routes that require authentication
+    Route::middleware('auth:api')->group(function () {
+        Route::post('/', [CourseController::class, 'store']);
+        Route::put('/{course}', [CourseController::class, 'update']);
+        Route::delete('/{course}', [CourseController::class, 'destroy']);
+        // Updated to support multiple courses in one enrollment
+        Route::post('/enroll', [EnrollmentController::class, 'store']);
+    });
+});
+
+// Course-related resources
+Route::apiResource('course-levels', CourseLevelController::class);
+Route::apiResource('course-sessions', CourseSessionController::class);
+Route::apiResource('session-attendances', SessionAttendanceController::class);
+
+Route::apiResource('coupons', CouponController::class);
+
+// Protected routes
+Route::middleware('auth:api')->group(function () {
+    // User routes
+    Route::get('/profile', [UserController::class, 'show']);
+    Route::put('/profile', [UserController::class, 'update']);
+    
+    // Course sessions
+    //Route::post('/course-sessions/{courseSession}/attend', [SessionAttendanceController::class, 'store']);
+    
+    // Course materials
+    //Route::get('/course-materials/{courseMaterial}', [CourseMaterialController::class, 'show']);
+    
+    // Coupons
+    Route::post('/coupons/validate', [CouponController::class, 'validate']);
+    
+    // Wishlist
+    Route::apiResource('/wishlist', WishlistController::class);
+    
+    // My enrollments
+    Route::get('/my-enrollments', [EnrollmentController::class, 'myEnrollments']);
+    Route::put('/my-courses/{course}/progress', [EnrollmentController::class, 'updateMyProgress']);
+});

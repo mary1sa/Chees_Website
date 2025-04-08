@@ -15,12 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('session_id')->constrained('course_sessions')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->boolean('attended')->default(false);
-            $table->timestamp('join_time')->nullable();
-            $table->timestamp('leave_time')->nullable();
-            $table->text('feedback')->nullable();
-            $table->tinyInteger('rating')->nullable();
-            $table->timestamps();
+            $table->enum('status', ['attended', 'excused', 'absent'])->default('attended');
+            $table->timestamp('attended_at')->nullable();
+            $table->text('notes')->nullable();
+            $table->timestamps(); 
             $table->unique(['session_id', 'user_id']);
         });
     }

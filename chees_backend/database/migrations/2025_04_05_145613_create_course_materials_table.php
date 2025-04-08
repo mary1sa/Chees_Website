@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('file_type', 50)->nullable(); // pdf, video, image, etc.
             $table->boolean('is_downloadable')->default(true);
             $table->integer('order_number')->default(0);
-            $table->timestamps();
+            $table->timestamps();  
         });
     }
 
