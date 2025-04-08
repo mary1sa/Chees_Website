@@ -13,15 +13,25 @@ const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [activeMenu, setActiveMenu] = useState('');
+  const [adminData, setAdminData] = useState({});
+
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const adminData = {
-    name: "Admin Name",
-    avatar: "/admin-avatar.jpg",
-    role: "Super Admin"
-  };
+
+  
+  
+  useEffect(() => {
+    const storedAdminData = JSON.parse(localStorage.getItem('user'));
+
+    if (storedAdminData && storedAdminData.role === 'admin') {
+      setAdminData(storedAdminData);
+    } else {
+      navigate('/login');
+    }
+  }, [navigate]);
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -131,9 +141,13 @@ const AdminDashboard = () => {
           </div>
           
           <div className="admin-profile">
-            <img src={adminData.avatar} alt={adminData.name} className="admin-avatar" />
+            <img   src={
+                     adminData.profile_picture
+                        ? `http://localhost:8000/storage/${ adminData.profile_picture}`
+                        :  '/anony.jpg'
+                    } alt={adminData.name} className="admin-avatar" />
             <div className="profile-info">
-              <span className="admin-name">{adminData.name}</span>
+              <span className="admin-name">{adminData.first_name} {adminData.last_name}</span>
               <span className="admin-role">{adminData.role}</span>
             </div>
           </div>
@@ -145,7 +159,7 @@ const AdminDashboard = () => {
           <button className="menu-toggle" onClick={toggleSidebar}>
             {sidebarOpen ? <FiX /> : <FiMenu />}
           </button>
-          {sidebarOpen && <h2 className="sidebar-brand">Admin Panel</h2>}
+          {sidebarOpen && <h2 className="sidebar-brand">RCI</h2>}
         </div>
         
         <div className="sidebar-menu">

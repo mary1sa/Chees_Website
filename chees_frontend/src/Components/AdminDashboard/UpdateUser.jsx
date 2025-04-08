@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import axiosInstance from '../config/axiosInstance';
 import"./CreateUser.css"
 import PageLoading from '../PageLoading/PageLoading';
+import SuccessAlert from '../Alerts/SuccessAlert';
+import ErrorAlert from '../Alerts/ErrorAlert';
 
 const UpdateUser = () => {
   const { id } = useParams();
@@ -28,6 +30,7 @@ const UpdateUser = () => {
   const [previewImage, setPreviewImage] = useState('');
   const [roles, setRoles] = useState([]);
   const [errors, setErrors] = useState({});
+  const [showAlert, setShowAlert] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -191,22 +194,17 @@ const UpdateUser = () => {
       setIsSubmitting(false);
     }
   };
-
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
   if (loading) return <PageLoading/>;  return (
     <div className="create-user-container">
       <h1 className="create-user-title">Modifier l'Utilisateur</h1>
       
-      {successMessage && (
-        <div className="alert alert-success">
-          {successMessage}
-        </div>
-      )}
-      
-      {errors.form && (
-        <div className="alert alert-danger">
-          {errors.form}
-        </div>
-      )}
+      {successMessage && <SuccessAlert message={successMessage}  onClose={handleCloseAlert}           iconType="check"
+ />}
+{errors.form && <ErrorAlert message={errors.form}  onClose={handleCloseAlert}         
+/>}
 
       <form onSubmit={handleSubmit} className="create-user-form" encType="multipart/form-data">
         <div className="image-upload-section">

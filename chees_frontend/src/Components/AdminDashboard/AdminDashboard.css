@@ -86,9 +86,9 @@
 .brand-name {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var( --text-color);
   margin: 0;
-  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+  background: var( --text-color);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -369,6 +369,18 @@
   transition: all var(--transition-speed) ease;
   margin-right: 0.75rem;
 }
+.admin-sidebar.closed .submenu-text{
+display: none;
+}
+
+.admin-sidebar.closed .submenu-item  {
+  margin-left: 2px; 
+ display: flex;
+ align-items: center;
+ justify-content: center;
+  margin: 0 !important;
+}
+
 
 .submenu-item:hover .submenu-icon,
 .submenu-item.active .submenu-icon {

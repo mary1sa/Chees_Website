@@ -85,7 +85,7 @@ console.log(user)
    {error && <div className="alert alert-danger">{error}</div>}
       
       <form onSubmit={handleLogin} className='login-form'>
-        <div className="form-group">
+        <div className="form-group-login">
           <label  className="labellogin" htmlFor="">Email</label>
         <div className='form-container'>
         <FaUser className="input-icon" /> 
@@ -101,7 +101,7 @@ console.log(user)
  </div>
         </div>
         
-       <div className="form-group ">
+       <div className="form-group-login ">
        <label className="labellogin" htmlFor="">Password</label>
 
         <div className='form-container'>
