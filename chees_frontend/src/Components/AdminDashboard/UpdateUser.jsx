@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../config/axiosInstance';
 import"./CreateUser.css"
 import PageLoading from '../PageLoading/PageLoading';
@@ -31,7 +31,7 @@ const UpdateUser = () => {
   const [roles, setRoles] = useState([]);
   const [errors, setErrors] = useState({});
   const [showAlert, setShowAlert] = useState(true);
-
+const navigate=useNavigate()
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -163,7 +163,7 @@ const UpdateUser = () => {
 
       setSuccessMessage('User updated successfully!');
       setErrors({});
-
+navigate("/admin/dashboard/fetchusers")
       if (response.data.user.profile_picture) {
         setPreviewImage(`${axiosInstance.defaults.baseURL}/storage/${response.data.user.profile_picture}`);
       }
@@ -197,7 +197,8 @@ const UpdateUser = () => {
   const handleCloseAlert = () => {
     setShowAlert(false);
   };
-  if (loading) return <PageLoading/>;  return (
+  if (loading) return <PageLoading/>; 
+   return (
     <div className="create-user-container">
       <h1 className="create-user-title">Modifier l'Utilisateur</h1>
       
@@ -404,7 +405,7 @@ const UpdateUser = () => {
         >
           {isSubmitting ? (
             <>
-              <span className="spinner"></span>
+              <span className="spinner_button"></span>
               Mise à jour...
             </>
           ) : 'Mettre à jour'}

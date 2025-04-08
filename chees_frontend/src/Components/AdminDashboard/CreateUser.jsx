@@ -3,6 +3,7 @@ import axiosInstance from '../config/axiosInstance';
 import"./CreateUser.css"
 import SuccessAlert from '../Alerts/SuccessAlert';  
 import ErrorAlert from '../Alerts/ErrorAlert';
+import { useNavigate } from 'react-router-dom';
 const CreateUser = () => {
   const [userForm, setUserForm] = useState({
     username: '',
@@ -27,7 +28,7 @@ const CreateUser = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [showAlert, setShowAlert] = useState(true);
   const [loading, setLoading] = useState(false);
-
+const navigate=useNavigate()
   useEffect(() => {
     const fetchRoles = async () => {
       try {
@@ -125,7 +126,8 @@ const CreateUser = () => {
 
       setSuccessMessage('Utilisateur créé avec succès !');
       setErrors({});
-      
+      navigate("/admin/dashboard/fetchusers")
+
       setUserForm({
         username: '',
         email: '',
@@ -362,8 +364,8 @@ const CreateUser = () => {
   disabled={loading}
 >
   {loading ? (
-    <span className="loading-content">
-      <span className="spinner"></span> Chargement...
+    <span className="loading-button">
+      <span className="spinner_button"></span> Chargement...
     </span>
   ) : (
     "Créer l'Utilisateur"
