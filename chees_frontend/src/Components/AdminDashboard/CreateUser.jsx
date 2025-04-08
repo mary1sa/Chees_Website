@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../config/axiosInstance';
 import"./CreateUser.css"
-import PageLoading from '../PageLoading/PageLoading';
+import SuccessAlert from '../Alerts/SuccessAlert';  
+import ErrorAlert from '../Alerts/ErrorAlert';
 const CreateUser = () => {
   const [userForm, setUserForm] = useState({
     username: '',
@@ -24,6 +25,8 @@ const CreateUser = () => {
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
+  const [showAlert, setShowAlert] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -105,6 +108,8 @@ const CreateUser = () => {
     }
 
     try {
+      setLoading(true);
+
       const formData = new FormData();
       Object.keys(userForm).forEach((key) => {
         if (userForm[key] !== null) {
@@ -156,23 +161,24 @@ const CreateUser = () => {
       } else {
         setErrors({ ...errors, form: 'Erreur réseau. Veuillez réessayer.' });
       }
+    }finally{
+      setLoading(false);
+
     }
   };
-
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
   return (
+<>
+
 
     <div className="create-user-container">
-      {/* <h1 className="create-user-title">Créer un Utilisateur</h1> */}
-      {successMessage && (
-        <div className="alert alert-success">
-          {successMessage}
-        </div>
-      )}
-      {errors.form && (
-        <div className="alert alert-danger">
-          {errors.form}
-        </div>
-      )}
+      <h1 className="create-user-title">Créer un Utilisateur</h1>
+   {successMessage && <SuccessAlert message={successMessage}  onClose={handleCloseAlert}           iconType="check"
+ />}
+{errors.form && <ErrorAlert message={errors.form}  onClose={handleCloseAlert}         
+/>}
       <form onSubmit={handleCreateUser} className="create-user-form">
 
       <div className="image-upload-section">
@@ -350,11 +356,22 @@ const CreateUser = () => {
           />
         </div>
 
-        <button type="submit" className="submit-button">
-          Créer l'Utilisateur
-        </button>
+        <button
+  type="submit"
+  className="submit-button"
+  disabled={loading}
+>
+  {loading ? (
+    <span className="loading-content">
+      <span className="spinner"></span> Chargement...
+    </span>
+  ) : (
+    "Créer l'Utilisateur"
+  )}
+</button>
       </form>
     </div>
+    </>
   );
 };
 
