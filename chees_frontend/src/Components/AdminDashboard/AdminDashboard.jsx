@@ -3,9 +3,10 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   FiMenu, FiX, FiHome, FiUsers, FiUserPlus,
   FiDollarSign, FiCalendar, FiSettings, FiKey,
-  FiLogOut, FiBell, FiSearch, FiSun, FiMoon,
-  FiChevronDown, FiChevronRight, FiChevronLeft,
-  FiCreditCard, FiFileText, FiList
+  FiLogOut, FiBell, FiSun, FiMoon,
+  FiChevronDown, FiChevronRight,
+  FiCreditCard, FiFileText, FiList, 
+  FiLayers, FiAward
 } from 'react-icons/fi';
 import './AdminDashboard.css';
 
@@ -34,21 +35,23 @@ const AdminDashboard = () => {
 
 
   useEffect(() => {
+    // Auto-expand active menu based on current route
+    if (location.pathname.includes('/admin/dashboard/events')) {
+      setActiveMenu('Events');
+    } else if (location.pathname.includes('/admin/dashboard/fetchusers')) {
+      setActiveMenu('User Management');
+    }
+
     const handleResize = () => {
       const mobile = window.innerWidth < 992;
       setIsMobile(mobile);
-      
-      if (mobile && sidebarOpen) {
-        setSidebarOpen(false);
-      }
-      if (!mobile && !sidebarOpen) {
-        setSidebarOpen(true);
-      }
+      if (mobile && sidebarOpen) setSidebarOpen(false);
+      if (!mobile && !sidebarOpen) setSidebarOpen(true);
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [sidebarOpen]);
+  }, [sidebarOpen, location.pathname]);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const toggleDarkMode = () => setDarkMode(!darkMode);
@@ -70,7 +73,7 @@ const AdminDashboard = () => {
     {
       title: "Dashboard",
       icon: <FiHome />,
-      path: "/admin"
+      path: "/admin/dashboard"
     },
     {
       title: "User Management",
@@ -87,9 +90,32 @@ const AdminDashboard = () => {
           icon: <FiUserPlus className="submenu-icon" />
         },
         { 
-          title: "Roles", 
-          path: "/admin/users/roles",
+          title: "User Roles", 
+          path: "user-roles",
           icon: <FiKey className="submenu-icon" />
+        }
+      ]
+    },
+    {
+      title: "Events",
+      icon: <FiCalendar />,
+      submenus: [
+        { 
+          title: "All Events", 
+          path: "events",
+          icon: <FiList className="submenu-icon" />
+        },
+        { 
+          title: "Event Types", 
+          path: "events/types",
+          icon: <FiLayers className="submenu-icon" />
+        },
+        { 
+         
+          title: "Registrations", 
+          path: "events/registrations",
+          icon: <FiAward className="submenu-icon" />
+          
         }
       ]
     },
@@ -99,12 +125,12 @@ const AdminDashboard = () => {
       submenus: [
         { 
           title: "Payments", 
-          path: "/admin/payments",
+          path: "payments",
           icon: <FiCreditCard className="submenu-icon" />
         },
         { 
           title: "Invoices", 
-          path: "/admin/invoices",
+          path: "invoices",
           icon: <FiFileText className="submenu-icon" />
         }
       ]
@@ -112,7 +138,7 @@ const AdminDashboard = () => {
     {
       title: "Settings",
       icon: <FiSettings />,
-      path: "/admin/settings"
+      path: "settings"
     }
   ];
 
@@ -169,7 +195,7 @@ const AdminDashboard = () => {
                 {item.path ? (
                   <Link
                     to={item.path}
-                    className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
+                    className={`menu-item ${location.pathname === `/admin/dashboard/${item.path}` ? 'active' : ''}`}
                     onClick={() => {
                       setActiveMenu(item.title);
                       if (isMobile) setSidebarOpen(false);
@@ -197,7 +223,7 @@ const AdminDashboard = () => {
                           <Link
                             key={subIndex}
                             to={sub.path}
-                            className={`submenu-item ${location.pathname === sub.path ? 'active' : ''}`}
+                            className={`submenu-item ${location.pathname.includes(sub.path) ? 'active' : ''}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               if (isMobile) setSidebarOpen(false);
