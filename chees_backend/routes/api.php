@@ -106,14 +106,14 @@ Route::delete('enrollments/{enrollment}/courses', [EnrollmentController::class, 
 Route::put('enrollments/{enrollment}/courses/{course}/progress', [EnrollmentController::class, 'updateCourseProgress']);
 Route::get('users/{user}/enrollments', [EnrollmentController::class, 'userEnrollments']);
 
-// Payments
+// Payments for courses and books and events 
 Route::middleware('auth:api')->group(function () {
     Route::apiResource('payments', PaymentController::class);
     Route::get('users/{user}/payments', [PaymentController::class, 'userPayments']);
     Route::post('payments/{payment}/verify', [PaymentController::class, 'verifyPayment']);
 });
 
-// Wishlist
+// Wishlist can be used for courses and books
 Route::apiResource('wishlists', WishlistController::class);
 Route::get('users/{user}/wishlist', [WishlistController::class, 'userWishlist']);
 Route::post('wishlists/toggle/{course}', [WishlistController::class, 'toggle']);
@@ -148,10 +148,10 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/profile', [UserController::class, 'update']);
     
     // Course sessions
-    //Route::post('/course-sessions/{courseSession}/attend', [SessionAttendanceController::class, 'store']);
+    Route::post('/course-sessions/{courseSession}/attend', [SessionAttendanceController::class, 'store']);
     
     // Course materials
-    //Route::get('/course-materials/{courseMaterial}', [CourseMaterialController::class, 'show']);
+    Route::get('/course-materials/{courseMaterial}', [CourseMaterialController::class, 'show']);
     
     // Coupons
     Route::post('/coupons/validate', [CouponController::class, 'validate']);
