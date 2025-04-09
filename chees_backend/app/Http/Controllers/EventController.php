@@ -76,7 +76,7 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $this->validateEventRequest($request);
+        $validated = $this->validateCreateEventRequest($request);
 
         // Handle image upload
         if ($request->has('image')) {
@@ -108,7 +108,7 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        $validated = $this->validateEventRequest($request, $event);
+        $validated = $this->validateUpdateEventRequest($request, $event);
 
         // Handle image upload/update
          // Handle image upload/update
@@ -128,9 +128,29 @@ class EventController extends Controller
         ]);
     }
 
-    /**
-     * Delete an event
-     */
+    private function handleBase64Image($base64Image)
+    {
+        if (!$base64Image) {
+            return null;
+        }
+    
+        // Check if it's already a stored image path
+        if (strpos($base64Image, 'storage/') === 0) {
+            return $base64Image;
+        }
+    
+        // Decode the base64 image
+        $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64Image));
+    
+        // Generate a unique filename
+        $extension = 'png'; // or detect from mime type
+        $filename = 'events/' . uniqid() . '.' . $extension;
+    
+        // Save the image to storage
+        Storage::disk('public')->put($filename, $imageData);
+    
+        return $filename;
+    }
     public function destroy(Event $event)
     {
         // Only delete if no dependent records exist
@@ -185,7 +205,7 @@ public function rounds(Event $event)
     /**
      * Validate event request data
      */
-    protected function validateEventRequest(Request $request, $event = null)
+    protected function validateCreateEventRequest(Request $request)
     {
         return $request->validate([
             'type_id' => 'required|exists:event_types,id',
@@ -212,24 +232,51 @@ public function rounds(Event $event)
             'is_active' => 'boolean',
         ]);
     }
-    private function handleBase64Image($base64Image)
-    {
-        if (!$base64Image) {
-            return null;
-        }
+    protected function validateUpdateEventRequest(Request $request, Event $event)
+{
+    return $request->validate([
+        'type_id' => 'sometimes|exists:event_types,id',
+        'title' => 'sometimes|string|max:255',
+        'description' => 'sometimes|string',
+        'image' => 'nullable|string',
+        'start_date' => 'sometimes|date',
+        'end_date' => 'sometimes|date|after_or_equal:start_date',
+        'start_time' => 'nullable|date_format:H:i',
+        'end_time' => 'nullable|date_format:H:i',
+        'venue' => 'nullable|string|max:255',
+        'address' => 'nullable|string',
+        'city' => 'nullable|string|max:100',
+        'region' => 'nullable|string|max:100',
+        'country' => 'nullable|string|max:100',
+        'postal_code' => 'nullable|string|max:20',
+        'latitude' => 'nullable|numeric|between:-90,90',
+        'longitude' => 'nullable|numeric|between:-180,180',
+        'max_participants' => 'nullable|integer|min:1',
+        'registration_fee' => 'nullable|numeric|min:0',
+        'registration_deadline' => 'nullable|date|before_or_equal:start_date',
+        'prize_pool' => 'nullable|numeric|min:0',
+        'is_featured' => 'sometimes|boolean',
+        'is_active' => 'sometimes|boolean',
+    ]);
+}
+    // private function handleBase64Image($base64Image)
+    // {
+    //     if (!$base64Image) {
+    //         return null;
+    //     }
 
-        // Decode the base64 image
-        $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64Image));
+    //     // Decode the base64 image
+    //     $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64Image));
 
-        // Generate a unique filename
-        $extension = 'png'; // or detect from mime type
-        $filename = 'events/' . uniqid() . '.' . $extension;
+    //     // Generate a unique filename
+    //     $extension = 'png'; // or detect from mime type
+    //     $filename = 'events/' . uniqid() . '.' . $extension;
 
-        // Save the image to storage
-        Storage::disk('public')->put($filename, $imageData);
+    //     // Save the image to storage
+    //     Storage::disk('public')->put($filename, $imageData);
 
-        return $filename;
-    }
+    //     return $filename;
+    // }
 
     public function getConfirmedPlayers($eventId)
 {

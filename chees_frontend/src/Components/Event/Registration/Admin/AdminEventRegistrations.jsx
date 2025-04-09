@@ -7,6 +7,11 @@ import PageLoading from '../../../PageLoading/PageLoading';
 import ConfirmDelete from '../../../Confirm/ConfirmDelete';
 import GettingRegistrations from './GettingRegistrations';
 
+
+import SuccessAlert from '../../../Alerts/SuccessAlert'; // Adjust path as needed
+import ErrorAlert from '../../../Alerts/ErrorAlert';     // Adjust path as needed
+
+
 const AdminEventRegistrations = () => {
   const [registrations, setRegistrations] = useState([]);
   const [filteredRegistrations, setFilteredRegistrations] = useState([]);
@@ -32,28 +37,13 @@ const AdminEventRegistrations = () => {
   const [registrationToDelete, setRegistrationToDelete] = useState(null);
   const navigate = useNavigate();
 
+  
+    const [successAlert, setSuccessAlert] = useState(null);
+    const [errorAlert, setErrorAlert] = useState(null);
+  
+
   // Fetch registrations
-  const fetchRegistrations = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosInstance.get('/registrations');
-      
-      if (response.data && response.data.data) {
-        const regs = response.data.data.data || [];
-        setRegistrations(regs);
-        setFilteredRegistrations(regs);
-        setPagination({
-          current_page: response.data.data.current_page,
-          total: response.data.data.total,
-          per_page: response.data.data.per_page
-        });
-      }
-    } catch (err) {
-      handleApiError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+ 
 
   // Filter registrations based on search term
   useEffect(() => {
@@ -87,14 +77,40 @@ const AdminEventRegistrations = () => {
     }
   };
 
+  // Fetch registrations
+  const fetchRegistrations = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get('/registrations');
+      
+      if (response.data && response.data.data) {
+        const regs = response.data.data.data || [];
+        setRegistrations(regs);
+        setFilteredRegistrations(regs);
+        setPagination({
+          current_page: response.data.data.current_page,
+          total: response.data.data.total,
+          per_page: response.data.data.per_page
+        });
+      }
+    } catch (err) {
+      setErrorAlert({ message: err.response?.data?.message || 'Failed to fetch registrations' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Confirm payment
   const handleConfirmPayment = async (id) => {
     try {
       setLoading(true);
       await axiosInstance.post(`/registrations/${id}/confirm-payment`);
+      setSuccessAlert({ message: 'Payment confirmed successfully!' });
       await fetchRegistrations();
     } catch (err) {
-      handleApiError(err);
+      setErrorAlert({ message: err.response?.data?.message || 'Failed to confirm payment' });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,20 +121,43 @@ const AdminEventRegistrations = () => {
     try {
       setLoading(true);
       await axiosInstance.delete(`/registrations/${registrationToDelete.id}`);
+      setSuccessAlert({ message: 'Registration deleted successfully!' });
       await fetchRegistrations();
     } catch (err) {
-      handleApiError(err);
+      setErrorAlert({ message: err.response?.data?.message || 'Failed to delete registration' });
     } finally {
+      setLoading(false);
       setShowDeleteModal(false);
       setRegistrationToDelete(null);
     }
   };
+
+  // Submit updated registration
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      await axiosInstance.put(
+        `/registrations/${editModal.registration.id}`,
+        editModal.formData
+      );
+      setSuccessAlert({ message: 'Registration updated successfully!' });
+      await fetchRegistrations();
+      setEditModal({ show: false, registration: null, formData: {} });
+    } catch (err) {
+      setErrorAlert({ message: err.response?.data?.message || 'Failed to update registration' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   // Show registration details
   const showDetails = async (id) => {
     try {
       setLoading(true);
       const response = await axiosInstance.get(`/registrations/${id}`);
+      
       setDetailView(response.data.data);
     } catch (err) {
       handleApiError(err);
@@ -153,20 +192,7 @@ const AdminEventRegistrations = () => {
   };
 
   // Submit updated registration
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      await axiosInstance.put(
-        `/registrations/${editModal.registration.id}`,
-        editModal.formData
-      );
-      setEditModal({ show: false, registration: null, formData: {} });
-      await fetchRegistrations();
-    } catch (err) {
-      handleApiError(err);
-    }
-  };
+ 
 
   // Clear search
   const clearSearch = () => {
@@ -236,6 +262,9 @@ const AdminEventRegistrations = () => {
 
     return (
       <div className="pagination">
+           {/* Add alerts at the top */}
+    
+    
         <button 
           onClick={() => paginate(currentPage - 1)} 
           disabled={currentPage === 1}
@@ -268,16 +297,28 @@ const AdminEventRegistrations = () => {
 
   return (
     <div className="table-container">
+      {/* Alerts should be placed at the top of the main container */}
+      {successAlert && (
+        <SuccessAlert
+          message={successAlert.message}
+          onClose={() => setSuccessAlert(null)}
+        />
+      )}
 
-      <GettingRegistrations></GettingRegistrations>
+      {errorAlert && (
+        <ErrorAlert
+          message={errorAlert.message}
+          onClose={() => setErrorAlert(null)}
+        />
+      )}
+
+      <GettingRegistrations />
       <ConfirmDelete
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={confirmDeleteRegistration}
         itemName={registrationToDelete ? `registration #${registrationToDelete.id}` : 'this registration'}
       />
-
-      {/* <h1 className="table-title">Registration Management</h1> */}
       
       <div className="filter-controls">
         <div className="search-container">

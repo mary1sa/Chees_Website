@@ -3,6 +3,9 @@ import axiosInstance from '../../config/axiosInstance';
 import "../../AdminDashboard/CreateUser.css";
 import PageLoading from '../../PageLoading/PageLoading';
 
+import SuccessAlert from '../../Alerts/SuccessAlert'; // Adjust path as needed
+import ErrorAlert from '../../Alerts/ErrorAlert';     // Adjust path as needed
+
 const CreateEvent = ({ onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     type_id: '',
@@ -35,11 +38,15 @@ const CreateEvent = ({ onSave, onCancel }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
+  const [successAlert, setSuccessAlert] = useState(null);
+  const [errorAlert, setErrorAlert] = useState(null);
+
   useEffect(() => {
     const fetchEventTypes = async () => {
       try {
         const response = await axiosInstance.get('/event-types');
         setEventTypes(response.data);
+
       } catch (error) {
         console.error('Error fetching event types:', error);
       }
@@ -70,38 +77,45 @@ const CreateEvent = ({ onSave, onCancel }) => {
       reader.readAsDataURL(file);
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
     setSuccessMessage('');
     setIsSubmitting(true);
-
+  
     try {
       const formDataToSend = new FormData();
-
-      Object.keys(formData).forEach(key => {
+      const data = { ...formData };
+  
+      // Convert image to base64 if it exists
+      if (data.image) {
+        const base64Image = await convertToBase64(data.image);
+        data.image = base64Image;
+      }
+  
+      Object.keys(data).forEach(key => {
         if (key !== 'image') {
           if (key === 'is_featured' || key === 'is_active') {
-            formDataToSend.append(key, formData[key] ? '1' : '0');
-          } else if (formData[key] !== null && formData[key] !== '') {
-            formDataToSend.append(key, formData[key]);
+            formDataToSend.append(key, data[key] ? '1' : '0');
+          } else if (data[key] !== null && data[key] !== '') {
+            formDataToSend.append(key, data[key]);
           }
         }
       });
-
-      if (formData.image) {
-        formDataToSend.append('image', formData.image);
+  
+      if (data.image) {
+        formDataToSend.append('image', data.image);
       }
-
+  
       const response = await axiosInstance.post('/events', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
+  
+      // ... rest of your success handling
+      setSuccessAlert({ message: 'Event created successfully!' });
 
-      setSuccessMessage('Event created successfully!');
-      
       // Reset form
       setFormData({
         type_id: '',
@@ -129,80 +143,95 @@ const CreateEvent = ({ onSave, onCancel }) => {
       });
       setPreviewImage(null);
 
-      if (onSave) onSave(response.data);
-
+      setTimeout(() => {
+        if (onSave) onSave(response.data);
+      }, 2000); // 2 seconds delay
     } catch (error) {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        setErrors({ general: ['An unexpected error occurred. Please try again.'] });
-        console.error('Error creating event:', error);
-      }
+      console.error('Error creating event:', error);
+      setErrorAlert({ message: 'Failed to create event. Please try again.' });
+      // ... error handling
     } finally {
       setIsSubmitting(false);
     }
   };
+  
+  // Helper function to convert file to base64
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  };
 
   return (
     <div className="create-user-container">
+      {/* Add alerts at the top */}
+      {successAlert && (
+        <SuccessAlert
+          message={successAlert.message}
+          onClose={() => setSuccessAlert(null)}
+        />
+      )}
+
+      {errorAlert && (
+        <ErrorAlert
+          message={errorAlert.message}
+          onClose={() => setErrorAlert(null)}
+        />
+      )}
       <h1 className="create-user-title">Create New Event</h1>
-      
-      {successMessage && (
-        <div className="alert alert-success">
-          {successMessage}
-        </div>
-      )}
-      
-      {errors.general && (
-        <div className="alert alert-danger">
-          {errors.general[0]}
-        </div>
-      )}
-      
+
+   
+
       <form onSubmit={handleSubmit} className="create-user-form">
         {/* Keep all the existing form fields exactly as they are */}
-        
+
         <div className="upload-container">
-  <label htmlFor="image-upload" className="upload-box">
-    <input
-      type="file"
-      id="image-upload"
-      className="upload-input"
-      accept="image/*"
-      onChange={handleFileChange}
-    />
     
-    {!previewImage ? (
-      <>
-        <div className="upload-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"></path>
-            <line x1="16" y1="5" x2="22" y2="5"></line>
-            <line x1="19" y1="2" x2="19" y2="8"></line>
-            <circle cx="9" cy="9" r="2"></circle>
-            <path d="M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
-          </svg>
+          <label htmlFor="image-upload" className="upload-box">
+
+            <input
+              type="file"
+              id="image-upload"
+              className="upload-input"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+
+            {!previewImage ? (
+              <>
+                <div className="upload-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"></path>
+                    <line x1="16" y1="5" x2="22" y2="5"></line>
+                    <line x1="19" y1="2" x2="19" y2="8"></line>
+                    <circle cx="9" cy="9" r="2"></circle>
+                    <path d="M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+                  </svg>
+                </div>
+                <p className="upload-text">Click to upload image</p>
+              </>
+            ) : (
+              <img src={previewImage} alt="Preview" className="upload-preview" />
+            )}
+
+            <div className="upload-hover-text">
+              Click to change image
+            </div>
+          </label>
+
+          {errors.image && (
+            <p className="upload-error">{errors.image[0]}</p>
+          )}
         </div>
-        <p className="upload-text">Click to upload image</p>
-      </>
-    ) : (
-      <img src={previewImage} alt="Preview" className="upload-preview" />
-    )}
-    
-    <div className="upload-hover-text">
-      Click to change image
-    </div>
-  </label>
-  
-  {errors.image && (
-    <p className="upload-error">{errors.image[0]}</p>
-  )}
-</div>
 
         <div className="form-group">
+          <label className="form-label">Event Type *</label>
           <select
-            name="type_id" 
-            value={formData.type_id} 
+            name="type_id"
+            value={formData.type_id}
             onChange={handleChange}
             className={`form-select ${errors.type_id ? 'is-invalid' : ''}`}
             required
@@ -216,6 +245,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label"> Title *</label>
           <input
             type="text"
             name="title"
@@ -230,6 +260,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Description *</label>
           <textarea
             name="description"
             placeholder="Description"
@@ -242,6 +273,8 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Start Date *</label>
+
           <input
             type="date"
             name="start_date"
@@ -255,6 +288,8 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">End Date *</label>
+
           <input
             type="date"
             name="end_date"
@@ -268,6 +303,8 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Start Time *</label>
+
           <input
             type="time"
             name="start_time"
@@ -279,6 +316,8 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">End Date *</label>
+
           <input
             type="time"
             name="end_time"
@@ -290,6 +329,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label"> venue *</label>
           <input
             type="text"
             name="venue"
@@ -302,6 +342,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label"> Address *</label>
           <input
             type="text"
             name="address"
@@ -313,6 +354,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">City *</label>
           <input
             type="text"
             name="city"
@@ -325,6 +367,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Region *</label>
           <input
             type="text"
             name="region"
@@ -337,6 +380,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Country *</label>
           <input
             type="text"
             name="country"
@@ -349,6 +393,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Postal Code *</label>
           <input
             type="text"
             name="postal_code"
@@ -361,6 +406,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Latitude *</label>
           <input
             type="number"
             step="any"
@@ -375,6 +421,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Longitude *</label>
           <input
             type="number"
             step="any"
@@ -389,6 +436,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Max Participants *</label>
           <input
             type="number"
             name="max_participants"
@@ -401,6 +449,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Registration Fee</label>
           <input
             type="number"
             step="0.01"
@@ -414,6 +463,8 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Registration Deadline</label>
+
           <input
             type="date"
             name="registration_deadline"
@@ -425,6 +476,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Prize Pool</label>
           <input
             type="number"
             step="0.01"
@@ -438,6 +490,7 @@ const CreateEvent = ({ onSave, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Event Status</label>
           <label className="checkbox-label">
             <input
               type="checkbox"
@@ -448,8 +501,9 @@ const CreateEvent = ({ onSave, onCancel }) => {
             />
             Featured Event
           </label>
-       
+
           <label className="checkbox-label">
+
             <input
               type="checkbox"
               name="is_active"
@@ -460,17 +514,17 @@ const CreateEvent = ({ onSave, onCancel }) => {
             Active Event
           </label>
         </div>
-        
+
         <div className="form-actions">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="submit-button"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Creating...' : 'Create Event'}
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="submit-button cancel-button"
             onClick={onCancel}
             disabled={isSubmitting}
