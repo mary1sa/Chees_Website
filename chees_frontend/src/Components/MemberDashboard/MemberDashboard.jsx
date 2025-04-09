@@ -5,7 +5,8 @@ import {
   FiDollarSign, FiCalendar, FiSettings, FiKey,
   FiLogOut, FiBell, FiSearch, FiSun, FiMoon,
   FiChevronDown, FiChevronRight, FiChevronLeft,
-  FiCreditCard, FiFileText, FiList
+  FiCreditCard, FiFileText, FiList, FiBook,
+  FiBookmark, FiPlay, FiAward, FiHeart
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -60,49 +61,48 @@ const MemberDashboard = () => {
     {
       title: "Dashboard",
       icon: <FiHome />,
-      path: "/admin"
+      path: "/member"
     },
     {
-      title: "User Management",
-      icon: <FiUsers />,
+      title: "My Courses",
+      icon: <FiBook />,
       submenus: [
         { 
-          title: "All Users", 
-          path: "/admin/users",
+          title: "Enrolled Courses", 
+          path: "/member/courses/enrolled",
+          icon: <FiBookmark className="submenu-icon" />
+        },
+        { 
+          title: "Course Catalog", 
+          path: "/member/courses/catalog",
           icon: <FiList className="submenu-icon" />
         },
         { 
-          title: "Add User", 
-          path: "/admin/users/add",
-          icon: <FiUserPlus className="submenu-icon" />
+          title: "My Progress", 
+          path: "/member/courses/progress",
+          icon: <FiAward className="submenu-icon" />
         },
         { 
-          title: "Roles", 
-          path: "/admin/users/roles",
-          icon: <FiKey className="submenu-icon" />
+          title: "Wishlist", 
+          path: "/member/courses/wishlist",
+          icon: <FiHeart className="submenu-icon" />
         }
       ]
     },
     {
-      title: "Financial",
+      title: "Events",
+      icon: <FiCalendar />,
+      path: "/member/events"
+    },
+    {
+      title: "Payments",
       icon: <FiDollarSign />,
-      submenus: [
-        { 
-          title: "Payments", 
-          path: "/admin/payments",
-          icon: <FiCreditCard className="submenu-icon" />
-        },
-        { 
-          title: "Invoices", 
-          path: "/admin/invoices",
-          icon: <FiFileText className="submenu-icon" />
-        }
-      ]
+      path: "/member/payments"
     },
     {
       title: "Settings",
       icon: <FiSettings />,
-      path: "/admin/settings"
+      path: "/member/settings"
     }
   ];
 

@@ -15,6 +15,13 @@ import ShowUser from './Components/AdminDashboard/ShowUser';
 import UpdateUser from './Components/AdminDashboard/UpdateUser';
 import CreateUser from './Components/AdminDashboard/CreateUser';
 
+// Course Components
+import CourseCatalog from './Components/Courses/CourseCatalog';
+import CourseDetail from './Components/Courses/CourseDetail';
+import EnrolledCourses from './Components/Courses/EnrolledCourses';
+import CourseProgress from './Components/Courses/CourseProgress';
+import CourseWishlist from './Components/Courses/CourseWishlist';
+
 import EventTypes from './Components/Event/EventTypes/EventTypes';
 import EventList from './Components/Event/Events/EventList';
 import AdminEventRegistrations from './Components/Event/Registration/Admin/AdminEventRegistrations';
@@ -52,7 +59,7 @@ function App() {
         </Route>
 
         <Route 
-          path="/member/dashboard" 
+          path="/member/dashboard"
           element={
             <ProtectedRoute roles={['member']}>
               <MemberDashboard />
@@ -60,6 +67,29 @@ function App() {
           }
         >
           <Route path="profile" element={<MemberProfile />} />
+          {/* Course Routes */}
+          <Route path="courses/catalog" element={<CourseCatalog />} />
+          <Route path="courses/:courseId" element={<CourseDetail />} />
+          <Route path="courses/enrolled" element={<EnrolledCourses />} />
+          <Route path="courses/progress" element={<CourseProgress />} />
+          <Route path="courses/wishlist" element={<CourseWishlist />} />
+        </Route>
+
+        <Route 
+          path="/member/dashboard"
+          element={
+            <ProtectedRoute roles={['member']}>
+              <MemberDashboard />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="profile" element={<MemberProfile />} />
+          {/* Course Routes */}
+          <Route path="courses/catalog" element={<CourseCatalog />} />
+          <Route path="courses/:courseId" element={<CourseDetail />} />
+          <Route path="courses/enrolled" element={<EnrolledCourses />} />
+          <Route path="courses/progress" element={<CourseProgress />} />
+          <Route path="courses/wishlist" element={<CourseWishlist />} />
         </Route>
 
         <Route
