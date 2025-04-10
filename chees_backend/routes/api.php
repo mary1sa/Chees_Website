@@ -176,3 +176,12 @@ Route::middleware('auth:api')->group(function () {
 // Event players
 Route::get('events/{event}/confirmed-players', [EventController::class, 'getConfirmedPlayers'])
     ->where('event', '[0-9]+'); // Ensure the parameter is numeric
+//books
+
+Route::apiResource('book-categories', BookCategoryController::class);
+Route::apiResource('authors', AuthorController::class);
+Route::apiResource('books', BookController::class);
+Route::apiResource('books.ratings', BookRatingController::class)->only(['index', 'store']);
+Route::apiResource('ratings', BookRatingController::class)->only(['update', 'destroy']);
+Route::apiResource('orders', OrderController::class)->except(['update']);
+Route::apiResource('order-items', OrderItemController::class)->only(['show']);
