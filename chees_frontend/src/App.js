@@ -27,6 +27,8 @@ import EventList from './Components/Event/Events/EventList';
 import AdminEventRegistrations from './Components/Event/Registration/Admin/AdminEventRegistrations';
 import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
 import TournamentMatchesManager from './Components/Event/Events/TournamentMatchesManager';
+import Roles from './Components/Roles/Roles';
+import CoachSpecialization from './Components/SpecializationCoatch/SpecializationCoach';
 // Import other event components as needed
 
 function App() {
@@ -55,7 +57,11 @@ function App() {
           <Route path="events" element={<EventList />} />
           <Route path="events/types" element={<EventTypes />} />
           <Route path="events/registrations" element={<AdminEventRegistrations />} />
-       
+       {/* Roles Management Routes */}
+       <Route path="roles" element={<Roles />} />
+          {/*Coatch Management Routes */}
+          <Route path="CoachSpecialization" element={<CoachSpecialization />} />
+
         </Route>
 
         <Route 

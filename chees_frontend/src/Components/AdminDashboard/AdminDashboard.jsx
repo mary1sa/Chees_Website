@@ -91,7 +91,7 @@ const AdminDashboard = () => {
         },
         { 
           title: "User Roles", 
-          path: "user-roles",
+          path: "roles",
           icon: <FiKey className="submenu-icon" />
         }
       ]
@@ -125,7 +125,7 @@ const AdminDashboard = () => {
       submenus: [
         { 
           title: "Payments", 
-          path: "payments",
+          path: "CoachSpecialization",
           icon: <FiCreditCard className="submenu-icon" />
         },
         { 
