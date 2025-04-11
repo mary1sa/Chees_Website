@@ -1,25 +1,32 @@
 <?php
 
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\CouponController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\EventTypeController;
+use App\Http\Controllers\OrderItemController;
+use App\Http\Controllers\BookRatingController;
+use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\TournamentController;
+use App\Http\Controllers\CourseLevelController;
+use App\Http\Controllers\CourseMediaController;
+use App\Http\Controllers\BookCategoryController;
+use App\Http\Controllers\Member\CoachController;
+use App\Http\Controllers\CourseSessionController;
+use App\Http\Controllers\CourseMaterialController;
 use App\Http\Controllers\TournamentMatchController;
 use App\Http\Controllers\TournamentRoundController;
 use App\Http\Controllers\EventRegistrationController;
-use App\Http\Controllers\CourseMaterialController;
-use App\Http\Controllers\CourseMediaController;
-use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\CourseLevelController;
-use App\Http\Controllers\CourseSessionController;
-use App\Http\Controllers\CouponController;
 use App\Http\Controllers\SessionAttendanceController;
 
 // Route::get('/user', function (Request $request) {
@@ -169,10 +176,10 @@ Route::get('events/{event}/confirmed-players', [EventController::class, 'getConf
     ->where('event', '[0-9]+'); // Ensure the parameter is numeric
 //books
 
-Route::apiResource('book-categories', BookCategoryController::class);
+Route::apiResource('categories', BookCategoryController::class);
 Route::apiResource('authors', AuthorController::class);
 Route::apiResource('books', BookController::class);
 Route::apiResource('books.ratings', BookRatingController::class)->only(['index', 'store']);
 Route::apiResource('ratings', BookRatingController::class)->only(['update', 'destroy']);
-Route::apiResource('orders', OrderController::class)->except(['update']);
+Route::apiResource('orders', OrderController::class)->middleware('auth:api');
 Route::apiResource('order-items', OrderItemController::class)->only(['show']);

@@ -2,20 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
 
     public function index()
     {
-        $orders = Auth::user()->orders()->with('items.book')->latest()->paginate(10);
+        $orders = Order::with(['user','items'])->get();
         return response()->json($orders);
     }
 

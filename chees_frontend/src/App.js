@@ -27,6 +27,10 @@ import EventList from './Components/Event/Events/EventList';
 import AdminEventRegistrations from './Components/Event/Registration/Admin/AdminEventRegistrations';
 import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
 import TournamentMatchesManager from './Components/Event/Events/TournamentMatchesManager';
+import BookList from './Components/BookStore/BookList';
+import AddBook from './Components/BookStore/AddBook';
+import AuthorList from './Components/BookStore/AuthorList';
+import OrdersList from './Components/BookStore/OrdersList';
 // Import other event components as needed
 
 function App() {
@@ -56,6 +60,14 @@ function App() {
           <Route path="events/types" element={<EventTypes />} />
           <Route path="events/registrations" element={<AdminEventRegistrations />} />
        
+
+
+          {/* Bookstore Management (moved here) */}
+          <Route path="books" element={<BookList />} />
+          <Route path="books/create" element={<AddBook />} />
+          <Route path="authors" element={<AuthorList />} />
+          <Route path="orders" element={<OrdersList />} />
+          
         </Route>
 
         <Route 
@@ -115,6 +127,9 @@ function App() {
         {/* <Route path='/EventTypes' element={<EventTypes />} /> */}
         {/* <Route path='/EventList' element={<EventList />} /> */}
         {/* <Route path='/AdminEventRegistrations' element={<AdminEventRegistrations />} /> */}
+
+
+
       </Routes>
     </Router>
   );
