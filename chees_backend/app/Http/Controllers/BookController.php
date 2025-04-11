@@ -84,6 +84,7 @@ class BookController extends Controller
         }
 
         $book->update($validated);
+        
         return response()->json($book->load(['author', 'category']));
     }
 

@@ -39,7 +39,7 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [bookRes, catsRes, authsRes] = await Promise.all([
+        const [bookRes, categoriesRes, authorsRes] = await Promise.all([
           axiosInstance.get(`/books/${bookId}`),
           axiosInstance.get('/categories'),
           axiosInstance.get('/authors')
@@ -51,24 +51,24 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
           author_id: book.author?.id || '',
           category_id: book.category?.id || '',
           isbn: book.isbn || '',
-          price: book.price ? String(book.price) : '',
-          stock: book.stock ? String(book.stock) : '',
+          price: book.price ? book.price.toString() : '',
+          stock: book.stock ? book.stock.toString() : '',
           description: book.description || '',
           cover_image: null,
-          sale_price: book.sale_price ? String(book.sale_price) : '',
-          pages: book.pages ? String(book.pages) : '',
+          sale_price: book.sale_price ? book.sale_price.toString() : '',
+          pages: book.pages ? book.pages.toString() : '',
           publisher: book.publisher || '',
           publication_date: book.publication_date ? book.publication_date.split('T')[0] : '',
           language: book.language || '',
           format: book.format || '',
-          weight: book.weight ? String(book.weight) : '',
+          weight: book.weight ? book.weight.toString() : '',
           dimensions: book.dimensions || '',
           is_featured: book.is_featured || false,
           is_active: book.is_active !== undefined ? book.is_active : true
         });
 
-        setCategories(catsRes.data);
-        setAuthors(authsRes.data);
+        setCategories(categoriesRes.data);
+        setAuthors(authorsRes.data);
         
         if (book.cover_image) {
           setPreviewImage(`http://localhost:8000/storage/${book.cover_image}`);
@@ -98,19 +98,27 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
       setFormData(prev => ({
         ...prev,
         cover_image: file
       }));
 
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
+      reader.onload = (event) => {
+        setPreviewImage(event.target.result);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -122,51 +130,24 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
     try {
       const formDataToSend = new FormData();
       
-      // Process required fields first
-      const requiredFields = {
-        title: formData.title,
-        author_id: formData.author_id,
-        category_id: formData.category_id,
-        price: formData.price ? parseFloat(formData.price) : null,
-        stock: formData.stock ? parseInt(formData.stock) : null
-      };
-
-      // Check for empty required fields
-      for (const [field, value] of Object.entries(requiredFields)) {
-        if (value === null || value === '') {
-          throw new Error(`${field} is required`);
+      // Append all fields
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === 'cover_image') {
+          if (value instanceof File) {
+            formDataToSend.append(key, value);
+          }
+        } else if (value !== null && value !== undefined && value !== '') {
+          if (key === 'is_featured' || key === 'is_active') {
+            formDataToSend.append(key, value ? '1' : '0');
+          } else if (key === 'price' || key === 'sale_price' || key === 'weight') {
+            formDataToSend.append(key, String(value));
+          } else {
+            formDataToSend.append(key, value);
+          }
         }
-        formDataToSend.append(field, value);
-      }
+      });
 
-      // Process optional fields
-      const optionalFields = {
-        isbn: formData.isbn || null,
-        description: formData.description || null,
-        sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
-        pages: formData.pages ? parseInt(formData.pages) : null,
-        publisher: formData.publisher || null,
-        publication_date: formData.publication_date || null,
-        language: formData.language || null,
-        format: formData.format || null,
-        weight: formData.weight ? parseFloat(formData.weight) : null,
-        dimensions: formData.dimensions || null,
-        is_featured: formData.is_featured ? 1 : 0,
-        is_active: formData.is_active ? 1 : 0
-      };
-
-      for (const [field, value] of Object.entries(optionalFields)) {
-        if (value !== null) {
-          formDataToSend.append(field, value);
-        }
-      }
-
-      // Handle file upload separately
-      if (formData.cover_image) {
-        formDataToSend.append('cover_image', formData.cover_image);
-      }
-
-      // Debug output
+      // Debug: Log FormData contents
       for (let [key, value] of formDataToSend.entries()) {
         console.log(key, value);
       }
@@ -183,13 +164,18 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
       }, 1500);
     } catch (error) {
       if (error.response?.status === 422) {
-        setErrors(error.response.data.errors || {});
-      } else if (error.message) {
-        setErrors({ form: error.message });
+        const validationErrors = {};
+        Object.entries(error.response.data.errors).forEach(([field, messages]) => {
+          validationErrors[field] = Array.isArray(messages) ? messages.join(', ') : messages;
+        });
+        setErrors(validationErrors);
+        console.log('Validation errors:', validationErrors);
       } else {
-        setErrors({ form: 'An error occurred while updating the book' });
+        setErrors({ 
+          form: error.response?.data?.message || 'An error occurred while updating the book' 
+        });
       }
-      console.error("Submission error:", error);
+      console.error("Update error:", error.response);
     } finally {
       setSubmitting(false);
     }
@@ -207,11 +193,8 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
   if (errors.fetch) {
     return (
       <div className="error-container">
-        <ErrorAlert message={errors.fetch} />
-        <button 
-          onClick={onCancel}
-          className="btn-secondary"
-        >
+        <ErrorAlert message={errors.fetch} onClose={() => setErrors({})} />
+        <button onClick={onCancel} className="btn-secondary">
           Back to Books
         </button>
       </div>
@@ -221,53 +204,42 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
   return (
     <div className="create-book-container">
       <div className="modal-header">
-        <h1 className="create-book-title">Edit Book</h1>
+        <h1>Edit Book</h1>
         <button onClick={onCancel} className="close-btn">
           <FiX />
         </button>
       </div>
       
-      {successMessage && (
-        <SuccessAlert 
-          message={successMessage} 
-          onClose={handleCloseAlert}
-        />
-      )}
-      
-      {errors.form && (
-        <ErrorAlert 
-          message={errors.form} 
-          onClose={handleCloseAlert}
-        />
-      )}
+      {successMessage && <SuccessAlert message={successMessage} onClose={handleCloseAlert} />}
+      {errors.form && <ErrorAlert message={errors.form} onClose={handleCloseAlert} />}
 
       <form onSubmit={handleSubmit} className="create-book-form">
+        {/* Image Upload */}
         <div className="image-upload-section">
           <label htmlFor="cover_image" className={`file-label ${previewImage ? 'has-image' : ''}`}>
             <input
               type="file"
-              name="cover_image"
               id="cover_image"
               onChange={handleFileChange}
-              className="file-input"
               accept="image/*"
             />
-            {!previewImage ? (
+            {previewImage ? (
+              <div className="image-preview">
+                <img src={previewImage} alt="Book cover" />
+              </div>
+            ) : (
               <div className="default-cover">
                 <svg className="book-icon" viewBox="0 0 24 24">
                   <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
                 </svg>
                 <span>Upload Cover Image</span>
               </div>
-            ) : (
-              <div className="image-preview">
-                <img src={previewImage} alt="Book cover preview" />
-              </div>
             )}
           </label>
           {errors.cover_image && <div className="error-message">{errors.cover_image}</div>}
         </div>
 
+        {/* Required Fields */}
         <div className="form-group">
           <input
             type="text"
@@ -275,7 +247,7 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
             placeholder="Title*"
             value={formData.title}
             onChange={handleChange}
-            className={`form-input ${errors.title ? 'is-invalid' : ''}`}
+            className={errors.title ? 'is-invalid' : ''}
             required
           />
           {errors.title && <div className="error-message">{errors.title}</div>}
@@ -287,14 +259,12 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               name="author_id"
               value={formData.author_id}
               onChange={handleChange}
-              className={`form-select ${errors.author_id ? 'is-invalid' : ''}`}
+              className={errors.author_id ? 'is-invalid' : ''}
               required
             >
               <option value="">Select Author*</option>
               {authors.map(author => (
-                <option key={author.id} value={author.id}>
-                  {author.name}
-                </option>
+                <option key={author.id} value={author.id}>{author.name}</option>
               ))}
             </select>
             {errors.author_id && <div className="error-message">{errors.author_id}</div>}
@@ -305,14 +275,12 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               name="category_id"
               value={formData.category_id}
               onChange={handleChange}
-              className={`form-select ${errors.category_id ? 'is-invalid' : ''}`}
+              className={errors.category_id ? 'is-invalid' : ''}
               required
             >
               <option value="">Select Category*</option>
               {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
             {errors.category_id && <div className="error-message">{errors.category_id}</div>}
@@ -322,18 +290,6 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
         <div className="form-row">
           <div className="form-group">
             <input
-              type="text"
-              name="isbn"
-              placeholder="ISBN"
-              value={formData.isbn}
-              onChange={handleChange}
-              className={`form-input ${errors.isbn ? 'is-invalid' : ''}`}
-            />
-            {errors.isbn && <div className="error-message">{errors.isbn}</div>}
-          </div>
-
-          <div className="form-group">
-            <input
               type="number"
               name="price"
               placeholder="Price*"
@@ -341,24 +297,10 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               onChange={handleChange}
               min="0"
               step="0.01"
-              className={`form-input ${errors.price ? 'is-invalid' : ''}`}
+              className={errors.price ? 'is-invalid' : ''}
               required
             />
             {errors.price && <div className="error-message">{errors.price}</div>}
-          </div>
-
-          <div className="form-group">
-            <input
-              type="number"
-              name="sale_price"
-              placeholder="Sale Price"
-              value={formData.sale_price}
-              onChange={handleChange}
-              min="0"
-              step="0.01"
-              className={`form-input ${errors.sale_price ? 'is-invalid' : ''}`}
-            />
-            {errors.sale_price && <div className="error-message">{errors.sale_price}</div>}
           </div>
 
           <div className="form-group">
@@ -369,14 +311,53 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               value={formData.stock}
               onChange={handleChange}
               min="0"
-              className={`form-input ${errors.stock ? 'is-invalid' : ''}`}
+              className={errors.stock ? 'is-invalid' : ''}
               required
             />
             {errors.stock && <div className="error-message">{errors.stock}</div>}
           </div>
         </div>
 
+        {/* Optional Fields */}
+        <div className="form-group">
+          <input
+            type="text"
+            name="isbn"
+            placeholder="ISBN"
+            value={formData.isbn}
+            onChange={handleChange}
+            className={errors.isbn ? 'is-invalid' : ''}
+          />
+          {errors.isbn && <div className="error-message">{errors.isbn}</div>}
+        </div>
+
+        <div className="form-group">
+          <textarea
+            name="description"
+            placeholder="Description"
+            value={formData.description}
+            onChange={handleChange}
+            className={errors.description ? 'is-invalid' : ''}
+            rows="4"
+          />
+          {errors.description && <div className="error-message">{errors.description}</div>}
+        </div>
+
         <div className="form-row">
+          <div className="form-group">
+            <input
+              type="number"
+              name="sale_price"
+              placeholder="Sale Price"
+              value={formData.sale_price}
+              onChange={handleChange}
+              min="0"
+              step="0.01"
+              className={errors.sale_price ? 'is-invalid' : ''}
+            />
+            {errors.sale_price && <div className="error-message">{errors.sale_price}</div>}
+          </div>
+
           <div className="form-group">
             <input
               type="number"
@@ -385,11 +366,13 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               value={formData.pages}
               onChange={handleChange}
               min="1"
-              className={`form-input ${errors.pages ? 'is-invalid' : ''}`}
+              className={errors.pages ? 'is-invalid' : ''}
             />
             {errors.pages && <div className="error-message">{errors.pages}</div>}
           </div>
+        </div>
 
+        <div className="form-row">
           <div className="form-group">
             <input
               type="text"
@@ -397,7 +380,7 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               placeholder="Publisher"
               value={formData.publisher}
               onChange={handleChange}
-              className={`form-input ${errors.publisher ? 'is-invalid' : ''}`}
+              className={errors.publisher ? 'is-invalid' : ''}
             />
             {errors.publisher && <div className="error-message">{errors.publisher}</div>}
           </div>
@@ -409,7 +392,7 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               placeholder="Publication Date"
               value={formData.publication_date}
               onChange={handleChange}
-              className={`form-input ${errors.publication_date ? 'is-invalid' : ''}`}
+              className={errors.publication_date ? 'is-invalid' : ''}
               max={new Date().toISOString().split('T')[0]}
             />
             {errors.publication_date && <div className="error-message">{errors.publication_date}</div>}
@@ -424,7 +407,7 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               placeholder="Language"
               value={formData.language}
               onChange={handleChange}
-              className={`form-input ${errors.language ? 'is-invalid' : ''}`}
+              className={errors.language ? 'is-invalid' : ''}
             />
             {errors.language && <div className="error-message">{errors.language}</div>}
           </div>
@@ -436,21 +419,23 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               placeholder="Format"
               value={formData.format}
               onChange={handleChange}
-              className={`form-input ${errors.format ? 'is-invalid' : ''}`}
+              className={errors.format ? 'is-invalid' : ''}
             />
             {errors.format && <div className="error-message">{errors.format}</div>}
           </div>
+        </div>
 
+        <div className="form-row">
           <div className="form-group">
             <input
               type="number"
               name="weight"
-              placeholder="Weight (g)"
+              placeholder="Weight (kg)"
               value={formData.weight}
               onChange={handleChange}
               min="0"
               step="0.01"
-              className={`form-input ${errors.weight ? 'is-invalid' : ''}`}
+              className={errors.weight ? 'is-invalid' : ''}
             />
             {errors.weight && <div className="error-message">{errors.weight}</div>}
           </div>
@@ -459,25 +444,13 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
             <input
               type="text"
               name="dimensions"
-              placeholder="Dimensions (e.g., 20x25x5)"
+              placeholder="Dimensions (e.g., 6x9 inches)"
               value={formData.dimensions}
               onChange={handleChange}
-              className={`form-input ${errors.dimensions ? 'is-invalid' : ''}`}
+              className={errors.dimensions ? 'is-invalid' : ''}
             />
             {errors.dimensions && <div className="error-message">{errors.dimensions}</div>}
           </div>
-        </div>
-
-        <div className="form-group">
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={formData.description}
-            onChange={handleChange}
-            className={`form-textarea ${errors.description ? 'is-invalid' : ''}`}
-            rows="4"
-          />
-          {errors.description && <div className="error-message">{errors.description}</div>}
         </div>
 
         <div className="form-group checkbox-group">
@@ -486,10 +459,7 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               type="checkbox"
               name="is_featured"
               checked={formData.is_featured}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                is_featured: e.target.checked
-              }))}
+              onChange={handleCheckboxChange}
               className="form-checkbox"
             />
             Featured Book
@@ -502,10 +472,7 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               type="checkbox"
               name="is_active"
               checked={formData.is_active}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                is_active: e.target.checked
-              }))}
+              onChange={handleCheckboxChange}
               className="form-checkbox"
             />
             Active
@@ -513,28 +480,15 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
         </div>
 
         <div className="form-actions">
-          <button 
-            type="button" 
-            onClick={onCancel}
-            className="btn-secondary"
-            disabled={submitting}
-          >
+          <button type="button" onClick={onCancel} className="btn-secondary">
             Cancel
           </button>
           <button 
             type="submit" 
-            className="submit-button"
-            disabled={submitting}
+            className="submit-button" 
+            disabled={submitting || !formData.title || !formData.author_id || !formData.category_id}
           >
-            {submitting ? (
-              <span className="loading-button">
-                <span className="spinner_button"></span> Saving...
-              </span>
-            ) : (
-              <>
-                <FiSave className="icon" /> Save Changes
-              </>
-            )}
+            {submitting ? 'Saving...' : <><FiSave /> Save Changes</>}
           </button>
         </div>
       </form>
