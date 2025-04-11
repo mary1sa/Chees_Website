@@ -180,7 +180,15 @@
     color: #F44336;
     background-color: #f5e8e8;
   }
+  .approve-btn .icon {
+    font-size: 20px;  /* Adjust icon size */
+    color: green;     /* Green color for approve button */
+  }
   
+  .reject-btn .icon {
+    font-size: 20px;  /* Adjust icon size */
+    color: red;       /* Red color for reject button */
+  }
   .view-btn:hover {
     color: #4CAF50;
     background-color: #e6f7ee;

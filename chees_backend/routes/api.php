@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CoachesController;
 use App\Http\Controllers\CoachSpecializationCategoryController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -59,19 +60,40 @@ Route::get('/users/{id}', [UserController::class, 'getUserById']);
 Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
+Route::get('/coaches', [UserController::class, 'getCoaches']);
 
 // Get coaches for course creation
 Route::get('/coaches', [UserController::class, 'getCoaches']);
 
-
+//coatches routes
 //CoatchSpecializationCategoryController
 Route::get('specializations', [CoachSpecializationCategoryController::class, 'index']);
 Route::post('specializations', [CoachSpecializationCategoryController::class, 'store']);
 Route::get('specializations/{id}', [CoachSpecializationCategoryController::class, 'show']);
 Route::put('specializations/{id}', [CoachSpecializationCategoryController::class, 'update']);
 Route::delete('specializations/{id}', [CoachSpecializationCategoryController::class, 'destroy']);
-//Coaches
-//Route::apiResource('coaches', CoachController::class);
+
+
+// Coach API routes
+
+
+    Route::get('fetchcoaches', [CoachesController::class, 'adminIndex']);
+    Route::get('approved-coaches', [CoachesController::class, 'indexApprovedRejected']);
+    Route::get('/coaches/{id}', [CoachesController::class, 'show']);
+
+    Route::get('pending-coaches', [CoachesController::class, 'pendingCoaches']);
+
+    Route::post('/coaches', [CoachesController::class, 'store']);
+
+    Route::put('/coaches/{id}', [CoachesController::class, 'update']);
+
+    Route::delete('/coaches/{id}', [CoachesController::class, 'destroy']);
+
+    Route::put('/approve-coach/{id}', [CoachesController::class, 'approve']);
+
+    Route::put('/reject-coach/{id}', [CoachesController::class, 'reject']);
+
+
 
 
 // Event Types

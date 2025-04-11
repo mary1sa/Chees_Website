@@ -72,9 +72,9 @@ const CoatchDashboard = () => {
           path: "/admin/users",
           icon: <FiList className="submenu-icon" />
         },
-        {
-          title: "Add User",
-          path: "/admin/users/add",
+        { 
+          title: "Add Coatch", 
+          path: "/CreateCoatch",
           icon: <FiUserPlus className="submenu-icon" />
         },
         {

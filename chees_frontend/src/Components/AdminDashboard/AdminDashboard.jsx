@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -7,7 +9,8 @@ import {
   FiChevronDown, FiChevronRight,
   FiCreditCard, FiFileText, FiList, 
   FiLayers, FiAward, FiBook, FiPlusCircle,
-  FiBarChart2, FiUserCheck, FiUser, FiPlus, FiShoppingCart
+  FiBarChart2, FiUserCheck, FiUser, FiPlus, FiShoppingCart,FiGrid
+
 } from 'react-icons/fi';
 import './AdminDashboard.css';
 
@@ -122,6 +125,38 @@ const AdminDashboard = () => {
           path: "events/registrations",
           icon: <FiAward className="submenu-icon" />
         }
+      ]
+    },
+
+
+    {
+      title: "Coatchs",
+      icon: <FiAward />,
+      submenus: [
+        { 
+          title: " All Coatches", 
+          path: "Fetchcoatches",
+          // icon: <FiFileText className="submenu-icon" />
+          icon: <FiList className="submenu-icon" />
+
+        },
+        { 
+          
+          title: "CoatchCategorys", 
+          path: "CoachSpecialization",
+          icon: <FiGrid className="submenu-icon" />       },
+          { 
+          
+            title: "Request Pending", 
+            path: "RequestPending",
+            icon: <FiFileText className="submenu-icon" />
+ 
+               },
+               { 
+                 title: "Add User", 
+                 path: "CreateCoatch",
+                 icon: <FiUserPlus className="submenu-icon" />
+               },
       ]
     },
     {
