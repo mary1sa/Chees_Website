@@ -72,7 +72,7 @@ const BookList = () => {
   
     try {
       setLoading(true);
-      await axiosInstance.delete(`/api/books/${bookToDelete.id}`);
+      await axiosInstance.delete(`/books/${bookToDelete.id}`);
       setBooks(prev => prev.filter(b => b.id !== bookToDelete.id));
       setFilteredBooks(prev => prev.filter(b => b.id !== bookToDelete.id));
     } catch (error) {
