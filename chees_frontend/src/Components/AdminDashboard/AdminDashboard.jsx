@@ -6,7 +6,8 @@ import {
   FiLogOut, FiBell, FiSun, FiMoon,
   FiChevronDown, FiChevronRight,
   FiCreditCard, FiFileText, FiList, 
-  FiLayers, FiAward
+  FiLayers, FiAward,
+  FiGrid
 } from 'react-icons/fi';
 import './AdminDashboard.css';
 
@@ -120,19 +121,33 @@ const AdminDashboard = () => {
       ]
     },
     {
-      title: "Financial",
-      icon: <FiDollarSign />,
+      title: "Coatchs",
+      icon: <FiAward />,
       submenus: [
         { 
-          title: "Payments", 
-          path: "CoachSpecialization",
-          icon: <FiCreditCard className="submenu-icon" />
+          title: " All Coatches", 
+          path: "Fetchcoatches",
+          // icon: <FiFileText className="submenu-icon" />
+          icon: <FiList className="submenu-icon" />
+
         },
         { 
-          title: "Invoices", 
-          path: "invoices",
-          icon: <FiFileText className="submenu-icon" />
-        }
+          
+          title: "CoatchCategorys", 
+          path: "CoachSpecialization",
+          icon: <FiGrid className="submenu-icon" />       },
+          { 
+          
+            title: "Request Pending", 
+            path: "RequestPending",
+            icon: <FiFileText className="submenu-icon" />
+ 
+               },
+               { 
+                 title: "Add User", 
+                 path: "CreateCoatch",
+                 icon: <FiUserPlus className="submenu-icon" />
+               },
       ]
     },
     {

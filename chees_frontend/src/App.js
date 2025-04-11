@@ -28,7 +28,10 @@ import AdminEventRegistrations from './Components/Event/Registration/Admin/Admin
 import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
 import TournamentMatchesManager from './Components/Event/Events/TournamentMatchesManager';
 import Roles from './Components/Roles/Roles';
-import CoachSpecialization from './Components/SpecializationCoatch/SpecializationCoach';
+import CoachSpecialization from './Components/Coatches/SpecializationCoach';
+import FetchCoaches from './Components/Coatches/Coatche/FetchCoatches';
+import PendingRequestsTable from './Components/Coatches/PendingRequestsTable';
+import CreateCoach from './Components/Coatches/Coatche/CreateCoatch';
 // Import other event components as needed
 
 function App() {
@@ -61,6 +64,10 @@ function App() {
        <Route path="roles" element={<Roles />} />
           {/*Coatch Management Routes */}
           <Route path="CoachSpecialization" element={<CoachSpecialization />} />
+          <Route path="FetchCoatches" element={<FetchCoaches />} />
+          <Route path="CreateCoatch" element={<CreateCoach />} />
+
+          <Route path="RequestPending" element={<PendingRequestsTable />} />
 
         </Route>
 

@@ -14,10 +14,12 @@ class Coach extends Model
         'rating', 'peak_rating', 'years_teaching_experience', 'primary_specialization_id',
         'secondary_specialization_id', 'hourly_rate', 'preferred_languages', 'teaching_formats',
         'communication_methods', 'professional_bio', 'video_introduction_url',
-        'social_media_links', 'is_active', 'is_available'
+        'social_media_links', 'is_active', 'is_available',    'status'
+
     ];
     
     protected $casts = [
+        
         'preferred_languages' => 'array',
         'teaching_formats' => 'array',
         'communication_methods' => 'array',
@@ -55,4 +57,5 @@ class Coach extends Model
     {
         return $this->hasMany(CoachReview::class);
     }
+    
 }

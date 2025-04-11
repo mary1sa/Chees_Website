@@ -20,6 +20,16 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function getCoaches()
+    {
+        $users = User::with('role')
+        ->whereHas('role', function ($query) {
+            $query->where('name', 'coach'); 
+        })
+        ->get();
+
+    return response()->json($users);
+    }
     public function getUserById($id)
     {
         $user = User::with('role')->find($id);
