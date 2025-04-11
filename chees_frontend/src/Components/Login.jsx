@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from './config/axiosInstance';
@@ -9,6 +10,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  
 
   const navigate = useNavigate();
 
@@ -51,15 +53,15 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 console.log(user)
-      if (user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else if (user.role === 'member') {
-        navigate('/member/dashboard');
-      } else if (user.role === 'coach') {
-        navigate('/coach/dashboard');
-      } else {
-        navigate('/'); 
-      }
+if (user.role === 'admin') {
+  navigate('/admin/dashboard');
+} else if (user.role === 'member') {
+  navigate('/member/dashboard');
+} else if (user.role === 'coach') {  // Match the spelling in your backend
+  navigate('/coach/dashboard');    // Match the route in App.js
+}else {
+  navigate('/'); 
+}
 
     } catch (err) {
       if (err.response?.status === 401) {

@@ -22,7 +22,35 @@ class EventRegistrationController extends Controller
             'data' => $registrations
         ]);
     }
-
+    public function availableEvents()
+    {
+        try {
+            $tomorrow = now()->addDay();
+    
+            $events = Event::where(function($query) use ($tomorrow) {
+                    $query->whereNull('registration_deadline')
+                        ->orWhere('registration_deadline', '>', $tomorrow);
+                })
+                ->withCount(['registrations' => function($query) {
+                    $query->whereIn('status', ['confirmed', 'pending']);
+                }])
+                ->havingRaw('(max_participants IS NULL OR registrations_count < max_participants)')
+                ->get();
+    
+            return response()->json([
+                'success' => true,
+                'data' => $events,
+                'message' => $events->isEmpty() ? 'No available events found' : 'Events retrieved successfully'
+            ]);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve events',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
     /**
      * Store a new registration (POST /events/{event}/register)
      */
@@ -46,12 +74,12 @@ class EventRegistrationController extends Controller
             'event_id' => $event->id,
             'user_id' => $request->user_id,
             'registration_number' => $this->generateRegistrationNumber($event),
-            'status' => $event->registration_fee > 0 ? 'pending' : 'confirmed',
-            'payment_status' => $event->registration_fee > 0 ? 'pending' : 'completed',
+            'status' => 'pending',
+            'payment_status' => 'pending',
             'paid_amount' => $event->registration_fee > 0 ? $event->registration_fee : null,
             'registration_date' => now()
         ]);
-    
+ 
         return response()->json([
             'message' => 'Registration successful',
             'data' => $registration->load('event')

@@ -2,9 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use EventSeeder;
+
+use Database\Seeders\EventTypeSeeder;
+use Database\Seeders\EventsTableSeeder;
+use Database\Seeders\TournamentRoundsTableSeeder;
+use Database\Seeders\TournamentMatchesTableSeeder;
+use Database\Seeders\EventRegistrationsTableSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,8 +17,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+            UserSeeder::class,
+            EventTypeSeeder::class,
+            EventsTableSeeder::class,
+            EventRegistrationsTableSeeder::class,
+            TournamentRoundsTableSeeder::class,
+            TournamentMatchesTableSeeder::class,
+        ]);
         // User::factory(10)->create();
 
-        $this->call(UserSeeder::class);
     }
 }

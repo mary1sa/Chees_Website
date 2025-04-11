@@ -5,7 +5,8 @@ import {
   FiDollarSign, FiCalendar, FiSettings, FiKey,
   FiLogOut, FiBell, FiSearch, FiSun, FiMoon,
   FiChevronDown, FiChevronRight, FiChevronLeft,
-  FiCreditCard, FiFileText, FiList
+  FiCreditCard, FiFileText, FiList,
+  FiAward
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -27,7 +28,7 @@ const CoatchDashboard = () => {
     const handleResize = () => {
       const mobile = window.innerWidth < 992;
       setIsMobile(mobile);
-      
+
       if (mobile && sidebarOpen) {
         setSidebarOpen(false);
       }
@@ -66,8 +67,8 @@ const CoatchDashboard = () => {
       title: "User Management",
       icon: <FiUsers />,
       submenus: [
-        { 
-          title: "All Users", 
+        {
+          title: "All Users",
           path: "/admin/users",
           icon: <FiList className="submenu-icon" />
         },
@@ -76,24 +77,30 @@ const CoatchDashboard = () => {
           path: "/CreateCoatch",
           icon: <FiUserPlus className="submenu-icon" />
         },
-        { 
-          title: "Roles", 
+        {
+          title: "Roles",
           path: "/admin/users/roles",
           icon: <FiKey className="submenu-icon" />
         }
+        
       ]
     },
+
     {
+      title: "Registrations",
+      path: "registrations",  // This is now relative to /coach/dashboard
+      icon: <FiAward className="submenu-icon" />
+    }, {
       title: "Financial",
       icon: <FiDollarSign />,
       submenus: [
-        { 
-          title: "Payments", 
+        {
+          title: "Payments",
           path: "/admin/payments",
           icon: <FiCreditCard className="submenu-icon" />
         },
-        { 
-          title: "Invoices", 
+        {
+          title: "Invoices",
           path: "/admin/invoices",
           icon: <FiFileText className="submenu-icon" />
         }
@@ -122,14 +129,14 @@ const CoatchDashboard = () => {
           <button className="theme-toggle" onClick={toggleDarkMode}>
             {darkMode ? <FiSun /> : <FiMoon />}
           </button>
-          
+
           <div className="notifications-wrapper">
             <button className="notifications">
               <FiBell />
               <span className="notification-badge">3</span>
             </button>
           </div>
-          
+
           <div className="admin-profile">
             <img src={adminData.avatar} alt={adminData.name} className="admin-avatar" />
             <div className="profile-info">
@@ -147,7 +154,7 @@ const CoatchDashboard = () => {
           </button>
           {sidebarOpen && <h2 className="sidebar-brand">Admin Panel</h2>}
         </div>
-        
+
         <div className="sidebar-menu">
           <div className="menu-items-container">
             {menuItems.map((item, index) => (
@@ -176,7 +183,7 @@ const CoatchDashboard = () => {
                         {activeMenu === item.title ? <FiChevronDown /> : <FiChevronRight />}
                       </span>
                     </div>
-                    
+
                     {activeMenu === item.title && (
                       <div className="submenu">
                         {item.submenus.map((sub, subIndex) => (
@@ -200,7 +207,7 @@ const CoatchDashboard = () => {
               </div>
             ))}
           </div>
-          
+
           <div className="menu-group logout-group">
             <button className="menu-item logout" onClick={handleLogout}>
               <span className="menu-icon"><FiLogOut /></span>
@@ -214,11 +221,11 @@ const CoatchDashboard = () => {
         <div className="sidebar-overlay" onClick={closeSidebar} />
       )}
 
-      <main className={`admin-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-        <div className="content-wrapper">
-          <Outlet />
-        </div>
-      </main>
+<main className={`admin-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+  <div className="content-wrapper">
+    <Outlet />  {/* This will render the nested routes */}
+  </div>
+</main>
     </div>
   );
 };

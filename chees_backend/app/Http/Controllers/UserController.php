@@ -30,6 +30,11 @@ class UserController extends Controller
 
     return response()->json($users);
     }
+
+
+
+
+    
     public function getUserById($id)
     {
         $user = User::with('role')->find($id);
@@ -139,4 +144,6 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User deleted successfully']);
     }
+
+   
 }

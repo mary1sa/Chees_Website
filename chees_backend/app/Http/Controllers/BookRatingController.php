@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use App\Models\BookRating;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class BookRatingController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
-
+    
     public function index(Book $book)
     {
-        $ratings = $book->ratings()->with('user')->latest()->paginate(10);
+        $ratings = $book->ratings()->with('user')->get();
         return response()->json($ratings);
     }
 

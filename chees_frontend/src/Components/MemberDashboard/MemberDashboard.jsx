@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -93,6 +94,11 @@ const MemberDashboard = () => {
       title: "Events",
       icon: <FiCalendar />,
       path: "/member/events"
+    },
+    {
+      title: "My Registrations",
+      icon: <FiCalendar />,
+      path: "/member/dashboard/registrations"
     },
     {
       title: "Payments",
@@ -215,5 +221,4 @@ const MemberDashboard = () => {
     </div>
   );
 };
-
 export default MemberDashboard;

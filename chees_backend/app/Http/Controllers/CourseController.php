@@ -62,8 +62,8 @@ class CourseController extends Controller
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
             'max_students' => 'nullable|integer|min:1',
-            'is_online' => 'nullable|boolean',
-            'is_active' => 'nullable|boolean',
+            'is_online' => 'required|in:0,1',
+            'is_active' => 'required|in:0,1',
         ]);
 
         if ($validator->fails()) {
@@ -81,11 +81,8 @@ class CourseController extends Controller
             // Generate a unique filename
             $filename = uniqid() . '.' . $file->getClientOriginalExtension();
             
-            // Store the file in the public disk under courses directory
-            $thumbnailPath = $file->storeAs('public/courses', $filename);
-            
-            // Convert storage path to web accessible path
-            $thumbnailPath = str_replace('public/', 'storage/', $thumbnailPath);
+            // Store the file in the courses directory
+            $thumbnailPath = $file->storeAs('courses', $filename, 'public');
         }
 
         // Prepare input data
@@ -116,9 +113,53 @@ class CourseController extends Controller
     {
         $course = Course::with(['sessions', 'materials'])->findOrFail($id);
         
+        // Add additional data for frontend compatibility
+        $courseData = $course->toArray();
+        
+        // Debug the thumbnail path
+        \Log::info('Course thumbnail path:', [
+            'course_id' => $course->id,
+            'thumbnail' => $course->thumbnail
+        ]);
+        
+        // Check if thumbnail exists and generate correct URL
+        if ($course->thumbnail) {
+            // For new thumbnail format (stored directly as the path in course_thumbnails directory)
+            $thumbnailPath = $course->thumbnail;
+            
+            // Check if file exists in storage
+            if (Storage::disk('public')->exists($thumbnailPath)) {
+                $courseData['thumbnail_url'] = asset('storage/' . $thumbnailPath);
+                $courseData['thumbnail_exists'] = true;
+            } else {
+                // Fallback for older thumbnail paths (that might have storage/ prefix or be in different directories)
+                $alternativePath = str_replace('storage/', '', $course->thumbnail);
+                
+                if (Storage::disk('public')->exists($alternativePath)) {
+                    $courseData['thumbnail_url'] = asset('storage/' . $alternativePath);
+                    $courseData['thumbnail_exists'] = true;
+                } else {
+                    // If all attempts fail, use the original path as a last resort
+                    $courseData['thumbnail_url'] = asset($course->thumbnail);
+                    $courseData['thumbnail_exists'] = false;
+                    
+                    // Log the issue for debugging
+                    \Log::warning('Thumbnail file not found:', [
+                        'course_id' => $course->id,
+                        'thumbnail_path' => $thumbnailPath,
+                        'alternative_path' => $alternativePath,
+                        'original_thumbnail' => $course->thumbnail
+                    ]);
+                }
+            }
+        } else {
+            $courseData['thumbnail_url'] = null;
+            $courseData['thumbnail_exists'] = false;
+        }
+        
         return response()->json([
             'success' => true,
-            'data' => $course
+            'data' => $courseData
         ]);
     }
 
@@ -193,11 +234,12 @@ class CourseController extends Controller
                 'level_id' => 'sometimes|required|exists:course_levels,id',
                 'description' => 'sometimes|required|string',
                 'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+                'file_path' => 'nullable|string', // Allow file_path for existing thumbnails
                 'price' => 'sometimes|required|numeric|min:0',
                 'duration' => 'sometimes|required|integer|min:1',
                 'max_students' => 'nullable|integer|min:1',
-                'is_online' => 'nullable|boolean',
-                'is_active' => 'nullable|boolean',
+                'is_online' => 'nullable|in:0,1',
+                'is_active' => 'nullable|in:0,1',
             ]);
 
             // Collect update data
@@ -236,7 +278,19 @@ class CourseController extends Controller
                 $file = $request->file('thumbnail');
                 $filename = uniqid() . '.' . $file->getClientOriginalExtension();
                 $thumbnailPath = $file->storeAs('courses', $filename, 'public');
+                
+                // Log the thumbnail storage for debugging
+                \Log::info('Storing thumbnail:', [
+                    'original_name' => $file->getClientOriginalName(),
+                    'path' => $thumbnailPath,
+                    'full_path' => Storage::disk('public')->path($thumbnailPath),
+                    'url' => Storage::disk('public')->url($thumbnailPath)
+                ]);
+                
                 $updateData['thumbnail'] = 'storage/' . $thumbnailPath;
+            } elseif ($request->has('file_path') && !empty($request->file_path)) {
+                // Keep existing thumbnail if file_path is provided
+                $updateData['thumbnail'] = $request->file_path;
             }
             // Handle thumbnail removal
             elseif ($request->has('thumbnail') && 
@@ -284,6 +338,106 @@ class CourseController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update course: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update course with file upload support (handles multipart/form-data)
+     */
+    public function updateWithFile(Request $request, $course)
+    {
+        try {
+            $course = Course::findOrFail($course);
+            
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'title' => 'sometimes|required|string|max:255',
+                'level_id' => 'sometimes|required|exists:course_levels,id',
+                'description' => 'sometimes|required|string',
+                'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image validation
+                'price' => 'sometimes|required|numeric|min:0',
+                'duration' => 'sometimes|required|integer|min:1',
+                'max_students' => 'nullable|integer|min:1',
+                'is_online' => 'required|in:0,1',
+                'is_active' => 'required|in:0,1',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            
+            // Collect update data
+            $updateData = $request->only([
+                'title', 'description', 'price', 'level_id',
+                'duration', 'max_students', 'is_online', 'is_active'
+            ]);
+            
+            // Handle file upload if present
+            if ($request->hasFile('thumbnail')) {
+                // Delete old thumbnail if it exists
+                if ($course->thumbnail && file_exists(storage_path('app/public/' . $course->thumbnail))) {
+                    unlink(storage_path('app/public/' . $course->thumbnail));
+                }
+                
+                // Store the new thumbnail
+                $file = $request->file('thumbnail');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('courses', $fileName, 'public');
+                
+                $updateData['thumbnail'] = $filePath;
+            }
+            
+            // Update the course
+            $course->update($updateData);
+            
+            // Refresh the course data
+            $course->refresh();
+            
+            // Add thumbnail_url for frontend
+            $courseData = $course->toArray();
+            
+            // Check if thumbnail exists and generate correct URL
+            if ($course->thumbnail) {
+                // First, try to normalize the path
+                $thumbnailPath = str_replace('storage/', '', $course->thumbnail);
+                
+                // Check if file exists in storage
+                if (Storage::disk('public')->exists($thumbnailPath)) {
+                    $courseData['thumbnail_url'] = Storage::disk('public')->url($thumbnailPath);
+                    $courseData['thumbnail_exists'] = true;
+                } else {
+                    // Try with original path
+                    $courseData['thumbnail_url'] = asset($course->thumbnail);
+                    $courseData['thumbnail_exists'] = false;
+                    
+                    // Log the issue for debugging
+                    \Log::warning('Thumbnail file not found after update:', [
+                        'course_id' => $course->id,
+                        'thumbnail_path' => $thumbnailPath,
+                        'full_path' => Storage::disk('public')->path($thumbnailPath)
+                    ]);
+                }
+            } else {
+                $courseData['thumbnail_url'] = null;
+                $courseData['thumbnail_exists'] = false;
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Course updated successfully',
+                'data' => $courseData
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update course',
                 'error' => $e->getMessage()
             ], 500);
         }

@@ -46,7 +46,7 @@ class CourseSessionController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'course_id' => 'required|exists:courses,id',
-            'coach_id' => 'nullable|exists:coaches,id',
+            'coach_id' => 'nullable|exists:users,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'start_datetime' => 'required|date',
@@ -90,7 +90,7 @@ class CourseSessionController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'course_id' => 'exists:courses,id',
-            'coach_id' => 'nullable|exists:coaches,id',
+            'coach_id' => 'nullable|exists:users,id',
             'title' => 'string|max:255',
             'description' => 'nullable|string',
             'start_datetime' => 'date',
@@ -150,7 +150,7 @@ class CourseSessionController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'course_id' => 'required|exists:courses,id',
-            'coach_id' => 'nullable|exists:coaches,id',
+            'coach_id' => 'nullable|exists:users,id',
             'sessions' => 'required|array',
             'sessions.*.title' => 'required|string|max:255',
             'sessions.*.description' => 'nullable|string',
