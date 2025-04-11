@@ -96,9 +96,18 @@ const MemberDashboard = () => {
           title: "Invoices", 
           path: "/admin/invoices",
           icon: <FiFileText className="submenu-icon" />
-        }
+        },
+       
+        
       ]
     },
+    
+    {
+      title: "My Registrations",
+      icon: <FiCalendar />,
+      path: "/member/dashboard/registrations"
+    },
+    
     {
       title: "Settings",
       icon: <FiSettings />,

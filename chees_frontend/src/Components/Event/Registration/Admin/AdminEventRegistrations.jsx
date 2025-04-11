@@ -100,19 +100,7 @@ const AdminEventRegistrations = () => {
     }
   };
 
-  // Confirm payment
-  const handleConfirmPayment = async (id) => {
-    try {
-      setLoading(true);
-      await axiosInstance.post(`/registrations/${id}/confirm-payment`);
-      setSuccessAlert({ message: 'Payment confirmed successfully!' });
-      await fetchRegistrations();
-    } catch (err) {
-      setErrorAlert({ message: err.response?.data?.message || 'Failed to confirm payment' });
-    } finally {
-      setLoading(false);
-    }
-  };
+ 
 
   // Delete registration
   const confirmDeleteRegistration = async () => {
@@ -401,15 +389,7 @@ const AdminEventRegistrations = () => {
                 >
                   <FiTrash2 className="icon" />
                 </button>
-                {reg.payment_status === 'pending' && (
-                  <button 
-                    onClick={() => handleConfirmPayment(reg.id)}
-                    className="action-btn confirm-btn"
-                    title="Confirm Payment"
-                  >
-                    <FiCheck className="icon" />
-                  </button>
-                )}
+               
               </div>
             </div>
           ))

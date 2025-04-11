@@ -20,6 +20,7 @@ import EventList from './Components/Event/Events/EventList';
 import AdminEventRegistrations from './Components/Event/Registration/Admin/AdminEventRegistrations';
 import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
 import TournamentMatchesManager from './Components/Event/Events/TournamentMatchesManager';
+import UserEventRegistrations from './Components/Event/Registration/User/UserEventRegistrations';
 // Import other event components as needed
 
 function App() {
@@ -60,17 +61,20 @@ function App() {
           }
         >
           <Route path="profile" element={<MemberProfile />} />
+          <Route path="registrations" element={<UserEventRegistrations />} />
+
         </Route>
 
         <Route
-          path="/coatch/dashboard"
-          element={
-            <ProtectedRoute roles={['coatch']}>
-              <CoatchDashboard />
-            </ProtectedRoute>
-          }
-        >
-        </Route>
+  path="/coach/dashboard"
+  element={
+    <ProtectedRoute roles={['coach']}>
+      <CoatchDashboard />
+    </ProtectedRoute>
+  }
+>
+  <Route path="registrations" element={<UserEventRegistrations />} />
+</Route>
 
         <Route
           path="/"

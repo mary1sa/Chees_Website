@@ -69,8 +69,10 @@ Route::get('events/{event}/registration-status', [EventController::class,'regist
 // Event Registrations
 Route::apiResource('registrations', controller: EventRegistrationController::class)->except(['store']);
 Route::post('events/{event}/register', [EventRegistrationController::class, 'register']);
+Route::get('/events/available', [EventRegistrationController::class, 'availableEvents']);
 Route::post('registrations/{registration}/cancel', [EventRegistrationController::class, 'cancel']);
 Route::post('registrations/{registration}/confirm-payment', [EventRegistrationController::class, 'confirmPayment']);
+
 Route::get('users/{user}/registrations', [EventRegistrationController::class, 'userRegistrations']);
 Route::get('events/{event}/registrations', [EventRegistrationController::class, 'getEventRegistrations']);
 

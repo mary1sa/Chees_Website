@@ -55,9 +55,9 @@ console.log(user)
         navigate('/admin/dashboard');
       } else if (user.role === 'member') {
         navigate('/member/dashboard');
-      } else if (user.role === 'coach') {
-        navigate('/coach/dashboard');
-      } else {
+      } else if (user.role === 'coach') {  // Match the spelling in your backend
+        navigate('/coach/dashboard');    // Match the route in App.js
+      }else {
         navigate('/'); 
       }
 
