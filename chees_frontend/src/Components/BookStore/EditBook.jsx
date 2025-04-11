@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../config/axiosInstance';
-import { FiX, FiSave, FiArrowLeft } from 'react-icons/fi';
+import { FiX, FiSave } from 'react-icons/fi';
 import SuccessAlert from '../Alerts/SuccessAlert';
 import ErrorAlert from '../Alerts/ErrorAlert';
 import '../AdminDashboard/UserTable.css';
 import PageLoading from '../PageLoading/PageLoading';
 
-const EditBook = () => {
-  const { id: bookId } = useParams();
-  const navigate = useNavigate();
+const EditBook = ({ bookId, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     title: '',
     author_id: '',
@@ -54,17 +51,17 @@ const EditBook = () => {
           author_id: book.author?.id || '',
           category_id: book.category?.id || '',
           isbn: book.isbn || '',
-          price: book.price || '',
-          stock: book.stock || '',
+          price: book.price ? String(book.price) : '',
+          stock: book.stock ? String(book.stock) : '',
           description: book.description || '',
           cover_image: null,
-          sale_price: book.sale_price || '',
-          pages: book.pages || '',
+          sale_price: book.sale_price ? String(book.sale_price) : '',
+          pages: book.pages ? String(book.pages) : '',
           publisher: book.publisher || '',
-          publication_date: book.publication_date || '',
+          publication_date: book.publication_date ? book.publication_date.split('T')[0] : '',
           language: book.language || '',
           format: book.format || '',
-          weight: book.weight || '',
+          weight: book.weight ? String(book.weight) : '',
           dimensions: book.dimensions || '',
           is_featured: book.is_featured || false,
           is_active: book.is_active !== undefined ? book.is_active : true
@@ -120,23 +117,61 @@ const EditBook = () => {
     e.preventDefault();
     setSubmitting(true);
     setSuccessMessage('');
+    setErrors({});
     
     try {
       const formDataToSend = new FormData();
       
-      // Append all form data
-      Object.keys(formData).forEach(key => {
-        if (formData[key] !== null && formData[key] !== undefined) {
-          // Convert boolean values to 1/0 for form data
-          const value = typeof formData[key] === 'boolean' 
-            ? formData[key] ? 1 : 0 
-            : formData[key];
-          formDataToSend.append(key, value);
-        }
-      });
+      // Process required fields first
+      const requiredFields = {
+        title: formData.title,
+        author_id: formData.author_id,
+        category_id: formData.category_id,
+        price: formData.price ? parseFloat(formData.price) : null,
+        stock: formData.stock ? parseInt(formData.stock) : null
+      };
 
-      // Use PUT for updates
-      await axiosInstance.put(`/books/${bookId}`, formDataToSend, {
+      // Check for empty required fields
+      for (const [field, value] of Object.entries(requiredFields)) {
+        if (value === null || value === '') {
+          throw new Error(`${field} is required`);
+        }
+        formDataToSend.append(field, value);
+      }
+
+      // Process optional fields
+      const optionalFields = {
+        isbn: formData.isbn || null,
+        description: formData.description || null,
+        sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
+        pages: formData.pages ? parseInt(formData.pages) : null,
+        publisher: formData.publisher || null,
+        publication_date: formData.publication_date || null,
+        language: formData.language || null,
+        format: formData.format || null,
+        weight: formData.weight ? parseFloat(formData.weight) : null,
+        dimensions: formData.dimensions || null,
+        is_featured: formData.is_featured ? 1 : 0,
+        is_active: formData.is_active ? 1 : 0
+      };
+
+      for (const [field, value] of Object.entries(optionalFields)) {
+        if (value !== null) {
+          formDataToSend.append(field, value);
+        }
+      }
+
+      // Handle file upload separately
+      if (formData.cover_image) {
+        formDataToSend.append('cover_image', formData.cover_image);
+      }
+
+      // Debug output
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(key, value);
+      }
+
+      const response = await axiosInstance.put(`/books/${bookId}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -144,18 +179,17 @@ const EditBook = () => {
 
       setSuccessMessage('Book updated successfully!');
       setTimeout(() => {
-        navigate('/admin/dashboard/books');
+        onSave();
       }, 1500);
     } catch (error) {
       if (error.response?.status === 422) {
-        const serverErrors = {};
-        Object.keys(error.response.data.errors).forEach(key => {
-          serverErrors[key] = error.response.data.errors[key][0];
-        });
-        setErrors(serverErrors);
+        setErrors(error.response.data.errors || {});
+      } else if (error.message) {
+        setErrors({ form: error.message });
       } else {
-        setErrors({ form: error.response?.data?.message || 'An error occurred while updating the book' });
+        setErrors({ form: 'An error occurred while updating the book' });
       }
+      console.error("Submission error:", error);
     } finally {
       setSubmitting(false);
     }
@@ -175,10 +209,10 @@ const EditBook = () => {
       <div className="error-container">
         <ErrorAlert message={errors.fetch} />
         <button 
-          onClick={() => navigate('/admin/dashboard/books')}
+          onClick={onCancel}
           className="btn-secondary"
         >
-          <FiArrowLeft /> Back to Books
+          Back to Books
         </button>
       </div>
     );
@@ -187,13 +221,10 @@ const EditBook = () => {
   return (
     <div className="create-book-container">
       <div className="modal-header">
-        <button 
-          onClick={() => navigate('/admin/dashboard/books')}
-          className="back-btn"
-        >
-          <FiArrowLeft />
-        </button>
         <h1 className="create-book-title">Edit Book</h1>
+        <button onClick={onCancel} className="close-btn">
+          <FiX />
+        </button>
       </div>
       
       {successMessage && (
@@ -212,10 +243,7 @@ const EditBook = () => {
 
       <form onSubmit={handleSubmit} className="create-book-form">
         <div className="image-upload-section">
-          <label 
-            htmlFor="cover_image" 
-            className={`file-label ${previewImage ? 'has-image' : ''}`}
-          >
+          <label htmlFor="cover_image" className={`file-label ${previewImage ? 'has-image' : ''}`}>
             <input
               type="file"
               name="cover_image"
@@ -224,17 +252,14 @@ const EditBook = () => {
               className="file-input"
               accept="image/*"
             />
-            
-            {!previewImage && (
+            {!previewImage ? (
               <div className="default-cover">
                 <svg className="book-icon" viewBox="0 0 24 24">
                   <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
                 </svg>
                 <span>Upload Cover Image</span>
               </div>
-            )}
-
-            {previewImage && (
+            ) : (
               <div className="image-preview">
                 <img src={previewImage} alt="Book cover preview" />
               </div>
@@ -385,6 +410,7 @@ const EditBook = () => {
               value={formData.publication_date}
               onChange={handleChange}
               className={`form-input ${errors.publication_date ? 'is-invalid' : ''}`}
+              max={new Date().toISOString().split('T')[0]}
             />
             {errors.publication_date && <div className="error-message">{errors.publication_date}</div>}
           </div>
@@ -489,7 +515,7 @@ const EditBook = () => {
         <div className="form-actions">
           <button 
             type="button" 
-            onClick={() => navigate('/admin/dashboard/books')}
+            onClick={onCancel}
             className="btn-secondary"
             disabled={submitting}
           >
