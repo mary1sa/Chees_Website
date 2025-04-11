@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './Components/ProtectedRoute';
@@ -33,8 +34,15 @@ import CourseContent from './Components/MemberDashboard/CourseContent/CourseCont
 import EventTypes from './Components/Event/EventTypes/EventTypes';
 import EventList from './Components/Event/Events/EventList';
 import AdminEventRegistrations from './Components/Event/Registration/Admin/AdminEventRegistrations';
+import UserEventRegistrations from './Components/Event/Registration/User/UserEventRegistrations';
 import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
 import TournamentMatchesManager from './Components/Event/Events/TournamentMatchesManager';
+import BookList from './Components/BookStore/BookList';
+import AddBook from './Components/BookStore/AddBook';
+import AuthorList from './Components/BookStore/AuthorList';
+import OrdersList from './Components/BookStore/OrdersList';
+import Roles from './Components/Roles/Roles';
+import CoachSpecialization from './Components/SpecializationCoatch/SpecializationCoach';
 // Import other event components as needed
 
 import CourseList from './Components/AdminDashboard/CourseManagement/CourseList';
@@ -88,6 +96,45 @@ function App() {
           <Route path="createenrollment" element={<EnrollmentForm isEditing={false} />} />
           <Route path="enrollments/edit/:enrollmentId" element={<EnrollmentForm isEditing={true} />} />
        
+
+
+          {/* Bookstore Management (moved here) */}
+          <Route path="books" element={<BookList />} />
+          <Route path="books/create" element={<AddBook />} />
+          <Route path="authors" element={<AuthorList />} />
+          <Route path="orders" element={<OrdersList />} />
+          
+       {/* Roles Management Routes */}
+       <Route path="roles" element={<Roles />} />
+          {/*Coatch Management Routes */}
+          <Route path="CoachSpecialization" element={<CoachSpecialization />} />
+
+        </Route>
+
+        <Route 
+          path="/member/dashboard"
+          element={
+            <ProtectedRoute roles={['member']}>
+              <MemberDashboard />
+            </ProtectedRoute>
+          }>
+          <Route path="registrations" element={<UserEventRegistrations />} />
+
+        
+          <Route path="profile" element={<MemberProfile />} />
+          {/* Course Routes */}
+          <Route path="courses/catalog" element={<CourseCatalog />} />
+          <Route path="courses/:courseId" element={<CourseDetail />} />
+          <Route path="courses/enrolled" element={<EnrolledCourses />} />
+          <Route path="courses/progress" element={<CourseProgress />} />
+          <Route path="courses/wishlist" element={<CourseWishlist />} />
+<<<<<<< HEAD
+          <Route path="course-content" element={<CourseContent />} />
+          
+          {/* Session Routes */}
+          <Route path="upcoming-sessions" element={<UpcomingSessions />} />
+          <Route path="my-schedule" element={<UpcomingSessions />} /> {/* Reusing UpcomingSessions component */}
+=======
         </Route>
 
         <Route 
@@ -98,6 +145,8 @@ function App() {
             </ProtectedRoute>
           }
         >
+                    <Route path="registrations" element={<UserEventRegistrations />} />
+
           <Route path="profile" element={<MemberProfile />} />
           {/* Course Routes */}
           <Route path="courses/catalog" element={<CourseCatalog />} />
@@ -105,22 +154,19 @@ function App() {
           <Route path="courses/enrolled" element={<EnrolledCourses />} />
           <Route path="courses/progress" element={<CourseProgress />} />
           <Route path="courses/wishlist" element={<CourseWishlist />} />
-          <Route path="course-content" element={<CourseContent />} />
-          
-          {/* Session Routes */}
-          <Route path="upcoming-sessions" element={<UpcomingSessions />} />
-          <Route path="my-schedule" element={<UpcomingSessions />} /> {/* Reusing UpcomingSessions component */}
+>>>>>>> 98f894d84b7c545e590b81f3d3555eb3a1fc6d60
         </Route>
 
         <Route
-          path="/coatch/dashboard"
-          element={
-            <ProtectedRoute roles={['coatch']}>
-              <CoatchDashboard />
-            </ProtectedRoute>
-          }
-        >
-        </Route>
+  path="/coach/dashboard"
+  element={
+    <ProtectedRoute roles={['coach']}>
+      <CoatchDashboard />
+    </ProtectedRoute>
+  }
+>
+  <Route path="registrations" element={<UserEventRegistrations />} />
+</Route>
 
         <Route
           path="/"
@@ -135,9 +181,13 @@ function App() {
         {/* <Route path='/EventTypes' element={<EventTypes />} /> */}
         {/* <Route path='/EventList' element={<EventList />} /> */}
         {/* <Route path='/AdminEventRegistrations' element={<AdminEventRegistrations />} /> */}
+
+
+
       </Routes>
     </Router>
   );
 }
+
 
 export default App;

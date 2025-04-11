@@ -1,25 +1,33 @@
 <?php
 
+use App\Http\Controllers\CoachSpecializationCategoryController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\CouponController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\EventTypeController;
+use App\Http\Controllers\OrderItemController;
+use App\Http\Controllers\BookRatingController;
+use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\TournamentController;
+use App\Http\Controllers\CourseLevelController;
+use App\Http\Controllers\CourseMediaController;
+use App\Http\Controllers\BookCategoryController;
+use App\Http\Controllers\Member\CoachController;
+use App\Http\Controllers\CourseSessionController;
+use App\Http\Controllers\CourseMaterialController;
 use App\Http\Controllers\TournamentMatchController;
 use App\Http\Controllers\TournamentRoundController;
 use App\Http\Controllers\EventRegistrationController;
-use App\Http\Controllers\CourseMaterialController;
-use App\Http\Controllers\CourseMediaController;
-use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\CourseLevelController;
-use App\Http\Controllers\CourseSessionController;
-use App\Http\Controllers\CouponController;
 use App\Http\Controllers\SessionAttendanceController;
 
 // Route::get('/user', function (Request $request) {
@@ -52,8 +60,22 @@ Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
+<<<<<<< HEAD
 // Get coaches for course creation
 Route::get('/coaches', [UserController::class, 'getCoaches']);
+=======
+
+
+//CoatchSpecializationCategoryController
+Route::get('specializations', [CoachSpecializationCategoryController::class, 'index']);
+Route::post('specializations', [CoachSpecializationCategoryController::class, 'store']);
+Route::get('specializations/{id}', [CoachSpecializationCategoryController::class, 'show']);
+Route::put('specializations/{id}', [CoachSpecializationCategoryController::class, 'update']);
+Route::delete('specializations/{id}', [CoachSpecializationCategoryController::class, 'destroy']);
+//Coaches
+//Route::apiResource('coaches', CoachController::class);
+
+>>>>>>> 98f894d84b7c545e590b81f3d3555eb3a1fc6d60
 
 // Event Types
 Route::apiResource('event-types', EventTypeController::class);
@@ -66,8 +88,10 @@ Route::get('events/{event}/registration-status', [EventController::class,'regist
 // Event Registrations
 Route::apiResource('registrations', controller: EventRegistrationController::class)->except(['store']);
 Route::post('events/{event}/register', [EventRegistrationController::class, 'register']);
+Route::get('/events/available', [EventRegistrationController::class, 'availableEvents']);
 Route::post('registrations/{registration}/cancel', [EventRegistrationController::class, 'cancel']);
 Route::post('registrations/{registration}/confirm-payment', [EventRegistrationController::class, 'confirmPayment']);
+
 Route::get('users/{user}/registrations', [EventRegistrationController::class, 'userRegistrations']);
 Route::get('events/{event}/registrations', [EventRegistrationController::class, 'getEventRegistrations']);
 
@@ -169,3 +193,12 @@ Route::middleware('auth:api')->group(function () {
 // Event players
 Route::get('events/{event}/confirmed-players', [EventController::class, 'getConfirmedPlayers'])
     ->where('event', '[0-9]+'); // Ensure the parameter is numeric
+//books
+
+Route::apiResource('categories', BookCategoryController::class);
+Route::apiResource('authors', AuthorController::class);
+Route::apiResource('books', BookController::class);
+Route::apiResource('books.ratings', BookRatingController::class)->only(['index', 'store']);
+Route::apiResource('ratings', BookRatingController::class)->only(['update', 'destroy']);
+Route::apiResource('orders', OrderController::class)->middleware('auth:api');
+Route::apiResource('order-items', OrderItemController::class)->only(['show']);

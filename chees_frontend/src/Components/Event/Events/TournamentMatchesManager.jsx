@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../config/axiosInstance';
-import { FiEdit, FiTrash2, FiPlay, FiFlag, FiChevronLeft, FiChevronRight, FiSearch, FiX, FiPlus } from 'react-icons/fi';
+import { FiEdit, FiTrash2, FiPlay, FiFlag, FiChevronLeft, FiChevronRight, FiSearch, FiX, FiPlus, FiEye } from 'react-icons/fi';
 import ConfirmDelete from '../../Confirm/ConfirmDelete';
 import PageLoading from '../../PageLoading/PageLoading';
+import SuccessAlert from '../../Alerts/SuccessAlert';
+import ErrorAlert from '../../Alerts/ErrorAlert';
 import '../../AdminDashboard/CreateUser.css';
 
 const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
@@ -21,6 +23,7 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [currentMatch, setCurrentMatch] = useState(null);
   const [matchToDelete, setMatchToDelete] = useState(null);
+  const [detailView, setDetailView] = useState(null);
   
   const [formData, setFormData] = useState({
     white_player_id: '',
@@ -35,14 +38,31 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
     pgn: ''
   });
 
+  // Alert states
+  const [successAlert, setSuccessAlert] = useState(null);
+  const [errorAlert, setErrorAlert] = useState(null);
+
+  // Helper functions for date formatting
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().slice(0, 16);
+  };
+
+  const formatDateTime = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleString();
+  };
+
   // Fetch matches for the round
   const fetchMatches = async () => {
     try {
       setLoading(true);
+      setError(null);
+      setErrorAlert(null);
       const response = await axiosInstance.get(`/rounds/${roundId}/matches`);
       setMatches(response.data);
       setFilteredMatches(response.data);
-      setError(null);
     } catch (err) {
       handleApiError(err);
     } finally {
@@ -92,7 +112,12 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
   // Handle API errors
   const handleApiError = (err) => {
     console.error('API Error:', err);
-    setError(err.response?.data?.error || 'An error occurred');
+    const errorMessage = err.response?.data?.error || 
+                         err.response?.data?.message || 
+                         err.message || 
+                         'An error occurred';
+    setError(errorMessage);
+    setErrorAlert({ message: errorMessage });
   };
 
   // Handle input changes
@@ -118,16 +143,25 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      await axiosInstance.post(`/rounds/${roundId}/matches`, formData);
-      setShowCreateModal(false);
-      setFormData({
-        white_player_id: '',
-        black_player_id: '',
-        start_datetime: new Date().toISOString().slice(0, 16),
-        table_number: '',
-        status: 'scheduled'
-      });
-      await fetchMatches();
+      setError(null);
+      setErrorAlert(null);
+      
+      const response = await axiosInstance.post(`/rounds/${roundId}/matches`, formData);
+      
+      if (response.status >= 200 && response.status < 300) {
+        setSuccessAlert({ message: 'Match created successfully!' });
+        setShowCreateModal(false);
+        setFormData({
+          white_player_id: '',
+          black_player_id: '',
+          start_datetime: new Date().toISOString().slice(0, 16),
+          table_number: '',
+          status: 'scheduled'
+        });
+        await fetchMatches();
+      } else {
+        throw new Error(response.data?.message || 'Failed to create match');
+      }
     } catch (err) {
       handleApiError(err);
     } finally {
@@ -140,9 +174,26 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      await axiosInstance.put(`/matches/${currentMatch.id}`, formData);
-      setShowEditModal(false);
-      await fetchMatches();
+      setError(null);
+      setErrorAlert(null);
+      
+      const response = await axiosInstance.put(`/matches/${currentMatch.id}`, formData);
+      
+      if (response.status >= 200 && response.status < 300) {
+        setSuccessAlert({ message: 'Match updated successfully!' });
+        setShowEditModal(false);
+        await fetchMatches();
+        setFormData({
+          white_player_id: '',
+          black_player_id: '',
+          start_datetime: new Date().toISOString().slice(0, 16),
+          table_number: '',
+          status: 'scheduled'
+        });
+        
+      } else {
+        throw new Error(response.data?.message || 'Failed to update match');
+      }
     } catch (err) {
       handleApiError(err);
     } finally {
@@ -155,8 +206,17 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
     if (!matchToDelete) return;
     try {
       setLoading(true);
-      await axiosInstance.delete(`/matches/${matchToDelete.id}`);
-      await fetchMatches();
+      setError(null);
+      setErrorAlert(null);
+      
+      const response = await axiosInstance.delete(`/matches/${matchToDelete.id}`);
+      
+      if (response.status >= 200 && response.status < 300) {
+        setSuccessAlert({ message: 'Match deleted successfully!' });
+        await fetchMatches();
+      } else {
+        throw new Error(response.data?.message || 'Failed to delete match');
+      }
     } catch (err) {
       handleApiError(err);
     } finally {
@@ -169,8 +229,17 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
   const handleStartMatch = async (matchId) => {
     try {
       setLoading(true);
-      await axiosInstance.post(`/matches/${matchId}/start`);
-      await fetchMatches();
+      setError(null);
+      setErrorAlert(null);
+      
+      const response = await axiosInstance.post(`/matches/${matchId}/start`);
+      
+      if (response.status >= 200 && response.status < 300) {
+        setSuccessAlert({ message: 'Match started successfully!' });
+        await fetchMatches();
+      } else {
+        throw new Error(response.data?.message || 'Failed to start match');
+      }
     } catch (err) {
       handleApiError(err);
     } finally {
@@ -183,9 +252,31 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      await axiosInstance.post(`/matches/${currentMatch.id}/result`, resultData);
-      setShowResultModal(false);
-      await fetchMatches();
+      setError(null);
+      setErrorAlert(null);
+      
+      const response = await axiosInstance.post(`/matches/${currentMatch.id}/result`, resultData);
+      
+      if (response.status >= 200 && response.status < 300) {
+        setSuccessAlert({ message: 'Result submitted successfully!' });
+        setShowResultModal(false);
+        await fetchMatches();
+      } else {
+        throw new Error(response.data?.message || 'Failed to submit result');
+      }
+    } catch (err) {
+      handleApiError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Show match details
+  const showDetails = async (matchId) => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get(`/matches/${matchId}`);
+      setDetailView(response.data);
     } catch (err) {
       handleApiError(err);
     } finally {
@@ -199,7 +290,7 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
     setFormData({
       white_player_id: match.white_player_id,
       black_player_id: match.black_player_id,
-      start_datetime: match.start_datetime,
+      start_datetime: formatDateForInput(match.start_datetime),
       table_number: match.table_number,
       status: match.status
     });
@@ -225,6 +316,11 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
   const getPlayerName = (playerId) => {
     const player = players.find(p => p.id === playerId);
     return player ? `${player.first_name} ${player.last_name}` : 'Unknown';
+  };
+
+  // Get player details by ID
+  const getPlayerDetails = (playerId) => {
+    return players.find(p => p.id === playerId) || null;
   };
 
   // Pagination functions
@@ -318,6 +414,21 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
 
   return (
     <div className="table-container">
+      {/* Alerts */}
+      {successAlert && (
+        <SuccessAlert
+          message={successAlert.message}
+          onClose={() => setSuccessAlert(null)}
+        />
+      )}
+
+      {errorAlert && (
+        <ErrorAlert
+          message={errorAlert.message}
+          onClose={() => setErrorAlert(null)}
+        />
+      )}
+
       <ConfirmDelete
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -368,12 +479,9 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
 
       <div className="data-table">
         <div className="table-header">
-          <div className="header-cell">White Player</div>
-          <div className="header-cell">Black Player</div>
-          <div className="header-cell">Start Time</div>
-          <div className="header-cell">Table</div>
+          <div className="header-cell">Player 1 (White)</div>
+          <div className="header-cell">Player 2 (Black)</div>
           <div className="header-cell">Status</div>
-          <div className="header-cell">Result</div>
           <div className="header-cell actions-header">Actions</div>
         </div>
         
@@ -387,20 +495,18 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
                 {getPlayerName(match.black_player_id)}
               </div>
               <div className="table-cell">
-                {match.start_datetime ? new Date(match.start_datetime).toLocaleString() : 'N/A'}
-              </div>
-              <div className="table-cell">
-                {match.table_number || '-'}
-              </div>
-              <div className="table-cell">
                 <span className={`status-badge ${match.status?.toLowerCase().replace('-', '')}`}>
                   {match.status}
                 </span>
               </div>
-              <div className="table-cell">
-                {match.result || '-'}
-              </div>
               <div className="table-cell actions">
+                <button 
+                  onClick={() => showDetails(match.id)} 
+                  className="action-btn view-btn"
+                  title="View Details"
+                >
+                  <FiEye className="icon" />
+                </button>
                 <button 
                   onClick={() => openEditModal(match)} 
                   className="action-btn update-btn"
@@ -589,171 +695,264 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
                   <option value="">Select White Player</option>
                   {players.map(player => (
                     <option key={player.id} value={player.id}>
-                      {player.first_name} {player.last}
-                                          </option>
-                                        ))}
-                                      </select>
-                                    </div>
-                                    
-                                    <div className="form-group form-groupp">
-                                      <label className="form-label">Black Player *</label>
-                                      <select
-                                        name="black_player_id"
-                                        value={formData.black_player_id}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="form-select"
-                                      >
-                                        <option value="">Select Black Player</option>
-                                        {players.map(player => (
-                                          <option key={player.id} value={player.id}>
-                                            {player.first_name} {player.last_name}
-                                          </option>
-                                        ))}
-                                      </select>
-                                    </div>
-                                    
-                                    <div className="form-group form-groupp">
-                                      <label className="form-label">Start Date/Time *</label>
-                                      <input
-                                        type="datetime-local"
-                                        name="start_datetime"
-                                        value={formData.start_datetime}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="form-input"
-                                      />
-                                    </div>
-                                    
-                                    <div className="form-group form-groupp">
-                                      <label className="form-label">Table Number</label>
-                                      <input
-                                        type="number"
-                                        name="table_number"
-                                        value={formData.table_number}
-                                        onChange={handleInputChange}
-                                        className="form-input"
-                                        placeholder="Optional"
-                                      />
-                                    </div>
-                                    
-                                    <div className="form-group form-groupp">
-                                      <label className="form-label">Status *</label>
-                                      <select
-                                        name="status"
-                                        value={formData.status}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="form-select"
-                                      >
-                                        <option value="scheduled">Scheduled</option>
-                                        <option value="in-progress">In Progress</option>
-                                        <option value="completed">Completed</option>
-                                        <option value="cancelled">Cancelled</option>
-                                      </select>
-                                    </div>
-                                    
-                                    <div className="modal-footer form-groupp">
-                                      <button 
-                                        type="button" 
-                                        onClick={() => setShowEditModal(false)}
-                                        className="btn btn-secondary"
-                                      >
-                                        Cancel
-                                      </button>
-                                      <button 
-                                        type="submit" 
-                                        className="btn btn-primary"
-                                        disabled={loading}
-                                      >
-                                        {loading ? (
-                                          <>
-                                            <span className="loading-spinner"></span> Updating...
-                                          </>
-                                        ) : 'Save Changes'}
-                                      </button>
-                                    </div>
-                                  </form>
-                                </div>
-                              </div>
-                            )}
-                      
-                            {/* Result Modal */}
-                            {showResultModal && (
-                              <div className="modal-overlay">
-                                <div className="modal result-modal">
-                                  <div className="modal-header">
-                                    <h3>Record Match Result</h3>
-                                    <button 
-                                      onClick={() => setShowResultModal(false)} 
-                                      className="modal-close-btn"
-                                    >
-                                      &times;
-                                    </button>
-                                  </div>
-                                  <div className="modal-body">
-                                    <div className="match-info">
-                                      <h4>
-                                        {getPlayerName(currentMatch?.white_player_id)} vs {getPlayerName(currentMatch?.black_player_id)}
-                                      </h4>
-                                    </div>
-                                    <form onSubmit={handleSubmitResult} className="modal-form">
-                                      <div className="form-group form-groupp">
-                                        <label className="form-label">Result *</label>
-                                        <select
-                                          name="result"
-                                          value={resultData.result}
-                                          onChange={handleResultChange}
-                                          required
-                                          className="form-select"
-                                        >
-                                          <option value="">Select Result</option>
-                                          <option value="1-0">1-0 (White wins)</option>
-                                          <option value="0-1">0-1 (Black wins)</option>
-                                          <option value="1/2-1/2">½-½ (Draw)</option>
-                                          <option value="*">* (No result)</option>
-                                        </select>
-                                      </div>
-                                      
-                                      <div className="form-group form-groupp">
-                                        <label className="form-label">PGN (Optional)</label>
-                                        <textarea
-                                          name="pgn"
-                                          value={resultData.pgn}
-                                          onChange={handleResultChange}
-                                          rows="4"
-                                          className="form-textarea"
-                                          placeholder="Enter PGN notation..."
-                                        />
-                                      </div>
-                                      
-                                      <div className="modal-footer form-groupp">
-                                        <button 
-                                          type="button" 
-                                          onClick={() => setShowResultModal(false)}
-                                          className="btn btn-secondary"
-                                        >
-                                          Cancel
-                                        </button>
-                                        <button 
-                                          type="submit" 
-                                          className="btn btn-primary"
-                                          disabled={loading}
-                                        >
-                                          {loading ? (
-                                            <>
-                                              <span className="loading-spinner"></span> Saving...
-                                            </>
-                                          ) : 'Submit Result'}
-                                        </button>
-                                      </div>
-                                    </form>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      };
-                      
-                      export default TournamentMatchesManager;
+                      {player.first_name} {player.last_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group form-groupp">
+                <label className="form-label">Black Player *</label>
+                <select
+                  name="black_player_id"
+                  value={formData.black_player_id}
+                  onChange={handleInputChange}
+                  required
+                  className="form-select"
+                >
+                  <option value="">Select Black Player</option>
+                  {players.map(player => (
+                    <option key={player.id} value={player.id}>
+                      {player.first_name} {player.last_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group form-groupp">
+                <label className="form-label">Start Date/Time *</label>
+                <input
+                  type="datetime-local"
+                  name="start_datetime"
+                  value={formData.start_datetime}
+                  onChange={handleInputChange}
+                  required
+                  className="form-input"
+                />
+              </div>
+              
+              <div className="form-group form-groupp">
+                <label className="form-label">Table Number</label>
+                <input
+                  type="number"
+                  name="table_number"
+                  value={formData.table_number}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="Optional"
+                />
+              </div>
+              
+              <div className="form-group form-groupp">
+                <label className="form-label">Status *</label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleInputChange}
+                  required
+                  className="form-select"
+                >
+                  <option value="scheduled">Scheduled</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              
+              <div className="modal-footer form-groupp">
+                <button 
+                  type="button" 
+                  onClick={() => setShowEditModal(false)}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className="loading-spinner"></span> Updating...
+                    </>
+                  ) : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Result Modal */}
+      {showResultModal && (
+        <div className="modal-overlay">
+          <div className="modal result-modal">
+            <div className="modal-header">
+              <h3>Record Match Result</h3>
+              <button 
+                onClick={() => setShowResultModal(false)} 
+                className="modal-close-btn"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="match-info">
+                <h4>
+                  {getPlayerName(currentMatch?.white_player_id)} vs {getPlayerName(currentMatch?.black_player_id)}
+                </h4>
+              </div>
+              <form onSubmit={handleSubmitResult} className="modal-form">
+                <div className="form-group form-groupp">
+                  <label className="form-label">Result *</label>
+                  <select
+                    name="result"
+                    value={resultData.result}
+                    onChange={handleResultChange}
+                    required
+                    className="form-select"
+                  >
+                    <option value="">Select Result</option>
+                    <option value="1-0">1-0 (White wins)</option>
+                    <option value="0-1">0-1 (Black wins)</option>
+                    <option value="1/2-1/2">½-½ (Draw)</option>
+                    <option value="*">* (No result)</option>
+                  </select>
+                </div>
+                
+                <div className="form-group form-groupp">
+                  <label className="form-label">PGN (Optional)</label>
+                  <textarea
+                    name="pgn"
+                    value={resultData.pgn}
+                    onChange={handleResultChange}
+                    rows="4"
+                    className="form-textarea"
+                    placeholder="Enter PGN notation..."
+                  />
+                </div>
+                
+                <div className="modal-footer form-groupp">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowResultModal(false)}
+                    className="btn btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <span className="loading-spinner"></span> Saving...
+                      </>
+                    ) : 'Submit Result'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detail View Modal */}
+      {detailView && (
+        <div className="modal-overlay">
+          <div className="modal view-modal">
+            <div className="modal-header">
+              <h3>Match Details #{detailView.id}</h3>
+              <button 
+                onClick={() => setDetailView(null)} 
+                className="modal-close-btn"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="detail-card">
+                <div className="detail-section">
+                  <h4>Players</h4>
+                  <div className="detail-item">
+                    <span className="detail-label">White Player:</span>
+                    <span className="detail-value">
+                      {getPlayerName(detailView.white_player_id)}
+                      {getPlayerDetails(detailView.white_player_id)?.rating && 
+                        ` (Rating: ${getPlayerDetails(detailView.white_player_id).rating})`}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Black Player:</span>
+                    <span className="detail-value">
+                      {getPlayerName(detailView.black_player_id)}
+                      {getPlayerDetails(detailView.black_player_id)?.rating && 
+                        ` (Rating: ${getPlayerDetails(detailView.black_player_id).rating})`}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="detail-section">
+                  <h4>Match Details</h4>
+                  <div className="detail-item">
+                    <span className="detail-label">Start Time:</span>
+                    <span className="detail-value">
+                      {formatDateTime(detailView.start_datetime)}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Table Number:</span>
+                    <span className="detail-value">
+                      {detailView.table_number || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Status:</span>
+                    <span className={`detail-value status-badge ${detailView.status?.toLowerCase()}`}>
+                      {detailView.status}
+                    </span>
+                  </div>
+                  {detailView.result && (
+                    <div className="detail-item">
+                      <span className="detail-label">Result:</span>
+                      <span className="detail-value">{detailView.result}</span>
+                    </div>
+                  )}
+                  {detailView.pgn && (
+                    <div className="detail-item">
+                      <span className="detail-label">PGN:</span>
+                      <div className="detail-text">
+                        <pre>{detailView.pgn}</pre>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                onClick={() => {
+                  setDetailView(null);
+                  openEditModal(detailView);
+                }}
+                className="btn btn-edit"
+              >
+                <FiEdit className="icon" /> Edit
+              </button>
+              <button 
+                onClick={() => setDetailView(null)}
+                className="btn btn-close"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TournamentMatchesManager;

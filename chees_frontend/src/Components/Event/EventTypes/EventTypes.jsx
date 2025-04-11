@@ -4,7 +4,8 @@ import { FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight, FiPlus, FiSearc
 import '../../AdminDashboard/CreateUser.css';
 import PageLoading from '../../PageLoading/PageLoading';
 import ConfirmDelete from '../../Confirm/ConfirmDelete';
-
+import SuccessAlert from '../../Alerts/SuccessAlert'; // Adjust path as needed
+import ErrorAlert from '../../Alerts/ErrorAlert';     // Adjust path as needed
 const EventTypes = () => {
   const [eventTypes, setEventTypes] = useState([]);
   const [filteredEventTypes, setFilteredEventTypes] = useState([]);
@@ -14,7 +15,8 @@ const EventTypes = () => {
   const [eventTypeToDelete, setEventTypeToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
+  const [successAlert, setSuccessAlert] = useState(null);
+  const [errorAlert, setErrorAlert] = useState(null);
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
@@ -76,9 +78,12 @@ const EventTypes = () => {
       await axiosInstance.post('/event-types', formData);
       setShowCreateModal(false);
       setFormData({ name: '', description: '' });
+      setSuccessAlert({ message: 'Event type created successfully!' });
       fetchEventTypes();
     } catch (error) {
       console.error('Error creating event type:', error);
+      setErrorAlert({ message: 'Failed to create event type. Please try again.' });
+
     } finally {
       setLoading(false);
     }
@@ -106,8 +111,12 @@ const EventTypes = () => {
       await axiosInstance.delete(`/event-types/${eventTypeToDelete.id}`);
       setEventTypes(prev => prev.filter(t => t.id !== eventTypeToDelete.id));
       setFilteredEventTypes(prev => prev.filter(t => t.id !== eventTypeToDelete.id));
+      setSuccessAlert({ message: 'Event type deleted successfully!' });
+
     } catch (error) {
       console.error('Error deleting event type:', error);
+      setErrorAlert({ message: 'Failed to delete event type. Please try again.' });
+
     } finally {
       setShowDeleteModal(false);
       setEventTypeToDelete(null);
@@ -121,9 +130,14 @@ const EventTypes = () => {
     try {
       await axiosInstance.put(`/event-types/${selectedEventType.id}`, formData);
       setShowEditModal(false);
+      setSuccessAlert({ message: 'Event type updated successfully!' });
+
       fetchEventTypes();
     } catch (error) {
+      
       console.error('Error updating event type:', error);
+      setErrorAlert({ message: 'Failed to update event type. Please try again.' });
+
     } finally {
       setLoading(false);
     }
@@ -223,6 +237,19 @@ const EventTypes = () => {
 
   return (
     <div className="table-container">
+       {successAlert && (
+      <SuccessAlert 
+        message={successAlert.message} 
+        onClose={() => setSuccessAlert(null)} 
+      />
+    )}
+    
+    {errorAlert && (
+      <ErrorAlert 
+        message={errorAlert.message} 
+        onClose={() => setErrorAlert(null)} 
+      />
+    )}
       <ConfirmDelete
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
