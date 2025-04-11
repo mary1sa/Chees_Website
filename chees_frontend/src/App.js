@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './Components/ProtectedRoute';
@@ -15,12 +16,21 @@ import ShowUser from './Components/AdminDashboard/ShowUser';
 import UpdateUser from './Components/AdminDashboard/UpdateUser';
 import CreateUser from './Components/AdminDashboard/CreateUser';
 
+// Course Components
+import CourseCatalog from './Components/Courses/CourseCatalog';
+import CourseDetail from './Components/Courses/CourseDetail';
+import EnrolledCourses from './Components/Courses/EnrolledCourses';
+import CourseProgress from './Components/Courses/CourseProgress';
+import CourseWishlist from './Components/Courses/CourseWishlist';
+
 import EventTypes from './Components/Event/EventTypes/EventTypes';
 import EventList from './Components/Event/Events/EventList';
 import AdminEventRegistrations from './Components/Event/Registration/Admin/AdminEventRegistrations';
+import UserEventRegistrations from './Components/Event/Registration/User/UserEventRegistrations';
 import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
 import TournamentMatchesManager from './Components/Event/Events/TournamentMatchesManager';
-import UserEventRegistrations from './Components/Event/Registration/User/UserEventRegistrations';
+import Roles from './Components/Roles/Roles';
+import CoachSpecialization from './Components/SpecializationCoatch/SpecializationCoach';
 // Import other event components as needed
 
 function App() {
@@ -49,20 +59,49 @@ function App() {
           <Route path="events" element={<EventList />} />
           <Route path="events/types" element={<EventTypes />} />
           <Route path="events/registrations" element={<AdminEventRegistrations />} />
-       
+       {/* Roles Management Routes */}
+       <Route path="roles" element={<Roles />} />
+          {/*Coatch Management Routes */}
+          <Route path="CoachSpecialization" element={<CoachSpecialization />} />
+
         </Route>
 
         <Route 
-          path="/member/dashboard" 
+          path="/member/dashboard"
+          element={
+            <ProtectedRoute roles={['member']}>
+              <MemberDashboard />
+            </ProtectedRoute>
+          }>
+          <Route path="registrations" element={<UserEventRegistrations />} />
+
+        
+          <Route path="profile" element={<MemberProfile />} />
+          {/* Course Routes */}
+          <Route path="courses/catalog" element={<CourseCatalog />} />
+          <Route path="courses/:courseId" element={<CourseDetail />} />
+          <Route path="courses/enrolled" element={<EnrolledCourses />} />
+          <Route path="courses/progress" element={<CourseProgress />} />
+          <Route path="courses/wishlist" element={<CourseWishlist />} />
+        </Route>
+
+        <Route 
+          path="/member/dashboard"
           element={
             <ProtectedRoute roles={['member']}>
               <MemberDashboard />
             </ProtectedRoute>
           }
         >
-          <Route path="profile" element={<MemberProfile />} />
-          <Route path="registrations" element={<UserEventRegistrations />} />
+                    <Route path="registrations" element={<UserEventRegistrations />} />
 
+          <Route path="profile" element={<MemberProfile />} />
+          {/* Course Routes */}
+          <Route path="courses/catalog" element={<CourseCatalog />} />
+          <Route path="courses/:courseId" element={<CourseDetail />} />
+          <Route path="courses/enrolled" element={<EnrolledCourses />} />
+          <Route path="courses/progress" element={<CourseProgress />} />
+          <Route path="courses/wishlist" element={<CourseWishlist />} />
         </Route>
 
         <Route
@@ -93,5 +132,6 @@ function App() {
     </Router>
   );
 }
+
 
 export default App;

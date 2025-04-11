@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CoachSpecializationCategoryController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -54,6 +55,14 @@ Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
+
+
+//CoatchSpecializationCategoryController
+Route::get('specializations', [CoachSpecializationCategoryController::class, 'index']);
+Route::post('specializations', [CoachSpecializationCategoryController::class, 'store']);
+Route::get('specializations/{id}', [CoachSpecializationCategoryController::class, 'show']);
+Route::put('specializations/{id}', [CoachSpecializationCategoryController::class, 'update']);
+Route::delete('specializations/{id}', [CoachSpecializationCategoryController::class, 'destroy']);
 //Coaches
 //Route::apiResource('coaches', CoachController::class);
 
@@ -169,3 +178,12 @@ Route::middleware('auth:api')->group(function () {
 // Event players
 Route::get('events/{event}/confirmed-players', [EventController::class, 'getConfirmedPlayers'])
     ->where('event', '[0-9]+'); // Ensure the parameter is numeric
+//books
+
+Route::apiResource('book-categories', BookCategoryController::class);
+Route::apiResource('authors', AuthorController::class);
+Route::apiResource('books', BookController::class);
+Route::apiResource('books.ratings', BookRatingController::class)->only(['index', 'store']);
+Route::apiResource('ratings', BookRatingController::class)->only(['update', 'destroy']);
+Route::apiResource('orders', OrderController::class)->except(['update']);
+Route::apiResource('order-items', OrderItemController::class)->only(['show']);
