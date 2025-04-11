@@ -6,7 +6,8 @@ import {
   FiLogOut, FiBell, FiSun, FiMoon,
   FiChevronDown, FiChevronRight,
   FiCreditCard, FiFileText, FiList, 
-  FiLayers, FiAward
+  FiLayers, FiAward, FiBook, FiPlusCircle,
+  FiBarChart2, FiUserCheck
 } from 'react-icons/fi';
 import './AdminDashboard.css';
 
@@ -40,6 +41,14 @@ const AdminDashboard = () => {
       setActiveMenu('Events');
     } else if (location.pathname.includes('/admin/dashboard/fetchusers')) {
       setActiveMenu('User Management');
+    } else if (location.pathname.includes('/admin/dashboard/sessions')) {
+      setActiveMenu('Session Management');
+    } else if (location.pathname.includes('/admin/dashboard/courses')) {
+      setActiveMenu('Course Management');
+    } else if (location.pathname.includes('/admin/dashboard/levels')) {
+      setActiveMenu('Course Level Management');
+    } else if (location.pathname.includes('/admin/dashboard/enrollments')) {
+      setActiveMenu('Enrollment Management');
     }
 
     const handleResize = () => {
@@ -116,6 +125,65 @@ const AdminDashboard = () => {
           path: "events/registrations",
           icon: <FiAward className="submenu-icon" />
           
+        }
+      ]
+    },
+    {
+      title: "Courses",
+      icon: <FiBook />,
+      submenus: [
+        { 
+          title: "All Courses", 
+          path: "courses",
+          icon: <FiList className="submenu-icon" />
+        },
+        { 
+          title: "Add Course", 
+          path: "createcourse",
+          icon: <FiPlusCircle className="submenu-icon" />
+        }
+      ]
+    },
+    {
+      title: "Sessions",
+      icon: <FiCalendar />,
+      submenus: [
+        { 
+          title: "All Sessions", 
+          path: "sessions",
+          icon: <FiList className="submenu-icon" />
+        },
+      ]
+    },
+    {
+      title: "Enrollments",
+      icon: <FiUserCheck />,
+      submenus: [
+        { 
+          title: "All Enrollments", 
+          path: "enrollments",
+          icon: <FiList className="submenu-icon" />
+        },
+        { 
+          title: "Add Enrollment", 
+          path: "createenrollment",
+          icon: <FiPlusCircle className="submenu-icon" />
+        }
+      ]
+    },
+    {
+      title: "Course Levels",
+      icon: <FiBarChart2 />,
+      submenus: [
+        { 
+          title: "All Levels", 
+          path: "levels",
+          icon: <FiList className="submenu-icon" />
+        },
+        { 
+          title: "Add Level", 
+          path: "createlevel",
+          icon: <FiPlusCircle className="submenu-icon" />
         }
       ]
     },

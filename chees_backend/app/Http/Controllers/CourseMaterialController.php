@@ -538,39 +538,108 @@ class CourseMaterialController extends Controller
     }
     
     /**
-     * Helper method to determine file type from extension
+     * Get file type based on extension
      */
-    private function getFileType(string $extension): string
+    private function getFileType($extension)
     {
         $extension = strtolower($extension);
         
-        $documentTypes = ['pdf', 'doc', 'docx', 'txt', 'rtf', 'odt'];
-        $imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'];
-        $videoTypes = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv'];
-        $audioTypes = ['mp3', 'wav', 'ogg', 'aac', 'flac'];
-        $presentationTypes = ['ppt', 'pptx', 'key', 'odp'];
-        $spreadsheetTypes = ['xls', 'xlsx', 'csv', 'ods'];
-        $archiveTypes = ['zip', 'rar', '7z', 'tar', 'gz'];
-        $chessTypes = ['pgn', 'fen'];
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+        $documentExtensions = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'rtf', 'odt'];
+        $videoExtensions = ['mp4', 'webm', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'mpeg', 'quicktime'];
+        $audioExtensions = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a'];
         
-        if (in_array($extension, $documentTypes)) {
-            return 'document';
-        } elseif (in_array($extension, $imageTypes)) {
+        if (in_array($extension, $imageExtensions)) {
             return 'image';
-        } elseif (in_array($extension, $videoTypes)) {
+        } elseif (in_array($extension, $documentExtensions)) {
+            return 'document';
+        } elseif (in_array($extension, $videoExtensions)) {
             return 'video';
-        } elseif (in_array($extension, $audioTypes)) {
+        } elseif (in_array($extension, $audioExtensions)) {
             return 'audio';
-        } elseif (in_array($extension, $presentationTypes)) {
-            return 'presentation';
-        } elseif (in_array($extension, $spreadsheetTypes)) {
-            return 'spreadsheet';
-        } elseif (in_array($extension, $archiveTypes)) {
-            return 'archive';
-        } elseif (in_array($extension, $chessTypes)) {
-            return 'chess';
         } else {
             return 'other';
         }
+    }
+    
+    /**
+     * Download a course material file.
+     */
+    public function download($id)
+    {
+        $material = CourseMaterial::findOrFail($id);
+        
+        // Check if file exists
+        if (!$material->file_path || !Storage::disk('public')->exists($material->file_path)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File not found'
+            ], 404);
+        }
+        
+        // Get file information
+        $path = $material->file_path;
+        
+        // Determine download filename
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $filename = Str::slug($material->title) . '.' . $extension;
+        
+        // Return file as download
+        return Storage::disk('public')->download($path, $filename);
+    }
+    
+    /**
+     * Stream/view a course material file.
+     */
+    public function stream($id)
+    {
+        $material = CourseMaterial::findOrFail($id);
+        
+        // Check if file exists
+        if (!$material->file_path || !Storage::disk('public')->exists($material->file_path)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File not found'
+            ], 404);
+        }
+        
+        // Get file information
+        $path = Storage::disk('public')->path($material->file_path);
+        $type = $material->file_type;
+        
+        // Get mime type based on file extension
+        $mimeType = Storage::disk('public')->mimeType($material->file_path);
+        
+        // For videos, use streaming response
+        if ($type === 'video') {
+            $stream = new \Symfony\Component\HttpFoundation\BinaryFileResponse($path);
+            $stream->headers->set('Content-Type', $mimeType);
+            return $stream;
+        }
+        
+        // For other files, return response with file contents
+        return response()->file($path);
+    }
+    
+    /**
+     * Get view URL for a course material.
+     */
+    public function getViewUrl($id)
+    {
+        $material = CourseMaterial::findOrFail($id);
+        
+        if (!$material->file_path) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No file associated with this material'
+            ], 404);
+        }
+        
+        $url = Storage::url($material->file_path);
+        
+        return response()->json([
+            'success' => true,
+            'view_url' => $url
+        ]);
     }
 }

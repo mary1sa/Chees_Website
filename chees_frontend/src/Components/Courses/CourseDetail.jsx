@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Courses.css';
-import { FiHeart, FiCalendar, FiClock, FiUsers, FiDownload, FiPlay, FiCheck } from 'react-icons/fi';
+import { FiHeart, FiCalendar, FiClock, FiUsers, FiDownload, FiCheck } from 'react-icons/fi';
 
 const CourseDetail = () => {
   const { courseId } = useParams();

@@ -22,12 +22,27 @@ import EnrolledCourses from './Components/Courses/EnrolledCourses';
 import CourseProgress from './Components/Courses/CourseProgress';
 import CourseWishlist from './Components/Courses/CourseWishlist';
 
+// Session Management Components
+import SessionManagement from './Components/AdminDashboard/SessionManagement/SessionManagement';
+import SessionScheduler from './Components/AdminDashboard/SessionManagement/SessionScheduler';
+
+// Member Dashboard Components
+import UpcomingSessions from './Components/MemberDashboard/UpcomingSessions/UpcomingSessions';
+import CourseContent from './Components/MemberDashboard/CourseContent/CourseContent';
+
 import EventTypes from './Components/Event/EventTypes/EventTypes';
 import EventList from './Components/Event/Events/EventList';
 import AdminEventRegistrations from './Components/Event/Registration/Admin/AdminEventRegistrations';
 import TournamentRoundsManager from './Components/Event/Events/TournamentRoundsManager';
 import TournamentMatchesManager from './Components/Event/Events/TournamentMatchesManager';
 // Import other event components as needed
+
+import CourseList from './Components/AdminDashboard/CourseManagement/CourseList';
+import CourseForm from './Components/AdminDashboard/CourseManagement/CourseForm';
+import LevelList from './Components/AdminDashboard/CourseLevelManagement/LevelList';
+import LevelForm from './Components/AdminDashboard/CourseLevelManagement/LevelForm';
+import EnrollmentList from './Components/AdminDashboard/EnrollmentManagement/EnrollmentList';
+import EnrollmentForm from './Components/AdminDashboard/EnrollmentManagement/EnrollmentForm';
 
 function App() {
   return (
@@ -55,6 +70,23 @@ function App() {
           <Route path="events" element={<EventList />} />
           <Route path="events/types" element={<EventTypes />} />
           <Route path="events/registrations" element={<AdminEventRegistrations />} />
+          
+          {/* Session Management Routes */}
+          <Route path="sessions" element={<SessionManagement />} />
+          <Route path="sessions/edit/:sessionId" element={<SessionScheduler isEditing={true} />} />
+          <Route path="sessions/scheduler" element={<SessionScheduler />} />
+          
+          {/* Course Management Routes */}
+          <Route path="courses" element={<CourseList />} />
+          <Route path="createcourse" element={<CourseForm />} />
+          <Route path="courses/edit/:courseId" element={<CourseForm isEditing={true} />} />
+          <Route path="courses/:courseId" element={<CourseForm isEditing={true} isViewOnly={true} />} />
+          <Route path="levels" element={<LevelList />} />
+          <Route path="createlevel" element={<LevelForm isEditing={false} />} />
+          <Route path="levels/edit/:levelId" element={<LevelForm isEditing={true} />} />
+          <Route path="enrollments" element={<EnrollmentList />} />
+          <Route path="createenrollment" element={<EnrollmentForm isEditing={false} />} />
+          <Route path="enrollments/edit/:enrollmentId" element={<EnrollmentForm isEditing={true} />} />
        
         </Route>
 
@@ -73,23 +105,11 @@ function App() {
           <Route path="courses/enrolled" element={<EnrolledCourses />} />
           <Route path="courses/progress" element={<CourseProgress />} />
           <Route path="courses/wishlist" element={<CourseWishlist />} />
-        </Route>
-
-        <Route 
-          path="/member/dashboard"
-          element={
-            <ProtectedRoute roles={['member']}>
-              <MemberDashboard />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="profile" element={<MemberProfile />} />
-          {/* Course Routes */}
-          <Route path="courses/catalog" element={<CourseCatalog />} />
-          <Route path="courses/:courseId" element={<CourseDetail />} />
-          <Route path="courses/enrolled" element={<EnrolledCourses />} />
-          <Route path="courses/progress" element={<CourseProgress />} />
-          <Route path="courses/wishlist" element={<CourseWishlist />} />
+          <Route path="course-content" element={<CourseContent />} />
+          
+          {/* Session Routes */}
+          <Route path="upcoming-sessions" element={<UpcomingSessions />} />
+          <Route path="my-schedule" element={<UpcomingSessions />} /> {/* Reusing UpcomingSessions component */}
         </Route>
 
         <Route

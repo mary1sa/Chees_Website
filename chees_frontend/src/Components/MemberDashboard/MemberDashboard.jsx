@@ -69,23 +69,44 @@ const MemberDashboard = () => {
       submenus: [
         { 
           title: "Enrolled Courses", 
-          path: "/member/courses/enrolled",
+          path: "/member/dashboard/courses/enrolled",
           icon: <FiBookmark className="submenu-icon" />
         },
         { 
           title: "Course Catalog", 
-          path: "/member/courses/catalog",
+          path: "/member/dashboard/courses/catalog",
           icon: <FiList className="submenu-icon" />
         },
         { 
           title: "My Progress", 
-          path: "/member/courses/progress",
+          path: "/member/dashboard/courses/progress",
           icon: <FiAward className="submenu-icon" />
         },
         { 
           title: "Wishlist", 
-          path: "/member/courses/wishlist",
+          path: "/member/dashboard/courses/wishlist",
           icon: <FiHeart className="submenu-icon" />
+        },
+        { 
+          title: "Course Content", 
+          path: "/member/dashboard/course-content",
+          icon: <FiPlay className="submenu-icon" />
+        }
+      ]
+    },
+    {
+      title: "Sessions",
+      icon: <FiCalendar />,
+      submenus: [
+        { 
+          title: "Upcoming Sessions", 
+          path: "/member/dashboard/upcoming-sessions",
+          icon: <FiCalendar className="submenu-icon" />
+        },
+        { 
+          title: "My Schedule", 
+          path: "/member/dashboard/my-schedule",
+          icon: <FiCreditCard className="submenu-icon" />
         }
       ]
     },
@@ -138,7 +159,7 @@ const MemberDashboard = () => {
           <button className="menu-toggle" onClick={toggleSidebar}>
             {sidebarOpen ? <FiX /> : <FiMenu />}
           </button>
-          {sidebarOpen && <h2 className="sidebar-brand">Admin Panel</h2>}
+          {sidebarOpen && <h2 className="sidebar-brand">Member Panel</h2>}
         </div>
         
         <div className="sidebar-menu">

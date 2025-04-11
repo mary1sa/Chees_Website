@@ -516,10 +516,18 @@ width: 90%;
   background-color: #e3f2fd;
   color: #1976d2;
 }
+.view-btn:hover {
+  color: #1976d2 !important;
+  border-color: #1976d2 !important;
+}
 
 .update-btn {
   background-color: #fff8e1;
   color: #ff8f00;
+}
+.update-btn:hover {
+  color: #ff8f00 !important;
+  border-color: #ff8f00 !important;
 }
 
 .delete-btn {

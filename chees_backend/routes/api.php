@@ -45,18 +45,15 @@ Route::put('/roles/{id}', [RoleController::class, 'update']);
 
 Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
 
-//User 
-
-
+// User management routes
 Route::get('/users', [UserController::class, 'getAllUsers']);
 Route::get('/users/{id}', [UserController::class, 'getUserById']);
 Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
-//Coaches
-//Route::apiResource('coaches', CoachController::class);
-
+// Get coaches for course creation
+Route::get('/coaches', [UserController::class, 'getCoaches']);
 
 // Event Types
 Route::apiResource('event-types', EventTypeController::class);
@@ -95,12 +92,16 @@ Route::get('players/{player}/matches', [TournamentMatchController::class, 'playe
 
 // Course Materials
 Route::apiResource('course-materials', CourseMaterialController::class);
+Route::get('course-materials/{id}/download', [CourseMaterialController::class, 'download']);
+Route::get('course-materials/{id}/view', [CourseMaterialController::class, 'stream']);
+Route::get('course-materials/{id}/stream', [CourseMaterialController::class, 'stream']);
 
 // Course Media
 Route::apiResource('course-media', CourseMediaController::class);
 
 // Enrollments
 Route::apiResource('enrollments', EnrollmentController::class);
+Route::get('enrollments/export', [EnrollmentController::class, 'export']);
 Route::post('enrollments/{enrollment}/courses', [EnrollmentController::class, 'addCourses']);
 Route::delete('enrollments/{enrollment}/courses', [EnrollmentController::class, 'removeCourses']);
 Route::put('enrollments/{enrollment}/courses/{course}/progress', [EnrollmentController::class, 'updateCourseProgress']);
@@ -128,6 +129,7 @@ Route::prefix('courses')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::post('/', [CourseController::class, 'store']);
         Route::put('/{course}', [CourseController::class, 'update']);
+        Route::post('/{course}/update-with-file', [CourseController::class, 'updateWithFile']);
         Route::delete('/{course}', [CourseController::class, 'destroy']);
         // Updated to support multiple courses in one enrollment
         Route::post('/enroll', [EnrollmentController::class, 'store']);
