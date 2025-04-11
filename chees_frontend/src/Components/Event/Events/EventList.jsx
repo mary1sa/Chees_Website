@@ -8,6 +8,10 @@ import ViewEvent from './ViewEvent';
 import EditEvent from './EditEvent';
 import CreateEvent from './Create';
 
+import SuccessAlert from '../../Alerts/SuccessAlert'; // Adjust path as needed
+import ErrorAlert from '../../Alerts/ErrorAlert';     // Adjust path as needed
+
+
 const EventList = () => {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
@@ -23,6 +27,9 @@ const EventList = () => {
   const [editingEvent, setEditingEvent] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const itemsPerPage = 5;
+
+  const [successAlert, setSuccessAlert] = useState(null);
+const [errorAlert, setErrorAlert] = useState(null);
 
   useEffect(() => {
     fetchEvents();
@@ -77,9 +84,13 @@ const EventList = () => {
       setLoading(true);
       await axiosInstance.delete(`/events/${eventToDelete.id}`);
       setEvents(prev => prev.filter(e => e.id !== eventToDelete.id));
+      setSuccessAlert({ message: 'Event deleted successfully!' });
+
       setFilteredEvents(prev => prev.filter(e => e.id !== eventToDelete.id));
     } catch (error) {
       console.error("Error deleting event:", error);
+      setErrorAlert({ message: 'An unexpected error occurred. Please try again.' });
+
     } finally {
       setShowDeleteModal(false);
       setEventToDelete(null);
@@ -159,6 +170,19 @@ const EventList = () => {
 
     return (
       <div className="pagination">
+          {successAlert && (
+        <SuccessAlert 
+          message={successAlert.message} 
+          onClose={() => setSuccessAlert(null)} 
+        />
+      )}
+      
+      {errorAlert && (
+        <ErrorAlert 
+          message={errorAlert.message} 
+          onClose={() => setErrorAlert(null)} 
+        />
+      )}
         <button 
           onClick={() => paginate(currentPage - 1)} 
           disabled={currentPage === 1}

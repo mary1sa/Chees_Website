@@ -1,11 +1,12 @@
 <?php
 
+use App\Http\Controllers\CoachSpecializationCategoryController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AuthorController;
@@ -61,6 +62,14 @@ Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
+
+
+//CoatchSpecializationCategoryController
+Route::get('specializations', [CoachSpecializationCategoryController::class, 'index']);
+Route::post('specializations', [CoachSpecializationCategoryController::class, 'store']);
+Route::get('specializations/{id}', [CoachSpecializationCategoryController::class, 'show']);
+Route::put('specializations/{id}', [CoachSpecializationCategoryController::class, 'update']);
+Route::delete('specializations/{id}', [CoachSpecializationCategoryController::class, 'destroy']);
 //Coaches
 //Route::apiResource('coaches', CoachController::class);
 
@@ -76,8 +85,10 @@ Route::get('events/{event}/registration-status', [EventController::class,'regist
 // Event Registrations
 Route::apiResource('registrations', controller: EventRegistrationController::class)->except(['store']);
 Route::post('events/{event}/register', [EventRegistrationController::class, 'register']);
+Route::get('/events/available', [EventRegistrationController::class, 'availableEvents']);
 Route::post('registrations/{registration}/cancel', [EventRegistrationController::class, 'cancel']);
 Route::post('registrations/{registration}/confirm-payment', [EventRegistrationController::class, 'confirmPayment']);
+
 Route::get('users/{user}/registrations', [EventRegistrationController::class, 'userRegistrations']);
 Route::get('events/{event}/registrations', [EventRegistrationController::class, 'getEventRegistrations']);
 
