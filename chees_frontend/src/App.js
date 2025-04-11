@@ -128,13 +128,11 @@ function App() {
           <Route path="courses/enrolled" element={<EnrolledCourses />} />
           <Route path="courses/progress" element={<CourseProgress />} />
           <Route path="courses/wishlist" element={<CourseWishlist />} />
-<<<<<<< HEAD
           <Route path="course-content" element={<CourseContent />} />
           
           {/* Session Routes */}
           <Route path="upcoming-sessions" element={<UpcomingSessions />} />
           <Route path="my-schedule" element={<UpcomingSessions />} /> {/* Reusing UpcomingSessions component */}
-=======
         </Route>
 
         <Route 
@@ -154,7 +152,6 @@ function App() {
           <Route path="courses/enrolled" element={<EnrolledCourses />} />
           <Route path="courses/progress" element={<CourseProgress />} />
           <Route path="courses/wishlist" element={<CourseWishlist />} />
->>>>>>> 98f894d84b7c545e590b81f3d3555eb3a1fc6d60
         </Route>
 
         <Route

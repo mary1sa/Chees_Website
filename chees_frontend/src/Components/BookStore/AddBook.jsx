@@ -1,126 +1,140 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import SuccessAlert from '../Alerts/SuccessAlert';
 import ErrorAlert from '../Alerts/ErrorAlert';
 import axiosInstance from '../config/axiosInstance';
 
 const AddBook = () => {
-  const [formData, setFormData] = useState({
-    title: '',
-    author_id: '',
-    category_id: '',
-    isbn: '',
-    price: '',
-    stock: '',
-    description: '',
-    cover_image: null,
-    sale_price: '',
-    pages: '',
-    publisher: '',
-    publication_date: '',
-    language: '',
-    format: '',
-    weight: '',
-    dimensions: '',
-    is_featured: false,
-    is_active: true
-  });
+    const [formData, setFormData] = useState({
+      title: '',
+      author_id: '',
+      category_id: '',
+      isbn: '',
+      price: '',
+      stock: '',
+      description: '',
+      cover_image: null,
+      sale_price: '',
+      pages: '',
+      publisher: '',
+      publication_date: '',
+      language: '',
+      format: '',
+      weight: '',
+      dimensions: '',
+      is_featured: false,
+      is_active: true
+    });
+    
+    const [categories, setCategories] = useState([]);
+    const [authors, setAuthors] = useState([]);
+    const [errors, setErrors] = useState({});
+    const [successMessage, setSuccessMessage] = useState('');
+    const [previewImage, setPreviewImage] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
   
-  const [categories, setCategories] = useState([]);
-  const [authors, setAuthors] = useState([]);
-  const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState('');
-  const [previewImage, setPreviewImage] = useState(null);
-  const [showAlert, setShowAlert] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [catsRes, authsRes] = await Promise.all([
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const [catsRes, authsRes] = await Promise.all([
             axiosInstance.get('/categories'),
             axiosInstance.get('/authors')
-        ]);
-        setCategories(catsRes.data);
-        setAuthors(authsRes.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+          ]);
+          setCategories(catsRes.data);
+          setAuthors(authsRes.data);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+  
+      fetchData();
+    }, []);
+  
+    const handleChange = (e) => {
+      const { name, value } = e.target;
       setFormData(prev => ({
         ...prev,
-        cover_image: file
+        [name]: value
       }));
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setSuccessMessage('');
-    
-    try {
-      const formDataToSend = new FormData();
-      Object.keys(formData).forEach(key => {
-        if (formData[key] !== null && formData[key] !== '') {
-          formDataToSend.append(key, formData[key]);
-        }
-      });
-
-      const response = await axiosInstance.post('books', formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      setSuccessMessage('Book created successfully!');
-      setTimeout(() => {
-        navigate('/admin/dashboard/books');
-      }, 1500);
-    } catch (error) {
-      if (error.response?.status === 422) {
-        const serverErrors = {};
-        Object.keys(error.response.data.errors).forEach(key => {
-          serverErrors[key] = error.response.data.errors[key][0];
-        });
-        setErrors(serverErrors);
-      } else {
-        setErrors({ form: 'An error occurred while creating the book' });
+      if (errors[name]) {
+        setErrors(prev => ({ ...prev, [name]: '' }));
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCloseAlert = () => {
-    setShowAlert(false);
-  };
+    };
+  
+    const handleFileChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        setFormData(prev => ({
+          ...prev,
+          cover_image: file
+        }));
+  
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewImage(reader.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+  
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      setSuccessMessage('');
+      
+      try {
+        // Convert form data to JSON
+        const jsonData = {
+          ...formData,
+          // Convert empty strings to null for optional fields
+          sale_price: formData.sale_price || null,
+          pages: formData.pages || null,
+          publisher: formData.publisher || null,
+          publication_date: formData.publication_date || null,
+          language: formData.language || null,
+          format: formData.format || null,
+          weight: formData.weight || null,
+          dimensions: formData.dimensions || null,
+          // Convert price and stock to numbers
+          price: parseFloat(formData.price),
+          stock: parseInt(formData.stock),
+        };
+  
+        // If you need to handle file upload separately, you might need a different approach
+        // For now, we'll assume cover_image is handled separately or not required for initial submission
+        delete jsonData.cover_image;
+  
+        const response = await axiosInstance.post('/books', jsonData, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+  
+        setSuccessMessage('Book created successfully!');
+        setTimeout(() => {
+          navigate('/admin/dashboard/books');
+        }, 1500);
+      } catch (error) {
+        if (error.response?.status === 422) {
+          const serverErrors = {};
+          Object.keys(error.response.data.errors).forEach(key => {
+            serverErrors[key] = error.response.data.errors[key][0];
+          });
+          setErrors(serverErrors);
+        } else {
+          setErrors({ form: 'An error occurred while creating the book' });
+          console.error('Error:', error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    const handleCloseAlert = () => {
+      setSuccessMessage('');
+      setErrors({});
+    };
 
   return (
     <div className="create-book-container">

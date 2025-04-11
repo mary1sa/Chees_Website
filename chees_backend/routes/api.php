@@ -60,10 +60,8 @@ Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
-<<<<<<< HEAD
 // Get coaches for course creation
 Route::get('/coaches', [UserController::class, 'getCoaches']);
-=======
 
 
 //CoatchSpecializationCategoryController
@@ -75,7 +73,6 @@ Route::delete('specializations/{id}', [CoachSpecializationCategoryController::cl
 //Coaches
 //Route::apiResource('coaches', CoachController::class);
 
->>>>>>> 98f894d84b7c545e590b81f3d3555eb3a1fc6d60
 
 // Event Types
 Route::apiResource('event-types', EventTypeController::class);
