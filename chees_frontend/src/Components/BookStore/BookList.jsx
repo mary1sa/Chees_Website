@@ -271,7 +271,6 @@ const BookList = () => {
                       </span>
                     </div>
                     <span className="user-id">ISBN: {book.isbn || 'N/A'}</span>
-                    <p className="event-description">{book.description?.substring(0, 50)}...</p>
                   </div>
                 </div>
               </div>
