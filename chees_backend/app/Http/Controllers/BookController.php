@@ -90,15 +90,19 @@ class BookController extends Controller
     
     return response()->json($book->load(['author', 'category']));
 }
-    public function destroy(Book $book)
-    {
-        if ($book->cover_image) {
-            Storage::disk('public')->delete($book->cover_image);
-        }
-
-        $book->delete();
-        return response()->json(null, 204);
+public function destroy(Book $book)
+{
+    // Delete related order items first
+    $book->orderItems()->delete();
+    
+    // Then delete the book
+    if ($book->cover_image) {
+        Storage::disk('public')->delete($book->cover_image);
     }
+    
+    $book->delete();
+    return response()->json(null, 204);
+}
 
     public function getFilters()
     {
