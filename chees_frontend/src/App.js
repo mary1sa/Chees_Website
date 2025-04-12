@@ -43,9 +43,9 @@ import AuthorList from './Components/BookStore/AuthorList';
 import OrdersList from './Components/BookStore/OrdersList';
 import Roles from './Components/Roles/Roles';
 import CoachSpecialization from './Components/Coatches/SpecializationCoach';
-import FetchCoaches from './Components/Coatches/Coatche/FetchCoatches';
+import FetchCoaches from './Components/Coatches/Admin/FetchCoatches';
 import PendingRequestsTable from './Components/Coatches/PendingRequestsTable';
-import CreateCoach from './Components/Coatches/Coatche/CreateCoatch';
+import CreateCoach from './Components/Coatches/Admin/CreateCoatch';
 // Import other event components as needed
 
 import CourseList from './Components/AdminDashboard/CourseManagement/CourseList';
@@ -54,6 +54,8 @@ import LevelList from './Components/AdminDashboard/CourseLevelManagement/LevelLi
 import LevelForm from './Components/AdminDashboard/CourseLevelManagement/LevelForm';
 import EnrollmentList from './Components/AdminDashboard/EnrollmentManagement/EnrollmentList';
 import EnrollmentForm from './Components/AdminDashboard/EnrollmentManagement/EnrollmentForm';
+import CreateCoacheProfile from './Components/Coatches/Coches/CreateCoacheProfile';
+import UpdateCoach from './Components/Coatches/Admin/UpdateCoach';
 
 function App() {
   return (
@@ -113,6 +115,7 @@ function App() {
           <Route path="CoachSpecialization" element={<CoachSpecialization />} />
           <Route path="FetchCoatches" element={<FetchCoaches />} />
           <Route path="CreateCoatch" element={<CreateCoach />} />
+          <Route path="updatecoach/:id" element={<UpdateCoach />} />
 
           <Route path="RequestPending" element={<PendingRequestsTable />} />
 
@@ -170,6 +173,8 @@ function App() {
   }
 >
   <Route path="registrations" element={<UserEventRegistrations />} />
+  <Route path="CreateProfile" element={< CreateCoacheProfile />} />
+
 </Route>
 
         <Route

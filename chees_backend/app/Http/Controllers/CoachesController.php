@@ -34,10 +34,11 @@ class CoachesController extends Controller
     // Admin & Coach: Show specific coach profile if approved
     public function show($id)
     {
-        $coach = Coach::where('status', 'approved')->findOrFail($id);
-
+        $coach = Coach::findOrFail($id);
+    
         return response()->json($coach);
     }
+    
 
     // Admin: List coaches with pending status
     public function pendingCoaches()

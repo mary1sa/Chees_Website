@@ -37,7 +37,7 @@ const ConfirmAction = ({ isOpen, onClose, onConfirm, actionDescription }) => {
         aria-labelledby="confirm-action-title"
         aria-describedby="confirm-action-description"
       >
-        <FiInfo className="modal-icon" aria-hidden="true" />
+        <FiInfo className="modal-icone" aria-hidden="true" />
         <h2 id="confirm-action-title" className="modal-title">
           Confirmer l'action
         </h2>

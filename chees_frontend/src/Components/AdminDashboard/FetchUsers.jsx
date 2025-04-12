@@ -3,6 +3,7 @@ import axiosInstance from '../config/axiosInstance';
 import { Link } from 'react-router-dom';
 import { FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import './UserTable.css';
+
 import PageLoading from '../PageLoading/PageLoading';
 import ConfirmDelete from '../Confirm/ConfirmDelete';
 

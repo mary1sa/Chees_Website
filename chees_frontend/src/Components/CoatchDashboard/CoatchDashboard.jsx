@@ -74,7 +74,7 @@ const CoatchDashboard = () => {
         },
         { 
           title: "Add Coatch", 
-          path: "/CreateCoatch",
+          path: "CreateProfile",
           icon: <FiUserPlus className="submenu-icon" />
         },
         {
