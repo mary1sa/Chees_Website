@@ -56,6 +56,7 @@ import EnrollmentList from './Components/AdminDashboard/EnrollmentManagement/Enr
 import EnrollmentForm from './Components/AdminDashboard/EnrollmentManagement/EnrollmentForm';
 import CreateCoacheProfile from './Components/Coatches/Coches/CreateCoacheProfile';
 import UpdateCoach from './Components/Coatches/Admin/UpdateCoach';
+import ViewAuthor from './Components/BookStore/ViewAuthor';
 
 function App() {
   return (
@@ -78,6 +79,13 @@ function App() {
           <Route path="createuser" element={<CreateUser />} />
           <Route path="updateuser/:id" element={<UpdateUser />} />
           <Route path="showuser/:id" element={<ShowUser />} />
+
+          {/* Bookstore Management (moved here) */}
+          <Route path="books" element={<BookList />} />
+          <Route path="books/create" element={<AddBook />} />
+          <Route path="authors" element={<AuthorList />} />
+          <Route path="authors/show/:id" element={<ViewAuthor />} />
+          <Route path="orders" element={<OrdersList />} />
           
           {/* Event Management Routes */}
           <Route path="events" element={<EventList />} />
@@ -103,11 +111,7 @@ function App() {
        
 
 
-          {/* Bookstore Management (moved here) */}
-          <Route path="books" element={<BookList />} />
-          <Route path="books/create" element={<AddBook />} />
-          <Route path="authors" element={<AuthorList />} />
-          <Route path="orders" element={<OrdersList />} />
+          
           
        {/* Roles Management Routes */}
        <Route path="roles" element={<Roles />} />

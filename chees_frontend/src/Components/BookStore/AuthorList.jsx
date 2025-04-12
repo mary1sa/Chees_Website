@@ -241,11 +241,11 @@ const AuthorList = () => {
                   <FiTrash2 className="icon" />
                 </button>
                 <Link 
-                  to={`show/${author.id}`} 
-                  className="action-btn view-btn"
-                  title="View"
+                to={`/admin/dashboard/authors/show/${author.id}`}  // Updated path
+                className="action-btn view-btn"
+                title="View"
                 >
-                  <FiEye className="icon" />
+                <FiEye className="icon" />
                 </Link>
               </div>
             </div>
