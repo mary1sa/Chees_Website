@@ -6,8 +6,11 @@ import PageLoading from '../PageLoading/PageLoading';
 import ConfirmDelete from '../Confirm/ConfirmDelete';
 import ViewBook from './ViewBook';
 import EditBook from './EditBook';
+import { useNavigate } from 'react-router-dom'; // Add this import
+
 
 const BookList = () => {
+    const navigate = useNavigate(); // Add this hook
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [titleFilter, setTitleFilter] = useState('');
@@ -88,6 +91,7 @@ const BookList = () => {
     setEditingBook(null);
     fetchBooks();
   };
+  
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -185,20 +189,18 @@ const BookList = () => {
         itemName={bookToDelete ? bookToDelete.title : 'this book'}
       />
 
-      {viewingBook && (
+        {viewingBook ? (
         <ViewBook
-          bookId={viewingBook}
-          onClose={() => setViewingBook(null)}
+            bookId={viewingBook}
+            onClose={() => setViewingBook(null)}
         />
-      )}
-
-      {editingBook ? (
+        ) : editingBook ? (
         <EditBook
-          bookId={editingBook}
-          onSave={handleEditSuccess}
-          onCancel={() => setEditingBook(null)}
+            bookId={editingBook}
+            onSave={handleEditSuccess}
+            onCancel={() => setEditingBook(null)}
         />
-      ) : (
+        ) : (
         <>
           <h1 className="table-title">Books Management</h1>
 

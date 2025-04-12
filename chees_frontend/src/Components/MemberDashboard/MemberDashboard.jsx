@@ -7,7 +7,8 @@ import {
   FiLogOut, FiBell, FiSearch, FiSun, FiMoon,
   FiChevronDown, FiChevronRight, FiChevronLeft,
   FiCreditCard, FiFileText, FiList, FiBook,
-  FiBookmark, FiPlay, FiAward, FiHeart
+  FiBookmark, FiPlay, FiAward, FiHeart,
+  FiUser
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -105,6 +106,22 @@ const MemberDashboard = () => {
       icon: <FiDollarSign />,
       path: "/member/payments"
     },
+    {
+          title: "Book Store",
+          icon: <FiBook />, 
+          submenus: [
+            { 
+              title: "Books", 
+              path: "books",
+              icon: <FiBook className="submenu-icon" />
+            },
+            { 
+              title: "Authors", 
+              path: "authors",
+              icon: <FiUser className="submenu-icon" />
+            }
+          ]
+      },
     {
       title: "Settings",
       icon: <FiSettings />,
