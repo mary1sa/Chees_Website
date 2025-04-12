@@ -38,7 +38,7 @@ class AuthorController extends Controller
     public function update(Request $request, Author $author)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:100',
+            'name' => 'sometimes|string|max:100',
             'bio' => 'nullable|string',
             'photo' => 'nullable|image|max:2048'
         ]);

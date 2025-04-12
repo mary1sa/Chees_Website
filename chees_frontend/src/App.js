@@ -57,6 +57,7 @@ import EnrollmentForm from './Components/AdminDashboard/EnrollmentManagement/Enr
 import CreateCoacheProfile from './Components/Coatches/Coches/CreateCoacheProfile';
 import UpdateCoach from './Components/Coatches/Admin/UpdateCoach';
 import ViewAuthor from './Components/BookStore/ViewAuthor';
+import EditAuthor from './Components/BookStore/EditAuthor';
 
 function App() {
   return (
@@ -85,7 +86,9 @@ function App() {
           <Route path="books/create" element={<AddBook />} />
           <Route path="authors" element={<AuthorList />} />
           <Route path="authors/show/:id" element={<ViewAuthor />} />
+          <Route path="authors/edit/:id" element={<EditAuthor />} />
           <Route path="orders" element={<OrdersList />} />
+
           
           {/* Event Management Routes */}
           <Route path="events" element={<EventList />} />

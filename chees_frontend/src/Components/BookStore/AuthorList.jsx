@@ -224,11 +224,11 @@ const AuthorList = () => {
               
               <div className="table-cell actions">
                 <Link 
-                  to={`edit/${author.id}`} 
-                  className="action-btn update-btn"
-                  title="Edit"
-                >
-                  <FiEdit className="icon" />
+                    to={`/admin/dashboard/authors/edit/${author.id}`}
+                    className="action-btn update-btn"
+                    title="Edit"
+                    >
+                <FiEdit className="icon" />
                 </Link>
                 <button 
                   onClick={() => {
