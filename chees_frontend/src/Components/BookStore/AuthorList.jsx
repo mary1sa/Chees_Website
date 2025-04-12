@@ -162,7 +162,7 @@ const AuthorList = () => {
       <h1 className="table-title">Authors List</h1>
       
       <div className="header-actions">
-        <Link to="create" className="add-author-btn">
+        <Link to="/admin/dashboard/authors/create" className="add-author-btn">
           <FiPlus /> Add Author
         </Link>
         

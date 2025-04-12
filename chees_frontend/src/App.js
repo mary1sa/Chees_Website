@@ -58,6 +58,7 @@ import CreateCoacheProfile from './Components/Coatches/Coches/CreateCoacheProfil
 import UpdateCoach from './Components/Coatches/Admin/UpdateCoach';
 import ViewAuthor from './Components/BookStore/ViewAuthor';
 import EditAuthor from './Components/BookStore/EditAuthor';
+import AddAuthor from './Components/BookStore/AddAuthor';
 
 function App() {
   return (
@@ -87,6 +88,8 @@ function App() {
           <Route path="authors" element={<AuthorList />} />
           <Route path="authors/show/:id" element={<ViewAuthor />} />
           <Route path="authors/edit/:id" element={<EditAuthor />} />
+          <Route path="authors/create" element={<AddAuthor />} />
+
           <Route path="orders" element={<OrdersList />} />
 
           
