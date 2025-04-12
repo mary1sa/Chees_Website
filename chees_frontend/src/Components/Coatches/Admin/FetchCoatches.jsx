@@ -15,6 +15,7 @@ const FetchCoaches = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [coachToDelete, setCoachToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -265,7 +266,7 @@ const FetchCoaches = () => {
                   <FiTrash2 className="icon" />
                 </button>
                 <Link
-                  to={`/admin/dashboard/showcoach/${coach.id}`}
+                  to={`/admin/dashboard/showuser/${coach.user.id}`} 
                   className="action-btn view-btn"
                   title="View"
                 >

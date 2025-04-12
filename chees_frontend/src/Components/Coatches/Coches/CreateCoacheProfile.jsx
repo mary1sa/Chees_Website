@@ -3,11 +3,11 @@ import axiosInstance from '../../config/axiosInstance';
 import SuccessAlert from '../../Alerts/SuccessAlert';
 import ErrorAlert from '../../Alerts/ErrorAlert';
 import { useNavigate } from 'react-router-dom';
-import Select from 'react-select';  
+import Select from 'react-select';
+import { FiTrash2 } from 'react-icons/fi';
 
-const CreateCoach = () => {
+const CreateCoacheProfile = () => {
   const [coachForm, setCoachForm] = useState({
-    user_id: '',
     title: '',
     fide_id: '',
     national_title: '',
@@ -15,7 +15,7 @@ const CreateCoach = () => {
     rating: '',
     peak_rating: '',
     years_teaching_experience: '',
-    primary_specialization_id: '', 
+    primary_specialization_id: '',
     secondary_specialization_id: '',
     hourly_rate: '',
     preferred_languages: [],
@@ -23,11 +23,10 @@ const CreateCoach = () => {
     communication_methods: [],
     professional_bio: '',
     video_introduction_url: '',
-    social_media_links: [''], 
+    social_media_links: [''],
   });
 
-  const [users, setUsers] = useState([]);
-  const [specializations, setSpecializations] = useState([]); 
+  const [specializations, setSpecializations] = useState([]);
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
   const [showAlert, setShowAlert] = useState(true);
@@ -37,16 +36,7 @@ const CreateCoach = () => {
   const status = user && user.role === 'admin' ? 'approved' : 'pending';
 
   useEffect(() => {
-    const fetchCoachUsers = async () => {
-      try {
-        const response = await axiosInstance.get('/coaches');
-        setUsers(response.data);
-      } catch (error) {
-        console.error('Error fetching coach users:', error);
-      }
-    };
-
-    const fetchSpecializations = async () => { 
+    const fetchSpecializations = async () => {
       try {
         const response = await axiosInstance.get('/specializations');
         setSpecializations(response.data);
@@ -55,8 +45,7 @@ const CreateCoach = () => {
       }
     };
 
-    fetchCoachUsers();
-    fetchSpecializations(); 
+    fetchSpecializations();
   }, []);
 
   const handleChange = (e) => {
@@ -67,30 +56,9 @@ const CreateCoach = () => {
     }
   };
 
-  const handleSelectChange = (selectedOption) => {
-    setCoachForm({ ...coachForm, user_id: selectedOption ? selectedOption.value : '' });
-    if (errors.user_id) {
-      setErrors({ ...errors, user_id: '' });
-    }
-  };
-
-  const handleArrayChange = (e) => {
-    const { name, options } = e.target;
-    const selectedValues = Array.from(options)
-      .filter(option => option.selected)
-      .map(option => option.value);
-    
-    setCoachForm({ ...coachForm, [name]: selectedValues });
-  };
-
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
-
-    if (!coachForm.user_id) {
-      newErrors.user_id = 'User selection is required';
-      isValid = false;
-    }
 
     if (!coachForm.rating) {
       newErrors.rating = 'Rating is required';
@@ -129,6 +97,7 @@ const CreateCoach = () => {
 
       const formData = {
         ...coachForm,
+        user_id: user.id, // Get user ID from logged-in user
         preferred_languages: coachForm.preferred_languages,
         teaching_formats: coachForm.teaching_formats,
         communication_methods: coachForm.communication_methods,
@@ -142,10 +111,9 @@ const CreateCoach = () => {
 
       setSuccessMessage('Coach profile created successfully!');
       setErrors({});
-      navigate("/admin/dashboard/coaches");
+      navigate("/admin/dashboard/FetchCoatches");
 
       setCoachForm({
-        user_id: '',
         title: '',
         fide_id: '',
         national_title: '',
@@ -153,15 +121,15 @@ const CreateCoach = () => {
         rating: '',
         peak_rating: '',
         years_teaching_experience: '',
-        primary_specialization_id: '', 
-        secondary_specialization_id: '', 
+        primary_specialization_id: '',
+        secondary_specialization_id: '',
         hourly_rate: '',
         preferred_languages: [],
         teaching_formats: [],
         communication_methods: [],
         professional_bio: '',
         video_introduction_url: '',
-        social_media_links: [''], 
+        social_media_links: [''],
       });
 
     } catch (error) {
@@ -187,11 +155,6 @@ const CreateCoach = () => {
     setShowAlert(false);
   };
 
-  const userOptions = users.map(user => ({
-    value: user.id,
-    label: `${user.first_name} ${user.last_name} (${user.email})`
-  }));
-
   const specializationOptions = specializations.map(spec => ({
     value: spec.id,
     label: spec.name,
@@ -213,25 +176,13 @@ const CreateCoach = () => {
   };
 
   return (
-    <div className="create-coach-container">
-      <h1 className="create-coach-title">Create Coach Profile</h1>
+    <div className="create-user-container">
+      <h1 className="create-user-title">Create Coach Profile</h1>
       
       {successMessage && <SuccessAlert message={successMessage} onClose={handleCloseAlert} />}
       {errors.form && <ErrorAlert message={errors.form} onClose={handleCloseAlert} />}
 
-      <form onSubmit={handleCreateCoach} className="create-coach-form">
-        <div className="form-group">
-          <label>Select Coach User</label>
-          <Select
-            name="user_id"
-            value={userOptions.find(option => option.value === coachForm.user_id)}
-            onChange={handleSelectChange}
-            options={userOptions}
-            className={`form-select ${errors.user_id ? 'is-invalid' : ''}`}
-          />
-          {errors.user_id && <div className="error-message">{errors.user_id}</div>}
-        </div>
-
+      <form onSubmit={handleCreateCoach} className="create-user-form">
         <div className="form-group">
           <label>Title</label>
           <input
@@ -374,7 +325,7 @@ const CreateCoach = () => {
                 placeholder="Social Media URL"
               />
               <button type="button" onClick={() => removeSocialMediaLink(index)} className="remove-link-button">
-                Remove
+                <FiTrash2 className="icon" />
               </button>
             </div>
           ))}
@@ -423,4 +374,4 @@ const CreateCoach = () => {
   );
 };
 
-export default CreateCoach;
+export default CreateCoacheProfile;
