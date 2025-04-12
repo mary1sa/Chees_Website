@@ -221,3 +221,4 @@ Route::apiResource('books.ratings', BookRatingController::class)->only(['index',
 Route::apiResource('ratings', BookRatingController::class)->only(['update', 'destroy']);
 Route::apiResource('orders', OrderController::class)->middleware('auth:api');
 Route::apiResource('order-items', OrderItemController::class)->only(['show']);
+Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
