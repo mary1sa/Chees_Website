@@ -57,15 +57,27 @@ class AuthorController extends Controller
 
     public function destroy(Author $author)
     {
-        if ($author->books()->exists()) {
-            return response()->json(['message' => 'Cannot delete author with books'], 422);
+        try {
+            // First, disassociate all books from this author
+            $author->books()->update(['author_id' => null]);
+            
+            // Then delete the author's photo if exists
+            if ($author->photo) {
+                Storage::disk('public')->delete($author->photo);
+            }
+            
+            // Finally delete the author
+            $author->delete();
+            
+            return response()->json([
+                'message' => 'Author deleted successfully. Associated books were preserved.'
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error deleting author',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        if ($author->photo) {
-            Storage::disk('public')->delete($author->photo);
-        }
-
-        $author->delete();
-        return response()->json(null, 204);
     }
 }
