@@ -10,7 +10,7 @@ const ViewBook = ({ bookId, onClose }) => {
   useEffect(() => {
     const fetchBook = async () => {
       try {
-        const response = await axiosInstance.get(`/api/books/${bookId}`);
+        const response = await axiosInstance.get(`/books/${bookId}`);
         setBook(response.data);
       } catch (error) {
         console.error("Error fetching book:", error);

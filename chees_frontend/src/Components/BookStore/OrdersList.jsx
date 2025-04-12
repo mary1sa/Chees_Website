@@ -295,7 +295,7 @@ const OrdersList = () => {
                       <img 
                         src={item.book.cover_image || '/default-book.jpg'} 
                         alt={item.book.title} 
-                        className="item-image"
+                        className="orderimage"
                       />
                       <div className="item-info">
                         <div className="item-title">{item.book.title}</div>

@@ -130,34 +130,25 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
     try {
       const formDataToSend = new FormData();
       
-      // Append all fields
+      // Only append fields that have been changed
       Object.entries(formData).forEach(([key, value]) => {
+        // Skip unchanged fields (except for booleans and files)
+        if (value === '' || value === null) return;
+        
         if (key === 'cover_image') {
           if (value instanceof File) {
             formDataToSend.append(key, value);
           }
-        } else if (value !== null && value !== undefined && value !== '') {
+        } else {
           if (key === 'is_featured' || key === 'is_active') {
             formDataToSend.append(key, value ? '1' : '0');
-          } else if (key === 'price' || key === 'sale_price' || key === 'weight') {
-            formDataToSend.append(key, String(value));
           } else {
             formDataToSend.append(key, value);
           }
         }
       });
 
-      // Debug: Log FormData contents
-      for (let [key, value] of formDataToSend.entries()) {
-        console.log(key, value);
-      }
-
-      const response = await axiosInstance.put(`/books/${bookId}`, formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
+      const response = await axiosInstance.put(`/books/${bookId}`, formDataToSend);
       setSuccessMessage('Book updated successfully!');
       setTimeout(() => {
         onSave();
@@ -169,13 +160,11 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
           validationErrors[field] = Array.isArray(messages) ? messages.join(', ') : messages;
         });
         setErrors(validationErrors);
-        console.log('Validation errors:', validationErrors);
       } else {
         setErrors({ 
           form: error.response?.data?.message || 'An error occurred while updating the book' 
         });
       }
-      console.error("Update error:", error.response);
     } finally {
       setSubmitting(false);
     }
@@ -239,16 +228,15 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
           {errors.cover_image && <div className="error-message">{errors.cover_image}</div>}
         </div>
 
-        {/* Required Fields */}
+        {/* Fields - removed required attributes */}
         <div className="form-group">
           <input
             type="text"
             name="title"
-            placeholder="Title*"
+            placeholder="Title"
             value={formData.title}
             onChange={handleChange}
             className={errors.title ? 'is-invalid' : ''}
-            required
           />
           {errors.title && <div className="error-message">{errors.title}</div>}
         </div>
@@ -260,9 +248,8 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               value={formData.author_id}
               onChange={handleChange}
               className={errors.author_id ? 'is-invalid' : ''}
-              required
             >
-              <option value="">Select Author*</option>
+              <option value="">Select Author</option>
               {authors.map(author => (
                 <option key={author.id} value={author.id}>{author.name}</option>
               ))}
@@ -276,9 +263,8 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               value={formData.category_id}
               onChange={handleChange}
               className={errors.category_id ? 'is-invalid' : ''}
-              required
             >
-              <option value="">Select Category*</option>
+              <option value="">Select Category</option>
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
@@ -298,7 +284,6 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               min="0"
               step="0.01"
               className={errors.price ? 'is-invalid' : ''}
-              required
             />
             {errors.price && <div className="error-message">{errors.price}</div>}
           </div>
@@ -312,7 +297,6 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
               onChange={handleChange}
               min="0"
               className={errors.stock ? 'is-invalid' : ''}
-              required
             />
             {errors.stock && <div className="error-message">{errors.stock}</div>}
           </div>
@@ -486,7 +470,7 @@ const EditBook = ({ bookId, onSave, onCancel }) => {
           <button 
             type="submit" 
             className="submit-button" 
-            disabled={submitting || !formData.title || !formData.author_id || !formData.category_id}
+            disabled={submitting}
           >
             {submitting ? 'Saving...' : <><FiSave /> Save Changes</>}
           </button>
