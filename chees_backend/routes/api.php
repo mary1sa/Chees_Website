@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CoachesController;
 use App\Http\Controllers\CoachSpecializationCategoryController;
+use App\Http\Controllers\MemberBookingController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -83,6 +84,9 @@ Route::get('show_availability/{id}', [CoachAvailabilityController::class, 'showa
 
 Route::get('/coachby-user/{user_id}', [CoachesController::class, 'getCoachByUser']);
 
+//member bookin coach
+Route::get('/available-slots', [MemberBookingController::class, 'getAvailableSlots']);
+Route::post('/book-slot', [MemberBookingController::class, 'bookSlot']);
 
 // Coach API routes
 

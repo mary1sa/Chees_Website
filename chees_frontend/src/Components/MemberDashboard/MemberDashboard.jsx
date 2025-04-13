@@ -123,9 +123,9 @@ const MemberDashboard = () => {
           ]
       },
     {
-      title: "Settings",
+      title: "bookingcoach",
       icon: <FiSettings />,
-      path: "/member/settings"
+      path: "bookingcoach"
     }
   ];
 

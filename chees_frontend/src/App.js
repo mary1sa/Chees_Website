@@ -63,6 +63,7 @@ import ViewAuthor from './Components/BookStore/ViewAuthor';
 import EditAuthor from './Components/BookStore/EditAuthor';
 import AddAuthor from './Components/BookStore/AddAuthor';
 import CreateOrder from './Components/BookStore/CreateOrder';
+import UserAvailabilities from './Components/Coatches/Member/UserAvailabilities';
 
 function App() {
   return (
@@ -177,6 +178,11 @@ function App() {
           <Route path="courses/enrolled" element={<EnrolledCourses />} />
           <Route path="courses/progress" element={<CourseProgress />} />
           <Route path="courses/wishlist" element={<CourseWishlist />} />
+          {/* Cochs Routes */}
+
+          <Route path="bookingcoach" element={<UserAvailabilities />} />
+
+
         </Route>
 
         <Route
