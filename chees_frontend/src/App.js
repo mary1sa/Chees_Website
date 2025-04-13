@@ -56,6 +56,9 @@ import EnrollmentList from './Components/AdminDashboard/EnrollmentManagement/Enr
 import EnrollmentForm from './Components/AdminDashboard/EnrollmentManagement/EnrollmentForm';
 import CreateCoacheProfile from './Components/Coatches/Coches/CreateCoacheProfile';
 import UpdateCoach from './Components/Coatches/Admin/UpdateCoach';
+import CreateCoachAvailability from './Components/Coatches/Coches/CreateCoachAvailability';
+import CoachAvailability from './Components/Coatches/Coches/CoachAvailability';
+import UpdateCoachAvailability from './Components/Coatches/Coches/UpdateCoachAvailability';
 
 function App() {
   return (
@@ -174,6 +177,10 @@ function App() {
 >
   <Route path="registrations" element={<UserEventRegistrations />} />
   <Route path="CreateProfile" element={< CreateCoacheProfile />} />
+  <Route path="creatavailability" element={<  CreateCoachAvailability />} />
+  <Route path="coachavailability" element={<  CoachAvailability />} />
+  <Route path="Updateavailability/:id" element={<  UpdateCoachAvailability />} />
+
 
 </Route>
 

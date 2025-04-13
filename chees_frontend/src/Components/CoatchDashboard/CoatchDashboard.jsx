@@ -63,29 +63,31 @@ const CoatchDashboard = () => {
       icon: <FiHome />,
       path: "/admin"
     },
+   
+    { 
+      title: "Add Coatch", 
+      path: "CreateProfile",
+      icon: <FiUserPlus className="submenu-icon" />
+    },
     {
-      title: "User Management",
+      title: "CoachAvailability",
       icon: <FiUsers />,
       submenus: [
         {
-          title: "All Users",
-          path: "/admin/users",
+          title: "coachavailability",
+          path: "coachavailability",
           icon: <FiList className="submenu-icon" />
         },
-        { 
-          title: "Add Coatch", 
-          path: "CreateProfile",
-          icon: <FiUserPlus className="submenu-icon" />
-        },
         {
-          title: "Roles",
-          path: "/admin/users/roles",
-          icon: <FiKey className="submenu-icon" />
-        }
+          title: "creat vailability",
+          path: "creatavailability",
+          icon: <FiList className="submenu-icon" />
+        },
+       
+
         
       ]
     },
-
     {
       title: "Registrations",
       path: "registrations",  // This is now relative to /coach/dashboard

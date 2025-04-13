@@ -22,16 +22,22 @@ class CoachAvailabilityController extends Controller
 
         return response()->json($availability);
     }
-
+    public function showavail($id)
+    {
+        $avail = CoachAvailability::findOrFail($id);
+    
+        return response()->json($avail);
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
             'coach_id' => 'required|exists:coaches,id',
             'date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
+           'start_time' => 'required|date_format:H:i',
+        'end_time' => 'required|date_format:H:i|after:start_time',
             'availability_type' => 'required|in:regular,special,blocked,holiday,limited',
             'max_students' => 'required|integer|min:1',
+            'current_bookings' => 'required|integer|min:0',
             'location' => 'nullable|string|max:100',
             'booking_notes' => 'nullable|string',
             'is_bookable' => 'required|boolean',

@@ -30,6 +30,7 @@ use App\Http\Controllers\TournamentMatchController;
 use App\Http\Controllers\TournamentRoundController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\SessionAttendanceController;
+use App\Http\Controllers\CoachAvailabilityController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -72,6 +73,15 @@ Route::post('specializations', [CoachSpecializationCategoryController::class, 's
 Route::get('specializations/{id}', [CoachSpecializationCategoryController::class, 'show']);
 Route::put('specializations/{id}', [CoachSpecializationCategoryController::class, 'update']);
 Route::delete('specializations/{id}', [CoachSpecializationCategoryController::class, 'destroy']);
+//Coach availability
+
+Route::get('coach_availability/{coachId}', [CoachAvailabilityController::class, 'show']); 
+Route::post('coach_availability', [CoachAvailabilityController::class, 'store']); 
+Route::put('coach_availability/{id}', [CoachAvailabilityController::class, 'update']); 
+Route::delete('coach_availability/{id}', [CoachAvailabilityController::class, 'destroy']);
+Route::get('show_availability/{id}', [CoachAvailabilityController::class, 'showavail']); 
+
+Route::get('/coachby-user/{user_id}', [CoachesController::class, 'getCoachByUser']);
 
 
 // Coach API routes

@@ -1,0 +1,136 @@
+.modaloverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.6s ease-out;
+  }
+  
+  .modalcontent {
+    background-color: #fff;
+    border-radius: 16px; 
+    width: 600px;
+    padding: 30px;
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.15);
+    animation: scaleUp 0.5s ease-out;
+    transform-origin: center;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  
+  .modalheader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  
+  .modalheader h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  
+  .modalclose {
+    font-size: 2rem;
+    color: #333;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+  
+  .modalclose:hover {
+    color: #f44336; /* Red hover color */
+    transform: rotate(45deg);
+  }
+  
+  .modalbody {
+    margin-top: 25px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .detailitem {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 1.1rem;
+  }
+  
+  .detailitem label {
+    font-weight: 700;
+    color: #555;
+    width: 170px;
+    text-transform: capitalize;
+  }
+  
+  .detailitem span {
+    font-size: 1.1rem;
+    color: #444;
+    font-weight: 500;
+  }
+  
+  .notestext {
+    font-size: 1.1rem;
+    color: #666;
+    background-color: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modalfooter {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  
+  .btnsecondary {
+    padding: 12px 22px;
+    background-color: #2196f3;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+  }
+  
+  .btnsecondary:hover {
+    background-color: #1e88e5;
+    transform: translateY(-2px);
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes scaleUp {
+    from {
+      transform: scale(0.8);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  
+
+  

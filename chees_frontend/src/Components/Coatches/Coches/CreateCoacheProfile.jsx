@@ -97,7 +97,7 @@ const CreateCoacheProfile = () => {
 
       const formData = {
         ...coachForm,
-        user_id: user.id, // Get user ID from logged-in user
+        user_id: user.id, 
         preferred_languages: coachForm.preferred_languages,
         teaching_formats: coachForm.teaching_formats,
         communication_methods: coachForm.communication_methods,

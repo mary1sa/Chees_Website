@@ -23,7 +23,16 @@ class CoachesController extends Controller
     
         return response()->json($coaches);
     }
-    
+    public function getCoachByUser($user_id)
+{
+    $coach = Coach::where('user_id', $user_id)->first();
+
+    if (!$coach) {
+        return response()->json(['message' => 'Coach not found'], 404);
+    }
+
+    return response()->json($coach);
+}
 
     // Admin & Coach: List all coaches
     public function index()
