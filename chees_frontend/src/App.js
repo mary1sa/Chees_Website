@@ -59,6 +59,10 @@ import UpdateCoach from './Components/Coatches/Admin/UpdateCoach';
 import CreateCoachAvailability from './Components/Coatches/Coches/CreateCoachAvailability';
 import CoachAvailability from './Components/Coatches/Coches/CoachAvailability';
 import UpdateCoachAvailability from './Components/Coatches/Coches/UpdateCoachAvailability';
+import ViewAuthor from './Components/BookStore/ViewAuthor';
+import EditAuthor from './Components/BookStore/EditAuthor';
+import AddAuthor from './Components/BookStore/AddAuthor';
+import CreateOrder from './Components/BookStore/CreateOrder';
 
 function App() {
   return (
@@ -81,6 +85,18 @@ function App() {
           <Route path="createuser" element={<CreateUser />} />
           <Route path="updateuser/:id" element={<UpdateUser />} />
           <Route path="showuser/:id" element={<ShowUser />} />
+
+          {/* Bookstore Management (moved here) */}
+          <Route path="books" element={<BookList />} />
+          <Route path="books/create" element={<AddBook />} />
+          <Route path="authors" element={<AuthorList />} />
+          <Route path="authors/show/:id" element={<ViewAuthor />} />
+          <Route path="authors/edit/:id" element={<EditAuthor />} />
+          <Route path="authors/create" element={<AddAuthor />} />
+          <Route path="orders" element={<OrdersList />} />
+          <Route path="orders/create" element={<CreateOrder />} />
+
+
           
           {/* Event Management Routes */}
           <Route path="events" element={<EventList />} />
@@ -106,11 +122,7 @@ function App() {
        
 
 
-          {/* Bookstore Management (moved here) */}
-          <Route path="books" element={<BookList />} />
-          <Route path="books/create" element={<AddBook />} />
-          <Route path="authors" element={<AuthorList />} />
-          <Route path="orders" element={<OrdersList />} />
+          
           
        {/* Roles Management Routes */}
        <Route path="roles" element={<Roles />} />

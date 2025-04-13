@@ -162,7 +162,7 @@ const AuthorList = () => {
       <h1 className="table-title">Authors List</h1>
       
       <div className="header-actions">
-        <Link to="create" className="add-author-btn">
+        <Link to="/admin/dashboard/authors/create" className="add-author-btn">
           <FiPlus /> Add Author
         </Link>
         
@@ -224,11 +224,11 @@ const AuthorList = () => {
               
               <div className="table-cell actions">
                 <Link 
-                  to={`edit/${author.id}`} 
-                  className="action-btn update-btn"
-                  title="Edit"
-                >
-                  <FiEdit className="icon" />
+                    to={`/admin/dashboard/authors/edit/${author.id}`}
+                    className="action-btn update-btn"
+                    title="Edit"
+                    >
+                <FiEdit className="icon" />
                 </Link>
                 <button 
                   onClick={() => {
@@ -241,11 +241,11 @@ const AuthorList = () => {
                   <FiTrash2 className="icon" />
                 </button>
                 <Link 
-                  to={`show/${author.id}`} 
-                  className="action-btn view-btn"
-                  title="View"
+                to={`/admin/dashboard/authors/show/${author.id}`}  // Updated path
+                className="action-btn view-btn"
+                title="View"
                 >
-                  <FiEye className="icon" />
+                <FiEye className="icon" />
                 </Link>
               </div>
             </div>

@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+
     public function index()
     {
-        $orders = Order::with(['user', 'items.book.author', 'items.book.category'])->get();
+        $orders = Order::with(['user','items'])->get();
         return response()->json($orders);
     }
 
@@ -32,13 +33,12 @@ class OrderController extends Controller
         $items = [];
 
         foreach ($validated['items'] as $item) {
-            $book = Book::with('author', 'category')->findOrFail($item['book_id']);
+            $book = Book::findOrFail($item['book_id']);
             
             if ($book->stock < $item['quantity']) {
                 return response()->json([
                     'message' => "Not enough stock for book: {$book->title}",
-                    'book_id' => $book->id,
-                    'book' => $book // Include book details in error response
+                    'book_id' => $book->id
                 ], 422);
             }
 
@@ -62,7 +62,7 @@ class OrderController extends Controller
             'notes' => $validated['notes'] ?? null
         ]);
 
-        // Add order items with book relationships
+        // Add order items
         $order->items()->createMany($items);
 
         // Update book stock
@@ -70,25 +70,24 @@ class OrderController extends Controller
             Book::where('id', $item['book_id'])->decrement('stock', $item['quantity']);
         }
 
-        return response()->json($order->load(['items.book.author', 'items.book.category']), 201);
+        return response()->json($order->load('items.book'), 201);
     }
 
     public function show(Order $order)
     {
         $this->authorize('view', $order);
         
-        return response()->json($order->load(['items.book.author', 'items.book.category']));
+        return response()->json($order->load('items.book'));
     }
 
-    public function updateStatus(Request $request, Order $order)
-    {
-        $this->authorize('update', $order);
+    public function updateStatus(Order $order, Request $request)
+{
+    $request->validate([
+        'status' => 'required|in:pending,processing,shipped,completed,cancelled'
+    ]);
 
-        $validated = $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
-        ]);
-
-        $order->update(['status' => $validated['status']]);
-        return response()->json($order->load(['items.book.author', 'items.book.category']));
-    }
+    $order->update(['status' => $request->status]);
+    
+    return response()->json($order);
+}
 }

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../config/axiosInstance';
-import { FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight, FiPlus } from 'react-icons/fi';
+import { FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import '../AdminDashboard/UserTable.css';
 import PageLoading from '../PageLoading/PageLoading';
 import ConfirmDelete from '../Confirm/ConfirmDelete';
 import ViewBook from './ViewBook';
 import EditBook from './EditBook';
+import { useNavigate } from 'react-router-dom'; // Add this import
+
 
 const BookList = () => {
+    const navigate = useNavigate(); // Add this hook
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [titleFilter, setTitleFilter] = useState('');
@@ -28,25 +31,25 @@ const BookList = () => {
 
   useEffect(() => {
     let result = books;
-    
+
     if (titleFilter) {
-      result = result.filter(book => 
+      result = result.filter(book =>
         book.title?.toLowerCase().includes(titleFilter.toLowerCase())
       );
     }
-    
+
     if (authorFilter) {
-      result = result.filter(book => 
+      result = result.filter(book =>
         book.author?.name.toLowerCase().includes(authorFilter.toLowerCase())
       );
     }
-    
+
     if (categoryFilter !== 'all') {
-      result = result.filter(book => 
+      result = result.filter(book =>
         book.category?.name === categoryFilter
       );
     }
-    
+
     setFilteredBooks(result);
     setCurrentPage(1);
   }, [books, titleFilter, authorFilter, categoryFilter]);
@@ -57,7 +60,7 @@ const BookList = () => {
       const response = await axiosInstance.get('/books');
       setBooks(response.data);
       setFilteredBooks(response.data);
-      
+
       const categories = [...new Set(response.data.map(book => book.category?.name).filter(Boolean))];
       setUniqueCategories(categories);
     } catch (error) {
@@ -69,7 +72,7 @@ const BookList = () => {
 
   const confirmDeleteBook = async () => {
     if (!bookToDelete) return;
-  
+
     try {
       setLoading(true);
       await axiosInstance.delete(`/books/${bookToDelete.id}`);
@@ -88,7 +91,7 @@ const BookList = () => {
     setEditingBook(null);
     fetchBooks();
   };
-
+  
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -152,19 +155,19 @@ const BookList = () => {
 
     return (
       <div className="pagination">
-        <button 
-          onClick={() => paginate(currentPage - 1)} 
+        <button
+          onClick={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
           className="pagination-button pagination-nav"
         >
           <FiChevronLeft className="icon" />
           <span>Previous</span>
         </button>
-        
+
         {pages}
-        
-        <button 
-          onClick={() => paginate(currentPage + 1)} 
+
+        <button
+          onClick={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}
           className="pagination-button pagination-nav"
         >
@@ -175,7 +178,7 @@ const BookList = () => {
     );
   };
 
-  if (loading) return <PageLoading/>;
+  if (loading) return <PageLoading />;
 
   return (
     <div className="table-container">
@@ -186,145 +189,141 @@ const BookList = () => {
         itemName={bookToDelete ? bookToDelete.title : 'this book'}
       />
 
-      {viewingBook && (
-        <ViewBook 
-          bookId={viewingBook} 
-          onClose={() => setViewingBook(null)}
+        {viewingBook ? (
+        <ViewBook
+            bookId={viewingBook}
+            onClose={() => setViewingBook(null)}
         />
-      )}
-      
-      {editingBook && (
-        <EditBook 
-          bookId={editingBook}
-          onSave={handleEditSuccess}
-          onCancel={() => setEditingBook(null)}
+        ) : editingBook ? (
+        <EditBook
+            bookId={editingBook}
+            onSave={handleEditSuccess}
+            onCancel={() => setEditingBook(null)}
         />
-      )}
-      
-      
+        ) : (
+        <>
+          <h1 className="table-title">Books Management</h1>
 
-      <h1 className="table-title">Books Management</h1>
-      
-      <div className="filter-controls">
-        <div className="filter-group">
-          <input
-            type="text"
-            value={titleFilter}
-            onChange={(e) => setTitleFilter(e.target.value)}
-            placeholder="Book Title"
-            className="filter-input"
-          />
-        </div>
-        
-        <div className="filter-group">
-          <input
-            type="text"
-            value={authorFilter}
-            onChange={(e) => setAuthorFilter(e.target.value)}
-            placeholder="Author"
-            className="filter-input"
-          />
-        </div>
-        
-        <div className="filter-group">
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Categories</option>
-            {uniqueCategories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
-        </div>
+          <div className="filter-controls">
+            <div className="filter-group">
+              <input
+                type="text"
+                value={titleFilter}
+                onChange={(e) => setTitleFilter(e.target.value)}
+                placeholder="Book Title"
+                className="filter-input"
+              />
+            </div>
 
-        
-      </div>
-      
-      <div className="data-table">
-        <div className="table-header">
-          <div className="header-cell">Book</div>
-          <div className="header-cell">Author</div>
-          <div className="header-cell">Category</div>
-          <div className="header-cell">Price</div>
-          <div className="header-cell">Stock</div>
-          <div className="header-cell">Actions</div>
-        </div>
-        
-        {currentItems.length > 0 ? (
-          currentItems.map((book) => (
-            <div key={book.id} className="table-row">
-              <div className="table-cell">
-                <div className="profile-image-container">
-                  {book.cover_image && (
-                    <img
-                      src={`http://localhost:8000/storage/${book.cover_image}`}
-                      alt={book.title}
-                      className="profile-image"
-                    />
-                  )}
-                  <div className="user-info">
-                    <div className="name-container">
-                      <span className="user-name">
-                        {book.title}
-                      </span>
+            <div className="filter-group">
+              <input
+                type="text"
+                value={authorFilter}
+                onChange={(e) => setAuthorFilter(e.target.value)}
+                placeholder="Author"
+                className="filter-input"
+              />
+            </div>
+
+            <div className="filter-group">
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="filter-select"
+              >
+                <option value="all">All Categories</option>
+                {uniqueCategories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="data-table">
+            <div className="table-header">
+              <div className="header-cell">Book</div>
+              <div className="header-cell">Author</div>
+              <div className="header-cell">Category</div>
+              <div className="header-cell">Price</div>
+              <div className="header-cell">Stock</div>
+              <div className="header-cell">Actions</div>
+            </div>
+
+            {currentItems.length > 0 ? (
+              currentItems.map((book) => (
+                <div key={book.id} className="table-row">
+                  <div className="table-cell">
+                    <div className="profile-image-container">
+                      {book.cover_image && (
+                        <img
+                          src={`http://localhost:8000/storage/${book.cover_image}`}
+                          alt={book.title}
+                          className="profile-image"
+                        />
+                      )}
+                      <div className="user-info">
+                        <div className="name-container">
+                          <span className="user-name">
+                            {book.title}
+                          </span>
+                        </div>
+                        <span className="user-id">ISBN: {book.isbn || 'N/A'}</span>
+                      </div>
                     </div>
-                    <span className="user-id">ISBN: {book.isbn || 'N/A'}</span>
+                  </div>
+
+                  <div className="table-cell">
+                    {book.author?.name || 'Unknown'}
+                  </div>
+                  <div className="table-cell">
+                    {book.category?.name || 'Uncategorized'}
+                  </div>
+                  <div className="table-cell">
+                    ${Number(book.price)?.toFixed(2) || '0.00'}
+                  </div>
+                  <div className="table-cell">
+                    <span className={`status-badge ${book.stock > 0 ? 'in-stock' : 'out-of-stock'}`}>
+                      {book.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                    </span>
+                  </div>
+                  <div className="table-cell actions">
+                    <button
+                      onClick={() => setEditingBook(book.id)}
+                      className="action-btn update-btn"
+                      title="Edit"
+                    >
+                      <FiEdit className="icon" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setBookToDelete(book);
+                        setShowDeleteModal(true);
+                      }}
+                      className="action-btn delete-btn"
+                      title="Delete"
+                    >
+                      <FiTrash2 className="icon" />
+                    </button>
+                    <button
+                      onClick={() => setViewingBook(book.id)}
+                      className="action-btn view-btn"
+                      title="View"
+                    >
+                      <FiEye className="icon" />
+                    </button>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="no-results">
+                No books found matching your criteria
               </div>
-              
-              <div className="table-cell">
-                {book.author?.name || 'Unknown'}
-              </div>
-              <div className="table-cell">
-                {book.category?.name || 'Uncategorized'}
-              </div>
-              <div className="table-cell">
-              ${Number(book.price)?.toFixed(2) || '0.00'}
-              </div>
-              <div className="table-cell">
-                <span className={`status-badge ${book.stock > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                  {book.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                </span>
-              </div>
-              <div className="table-cell actions">
-                <button
-                  onClick={() => setEditingBook(book.id)} 
-                  className="action-btn update-btn"
-                  title="Edit"
-                >
-                  <FiEdit className="icon" />
-                </button>
-                <button 
-                  onClick={() => {
-                    setBookToDelete(book); 
-                    setShowDeleteModal(true); 
-                  }}                 
-                  className="action-btn delete-btn"
-                  title="Delete"
-                >
-                  <FiTrash2 className="icon" />
-                </button>
-                <button
-                  onClick={() => setViewingBook(book.id)} 
-                  className="action-btn view-btn"
-                  title="View"
-                >
-                  <FiEye className="icon" />
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="no-results">
-            No books found matching your criteria
+            )}
           </div>
-        )}
-      </div>
-      
-      {renderPagination()}
+
+          {renderPagination()}
+        </>
+      )}
     </div>
   );
 };

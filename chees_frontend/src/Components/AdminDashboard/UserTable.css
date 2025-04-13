@@ -449,7 +449,7 @@
 }
 
 /* Individual Order Items */
-.order-item {
+.orderimage {
   display: flex;
   gap: 1.5rem;
   padding: 1.25rem 0;
@@ -540,7 +540,7 @@
     gap: 1rem;
   }
   
-  .item-image {
+  .orderimage {
     width: 100%;
     height: auto;
     max-height: 200px;

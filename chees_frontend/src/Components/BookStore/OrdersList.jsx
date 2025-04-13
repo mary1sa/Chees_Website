@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FiEye, FiTrash2, FiChevronLeft, FiChevronRight, FiBook } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { FiEye, FiTrash2, FiChevronLeft, FiChevronRight, FiBook, FiPlus } from 'react-icons/fi';
 import axiosInstance from '../config/axiosInstance';
 import { format } from 'date-fns';
 import '../AdminDashboard/UserTable.css';
 import PageLoading from '../PageLoading/PageLoading';
 import ConfirmDelete from '../Confirm/ConfirmDelete';
+import SuccessAlert from '../Alerts/SuccessAlert';
+import ErrorAlert from '../Alerts/ErrorAlert';
 
 const OrdersList = () => {
   const [orders, setOrders] = useState([]);
@@ -17,7 +19,10 @@ const OrdersList = () => {
   const [orderToDelete, setOrderToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedOrder, setExpandedOrder] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const itemsPerPage = 5;
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchOrders();
@@ -49,14 +54,14 @@ const OrdersList = () => {
       const response = await axiosInstance.get('/orders');
       setOrders(response.data);
       setFilteredOrders(response.data);
-
     } catch (error) {
       console.error('Error fetching orders:', error);
+      setErrorMessage('Failed to load orders');
+      setTimeout(() => setErrorMessage(''), 3000);
     } finally {
       setLoading(false);
     }
   };
-  
 
   const confirmDeleteOrder = async () => {
     if (!orderToDelete) return;
@@ -66,11 +71,37 @@ const OrdersList = () => {
       await axiosInstance.delete(`/orders/${orderToDelete.id}`);
       setOrders(prev => prev.filter(o => o.id !== orderToDelete.id));
       setFilteredOrders(prev => prev.filter(o => o.id !== orderToDelete.id));
+      setSuccessMessage('Order deleted successfully');
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Error deleting order:', error);
+      setErrorMessage('Failed to delete order');
+      setTimeout(() => setErrorMessage(''), 3000);
     } finally {
       setShowDeleteModal(false);
       setOrderToDelete(null);
+      setLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.patch(`/orders/${orderId}/status`, {
+        status: newStatus
+      });
+      
+      setOrders(prev => prev.map(order => 
+        order.id === orderId ? { ...order, status: newStatus } : order
+      ));
+      
+      setSuccessMessage('Order status updated successfully');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      setErrorMessage('Failed to update order status');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
       setLoading(false);
     }
   };
@@ -188,32 +219,41 @@ const OrdersList = () => {
         itemName={orderToDelete ? `order #${orderToDelete.order_number}` : 'this order'}
       />
 
+      {successMessage && <SuccessAlert message={successMessage} />}
+      {errorMessage && <ErrorAlert message={errorMessage} />}
+
       <h1 className="table-title">Orders List</h1>
       
-      <div className="filter-controls">
-        <div className="filter-group">
-          <input
-            type="text"
-            value={searchFilter}
-            onChange={(e) => setSearchFilter(e.target.value)}
-            placeholder="Search by order #, customer, or book title"
-            className="filter-input"
-          />
-        </div>
+      <div className="header-actions">
+        <Link to="/admin/dashboard/orders/create" className="add-author-btn">
+          <FiPlus /> Create New Order
+        </Link>
         
-        <div className="filter-group">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+        <div className="filter-controls">
+          <div className="filter-group">
+            <input
+              type="text"
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              placeholder="Search by order #, customer, or book title"
+              className="filter-input"
+            />
+          </div>
+          
+          <div className="filter-group">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
         </div>
       </div>
       
@@ -248,7 +288,7 @@ const OrdersList = () => {
                 </div>
                 
                 <div className="table-cell">
-                    ${Number(order.total_amount).toFixed(2)}
+                  ${Number(order.total_amount).toFixed(2)}
                 </div>
                 
                 <div className="table-cell">
@@ -256,9 +296,18 @@ const OrdersList = () => {
                 </div>
                 
                 <div className="table-cell">
-                  <span className={`status-badge ${getStatusClass(order.status)}`}>
-                    {order.status}
-                  </span>
+                  <select
+                    value={order.status}
+                    onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                    className={`status-select ${getStatusClass(order.status)}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
                 </div>
                 
                 <div className="table-cell actions">
@@ -292,35 +341,36 @@ const OrdersList = () => {
                   </div>
                   {order.items.map((item) => (
                     <div key={item.id} className="order-item">
-                      <img 
-                        src={item.book.cover_image || '/default-book.jpg'} 
-                        alt={item.book.title} 
-                        className="item-image"
-                      />
-                      <div className="item-info">
-                        <div className="item-title">{item.book.title}</div>
+                        <img 
+                        src={item.book?.cover_image || '/default-book.jpg'} 
+                        alt={item.book?.title || 'Book'} 
+                        className="order-item-image"
+                        />
+                        <div className="item-info">
+                        <div className="item-title">{item.book?.title || 'Unknown Book'}</div>
                         <div className="item-meta">
-                          <span>Qty: {item.quantity}</span>
-                          <span>Price: ${item.price}</span>
-                          <span>Total: ${(item.price * item.quantity).toFixed(2)}</span>
+                            <span>Qty: {item.quantity}</span>
+                            <span>Price: ${Number(item.price).toFixed(2)}</span>
+                            <span>Total: ${(item.price * item.quantity).toFixed(2)}</span>
                         </div>
-                        {item.book.author && (
-                          <div className="item-author">Author: {item.book.author.name}</div>
+                        {item.book?.author && (
+                            <div className="item-author">Author: {item.book.author.name}</div>
                         )}
-                      </div>
+                        </div>
                     </div>
-                  ))}
+                    ))}
                   <div className="order-summary">
                     <div className="summary-row">
                       <span>Subtotal:</span>
-                      <span>${Number(order.total_amount).toFixed(2)}</span>                    </div>
+                      <span>${Number(order.total_amount).toFixed(2)}</span>
+                    </div>
                     <div className="summary-row">
                       <span>Shipping:</span>
-                      <span>${order.shipping_cost?.toFixed(2) || '0.00'}</span>
+                      <span>${Number(order.shipping_fee)?.toFixed(2) || '0.00'}</span>
                     </div>
                     <div className="summary-row total">
                       <span>Total:</span>
-                      <span>${Number(order.total_amount + Number(order.shipping_cost || 0)).toFixed(2)}</span>
+                      <span>${(Number(order.total_amount) + Number(order.shipping_fee || 0)).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
