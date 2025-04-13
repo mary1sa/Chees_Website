@@ -225,7 +225,7 @@ const OrdersList = () => {
       <h1 className="table-title">Orders List</h1>
       
       <div className="header-actions">
-        <Link to="/admin/dashboard/orders/create" className="add-order-btn">
+        <Link to="/admin/dashboard/orders/create" className="add-author-btn">
           <FiPlus /> Create New Order
         </Link>
         
@@ -341,24 +341,24 @@ const OrdersList = () => {
                   </div>
                   {order.items.map((item) => (
                     <div key={item.id} className="order-item">
-                      <img 
-                        src={item.book.cover_image || '/default-book.jpg'} 
-                        alt={item.book.title} 
+                        <img 
+                        src={item.book?.cover_image || '/default-book.jpg'} 
+                        alt={item.book?.title || 'Book'} 
                         className="order-item-image"
-                      />
-                      <div className="item-info">
-                        <div className="item-title">{item.book.title}</div>
+                        />
+                        <div className="item-info">
+                        <div className="item-title">{item.book?.title || 'Unknown Book'}</div>
                         <div className="item-meta">
-                          <span>Qty: {item.quantity}</span>
-                          <span>Price: ${Number(item.price).toFixed(2)}</span>
-                          <span>Total: ${(item.price * item.quantity).toFixed(2)}</span>
+                            <span>Qty: {item.quantity}</span>
+                            <span>Price: ${Number(item.price).toFixed(2)}</span>
+                            <span>Total: ${(item.price * item.quantity).toFixed(2)}</span>
                         </div>
-                        {item.book.author && (
-                          <div className="item-author">Author: {item.book.author.name}</div>
+                        {item.book?.author && (
+                            <div className="item-author">Author: {item.book.author.name}</div>
                         )}
-                      </div>
+                        </div>
                     </div>
-                  ))}
+                    ))}
                   <div className="order-summary">
                     <div className="summary-row">
                       <span>Subtotal:</span>

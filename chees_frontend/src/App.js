@@ -59,6 +59,7 @@ import UpdateCoach from './Components/Coatches/Admin/UpdateCoach';
 import ViewAuthor from './Components/BookStore/ViewAuthor';
 import EditAuthor from './Components/BookStore/EditAuthor';
 import AddAuthor from './Components/BookStore/AddAuthor';
+import CreateOrder from './Components/BookStore/CreateOrder';
 
 function App() {
   return (
@@ -89,8 +90,9 @@ function App() {
           <Route path="authors/show/:id" element={<ViewAuthor />} />
           <Route path="authors/edit/:id" element={<EditAuthor />} />
           <Route path="authors/create" element={<AddAuthor />} />
-
           <Route path="orders" element={<OrdersList />} />
+          <Route path="orders/create" element={<CreateOrder />} />
+
 
           
           {/* Event Management Routes */}
