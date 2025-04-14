@@ -7,6 +7,7 @@ import PageLoading from '../../PageLoading/PageLoading';
 import SuccessAlert from '../../Alerts/SuccessAlert';
 import ErrorAlert from '../../Alerts/ErrorAlert';
 import "./useravailabilities.css";
+import ConfirmAction from '../../Confirm/ConfirmAction';
 
 const UserAvailabilities = () => {
   const [availabilities, setAvailabilities] = useState([]);
@@ -18,6 +19,9 @@ const UserAvailabilities = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [uniqueTypes, setUniqueTypes] = useState([]);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+const [availabilityToBook, setAvailabilityToBook] = useState(null);
+
   const [selectedAvailability, setSelectedAvailability] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -93,27 +97,32 @@ const UserAvailabilities = () => {
   };
 
   const handleBooking = async (availabilityId) => {
+    if (!availabilityToBook) return;
+
     try {
       const user = JSON.parse(localStorage.getItem('user'));
-
       const userBookings = user.bookings || [];
-      if (userBookings.includes(availabilityId)) {
+  
+      if (userBookings.includes(availabilityToBook.id)) {
         setErrorMessage('You have already booked this session.');
         return;
       }
-
+  
       await axiosInstance.post('/book-slot', {
-        availability_id: availabilityId,
+        availability_id: availabilityToBook.id,
         user_id: user.id
       });
-
-      user.bookings = [...userBookings, availabilityId];
+  
+      user.bookings = [...userBookings, availabilityToBook.id];
       localStorage.setItem('user', JSON.stringify(user));
-
+  
       setSuccessMessage('Booking successful!');
       fetchAvailabilities();
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Booking failed');
+    } finally {
+      setShowConfirmModal(false);
+      setAvailabilityToBook(null);
     }
   };
 
@@ -299,13 +308,16 @@ const UserAvailabilities = () => {
           onClick={() => {
             setSelectedAvailability(availability);
             setShowViewModal(true);
+
           }}
         >
           <FiEye /> Details
         </button>
         <button
           className="book-now-btn"
-          onClick={() => handleBooking(availability.id)}
+          onClick={() => { setAvailabilityToBook(availability); 
+            setShowConfirmModal(true); ;}}
+          
           disabled={
             availability.current_bookings >= availability.max_students ||
             isPastSession(availability)
@@ -377,7 +389,15 @@ const UserAvailabilities = () => {
         }}
         availability={selectedAvailability}
       />
-
+<ConfirmAction
+  isOpen={showConfirmModal}
+  onClose={() => {
+    setShowConfirmModal(false);
+    setAvailabilityToBook(null);
+  }}
+  onConfirm={handleBooking}
+  actionDescription="réserver cette session"
+/>
       {successMessage && <SuccessAlert message={successMessage} onClose={() => setSuccessMessage('')} />}
       {errorMessage && <ErrorAlert message={errorMessage} onClose={() => setErrorMessage('')} />}
     </div>

@@ -64,6 +64,9 @@ import EditAuthor from './Components/BookStore/EditAuthor';
 import AddAuthor from './Components/BookStore/AddAuthor';
 import CreateOrder from './Components/BookStore/CreateOrder';
 import UserAvailabilities from './Components/Coatches/Member/UserAvailabilities';
+import AdminCoachAvailability from './Components/Coatches/Admin/AdminCoachAvailability';
+import AdminCreateAvailability from './Components/Coatches/Admin/AdminCreateAvailability';
+import AdminUpdateAvailability from './Components/Coatches/Admin/AdminUpdateAvailability';
 
 function App() {
   return (
@@ -121,10 +124,6 @@ function App() {
           <Route path="createenrollment" element={<EnrollmentForm isEditing={false} />} />
           <Route path="enrollments/edit/:enrollmentId" element={<EnrollmentForm isEditing={true} />} />
        
-
-
-          
-          
        {/* Roles Management Routes */}
        <Route path="roles" element={<Roles />} />
           {/*Coatch Management Routes */}
@@ -134,6 +133,10 @@ function App() {
           <Route path="updatecoach/:id" element={<UpdateCoach />} />
 
           <Route path="RequestPending" element={<PendingRequestsTable />} />
+   {/* Roles Management Routes */}
+   <Route path="coachavailability" element={<AdminCoachAvailability />} />
+   <Route path="creatavailability" element={<AdminCreateAvailability />} />
+   <Route path="updateavailability/:id" element={<AdminUpdateAvailability/>} />
 
         </Route>
 

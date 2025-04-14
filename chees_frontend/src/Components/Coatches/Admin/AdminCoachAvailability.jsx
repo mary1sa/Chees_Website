@@ -5,9 +5,9 @@ import PageLoading from '../../PageLoading/PageLoading';
 import ConfirmDelete from '../../Confirm/ConfirmDelete';
 import SuccessAlert from '../../Alerts/SuccessAlert';
 import ErrorAlert from '../../Alerts/ErrorAlert';
-import { Link } from 'react-router-dom';
-import "./modelavail.css"
-const CoachAvailability = () => {
+import { Link, useNavigate } from 'react-router-dom';
+
+const AdminCoachAvailability = () => {
   const [availabilities, setAvailabilities] = useState([]);
   const [filteredAvailabilities, setFilteredAvailabilities] = useState([]);
   const [dateFilter, setDateFilter] = useState('');
@@ -23,56 +23,48 @@ const CoachAvailability = () => {
   const itemsPerPage = 5;
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
+const navigate=useNavigate()
   useEffect(() => {
-    fetchCoachAvailability();
+    fetchAllAvailabilities();
   }, []);
 
   useEffect(() => {
     filterAvailabilities();
   }, [availabilities, dateFilter, typeFilter, locationFilter]);
 
-  const fetchCoachAvailability = async () => {
+  const fetchAllAvailabilities = async () => {
     setLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (user?.id) {
-        const coachResponse = await axiosInstance.get(`/coachby-user/${user.id}`);
-        const response = await axiosInstance.get(`/coach_availability/${coachResponse.data.id}`);
-        setAvailabilities(response.data);
-        
-        const types = [...new Set(response.data
-          .map(avail => avail.availability_type)
-          .filter(Boolean)
-          .sort())];
-        setUniqueTypes(types);
-      }
+      const response = await axiosInstance.get('/coach_availability'); 
+      setAvailabilities(response.data);
+
+      const types = [...new Set(response.data
+        .map(avail => avail.availability_type)
+        .filter(Boolean)
+        .sort())];
+      setUniqueTypes(types);
     } catch (error) {
       setErrorMessage('Failed to fetch availabilities');
     } finally {
       setLoading(false);
     }
   };
-
+  const handleClick = () => {
+    navigate('/admin/dashboard/creatavailability');
+  };
   const filterAvailabilities = () => {
     let filtered = [...availabilities];
 
     if (dateFilter) {
-      filtered = filtered.filter(avail => 
-        avail.date.includes(dateFilter)
-      );
+      filtered = filtered.filter(avail => avail.date.includes(dateFilter));
     }
 
     if (typeFilter !== 'all') {
-      filtered = filtered.filter(avail => 
-        avail.availability_type === typeFilter
-      );
+      filtered = filtered.filter(avail => avail.availability_type === typeFilter);
     }
 
     if (locationFilter) {
-      filtered = filtered.filter(avail => 
-        avail.location?.toLowerCase().includes(locationFilter.toLowerCase())
-      );
+      filtered = filtered.filter(avail => avail.location?.toLowerCase().includes(locationFilter.toLowerCase()));
     }
 
     setFilteredAvailabilities(filtered);
@@ -85,7 +77,7 @@ const CoachAvailability = () => {
     try {
       await axiosInstance.delete(`/coach_availability/${availabilityToDelete.id}`);
       setSuccessMessage('Availability deleted successfully!');
-      await fetchCoachAvailability();
+      await fetchAllAvailabilities();
     } catch (error) {
       setErrorMessage('Failed to delete availability');
     } finally {
@@ -162,32 +154,22 @@ const CoachAvailability = () => {
           <div className="modalbody">
             <div className="detail-item">
               <label>Date:</label>
-              <span>
-                {new Date(availability.date).toLocaleDateString('en-MA', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </span>
+              <span>{new Date(availability.date).toLocaleDateString()}</span>
             </div>
 
             <div className="detailitem">
               <label>Start Time:</label>
-              <span>
-                {availability.start_time}
-              </span>
+              <span>{availability.start_time}</span>
             </div>
+
             <div className="detailitem">
               <label>End Time:</label>
-              <span>
-               {availability.end_time}
-              </span>
+              <span>{availability.end_time}</span>
             </div>
+
             <div className="detailitem">
               <label>Type:</label>
-              <span className={`type-tag ${availability.availability_type.toLowerCase()}`}>
-                {availability.availability_type.replace(/_/g, ' ')}
-              </span>
+              <span>{availability.availability_type}</span>
             </div>
 
             <div className="detailitem">
@@ -203,7 +185,6 @@ const CoachAvailability = () => {
               <label>Available Spots:</label>
               <span>{availability.max_students - availability.current_bookings}</span>
             </div>
-
             {availability.notes && (
               <div className="detailitem">
                 <label>Additional Notes:</label>
@@ -213,9 +194,7 @@ const CoachAvailability = () => {
           </div>
 
           <div className="modalfooter">
-            <button className="btnsecondary" onClick={onClose}>
-              Close
-            </button>
+            <button className="btnsecondary" onClick={onClose}>Close</button>
           </div>
         </div>
       </div>
@@ -232,7 +211,6 @@ const CoachAvailability = () => {
         onConfirm={confirmDelete}
         itemName={`availability on ${availabilityToDelete?.date}`}
       />
-
       <ViewAvailabilityModal
         isOpen={showViewModal}
         onClose={() => {
@@ -245,7 +223,7 @@ const CoachAvailability = () => {
       {successMessage && <SuccessAlert message={successMessage} onClose={() => setSuccessMessage('')} />}
       {errorMessage && <ErrorAlert message={errorMessage} onClose={() => setErrorMessage('')} />}
 
-      <h1 className="table-title">Manage Availabilities</h1>
+      <h1 className="table-title">Manage Coach Availabilities</h1>
 
       <div className="filter-controls">
         <div className="filter-group">
@@ -282,13 +260,10 @@ const CoachAvailability = () => {
           />
         </div>
 
-        <Link 
-          to="/coach/dashboard/add-availability"
-          className="add-new-btn"
-        >
-          <FiPlus className="icon" />
-          Add New 
-        </Link>
+        <button onClick={handleClick} className="add-new-btn">
+      <FiPlus className="icon" />
+      Add New
+    </button>
       </div>
 
       <div className="data-table">
@@ -304,31 +279,15 @@ const CoachAvailability = () => {
         {currentItems.length > 0 ? (
           currentItems.map(avail => (
             <div key={avail.id} className="table-row">
+              <div className="table-cell">{new Date(avail.date).toLocaleDateString()}</div>
               <div className="table-cell">
-                {new Date(avail.date).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                })}
+                {avail.start_time} - {avail.end_time}
               </div>
-              <div className="table-cell time-cell">
-                <span className="time">{avail.start_time}</span>
-                <span className="time-separator">-</span>
-                <span className="time">{avail.end_time}</span>
-              </div>
-              <div className="table-cell">
-                <span className={`type-tag ${avail.availability_type.toLowerCase()}`}>
-                  {avail.availability_type}
-                </span>
-              </div>
+              <div className="table-cell">{avail.availability_type}</div>
               <div className="table-cell">{avail.location || 'Not specified'}</div>
               <div className="table-cell">{avail.max_students || 'Unlimited'}</div>
               <div className="table-cell actions">
-                <Link
-                  to={`/coach/dashboard/Updateavailability/${avail.id}`}
-                  className="action-btn update-btn"
-                  title="Update"
-                >
+                <Link to={`/admin/dashboard/updateavailability/${avail.id}`} className="action-btn update-btn" title="Update">
                   <FiEdit className="icon" />
                 </Link>
                 <button
@@ -337,8 +296,9 @@ const CoachAvailability = () => {
                     setShowDeleteModal(true);
                   }}
                   className="action-btn delete-btn"
+                  title="Delete"
                 >
-                  <FiTrash2 />
+                  <FiTrash2 className="icon" />
                 </button>
                 <button
                   onClick={() => {
@@ -346,23 +306,21 @@ const CoachAvailability = () => {
                     setShowViewModal(true);
                   }}
                   className="action-btn view-btn"
-                  title="View Details"
+                  title="View"
                 >
-                  <FiEye />
+                  <FiEye className="icon" />
                 </button>
               </div>
             </div>
           ))
         ) : (
-          <div className="no-results">
-            No availabilities found matching your criteria
-          </div>
+          <div>No availabilities found.</div>
         )}
       </div>
 
-      {totalPages > 1 && renderPagination()}
+      {renderPagination()}
     </div>
   );
 };
 
-export default CoachAvailability;
+export default AdminCoachAvailability;

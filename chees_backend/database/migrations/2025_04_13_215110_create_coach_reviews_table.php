@@ -14,19 +14,17 @@ return new class extends Migration
         Schema::create('coach_reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('coach_id')->constrained()->onDelete('cascade');
-            $table->foreignId('student_id')->constrained('users')->onDelete('cascade');
-            
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); 
             $table->tinyInteger('rating');
-            $table->text('review_text')->nullable();
+            $table->text('review_text')->nullable(); 
             
             $table->tinyInteger('teaching_clarity_rating')->nullable();
             $table->tinyInteger('communication_rating')->nullable();
             $table->tinyInteger('knowledge_depth_rating')->nullable();
             
-            
             $table->timestamps();
-            
-            $table->unique(['coach_id', 'student_id']);
+
+            $table->unique(['coach_id', 'user_id']);
         });
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CoachesController;
+use App\Http\Controllers\CoachReviewController;
 use App\Http\Controllers\CoachSpecializationCategoryController;
 use App\Http\Controllers\MemberBookingController;
 use App\Http\Controllers\RoleController;
@@ -75,6 +76,7 @@ Route::get('specializations/{id}', [CoachSpecializationCategoryController::class
 Route::put('specializations/{id}', [CoachSpecializationCategoryController::class, 'update']);
 Route::delete('specializations/{id}', [CoachSpecializationCategoryController::class, 'destroy']);
 //Coach availability
+Route::get('coach_availability', [CoachAvailabilityController::class, 'index']); 
 
 Route::get('coach_availability/{coachId}', [CoachAvailabilityController::class, 'show']); 
 Route::post('coach_availability', [CoachAvailabilityController::class, 'store']); 
@@ -87,6 +89,13 @@ Route::get('/coachby-user/{user_id}', [CoachesController::class, 'getCoachByUser
 //member bookin coach
 Route::get('/available-slots', [MemberBookingController::class, 'getAvailableSlots']);
 Route::post('/book-slot', [MemberBookingController::class, 'bookSlot']);
+
+
+
+//coachs review
+Route::post('/reviews', [CoachReviewController::class, 'store']);
+Route::get('/reviews/{coachId}', [CoachReviewController::class, 'index']);
+
 
 // Coach API routes
 

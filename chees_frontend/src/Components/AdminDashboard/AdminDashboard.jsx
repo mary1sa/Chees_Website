@@ -85,6 +85,8 @@ const AdminDashboard = () => {
       icon: <FiHome />,
       path: "/admin/dashboard"
     },
+
+   
     {
       title: "User Management",
       icon: <FiUsers />,
@@ -153,12 +155,29 @@ const AdminDashboard = () => {
  
                },
                { 
-                 title: "Add User", 
+                 title: "Add coach", 
                  path: "CreateCoatch",
                  icon: <FiUserPlus className="submenu-icon" />
                },
       ]
     },
+    {
+      title: "Coach Availability",
+      icon: <FiCalendar />,  
+      submenus: [
+        {
+          title: "Coach Availability",
+          icon: <FiList />,  
+          path: "coachavailability"
+        },
+        { 
+          title: "Add Availability", 
+          path: "creatavailability",
+          icon: <FiPlusCircle className="submenu-icon" /> 
+        },
+      ]
+    }
+,    
     {
       title: "Courses",
       icon: <FiBook />,
