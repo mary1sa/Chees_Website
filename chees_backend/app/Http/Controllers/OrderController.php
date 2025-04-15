@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class OrderController extends Controller
 {
@@ -75,19 +76,47 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $this->authorize('view', $order);
+        // Check if user can view the order
+        if (Gate::denies('view-order', $order)) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
         
         return response()->json($order->load('items.book'));
     }
 
     public function updateStatus(Order $order, Request $request)
-{
-    $request->validate([
-        'status' => 'required|in:pending,processing,shipped,completed,cancelled'
-    ]);
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,shipped,completed,cancelled'
+        ]);
 
-    $order->update(['status' => $request->status]);
-    
-    return response()->json($order);
-}
+        $order->update(['status' => $request->status]);
+        
+        return response()->json($order);
+    }
+
+    public function destroy(Order $order)
+    {
+        // Check if user can delete the order
+        if (Gate::denies('delete-order', $order)) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        try {
+            // Restore stock for each item
+            foreach ($order->items as $item) {
+                Book::where('id', $item->book_id)->increment('stock', $item->quantity);
+            }
+
+            // Delete the order
+            $order->delete();
+
+            return response()->json(null, 204);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete order',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
