@@ -71,6 +71,8 @@ import Books from './Components/MemberDashboard/BookStor/Books';
 import BookDetail from './Components/MemberDashboard/BookStor/BookDetail';
 import OrderForm from './Components/MemberDashboard/BookStor/OrderForm';
 import BookStoreDashboard from './Components/BookStore/BookStoreDashboard';
+import Authors from './Components/MemberDashboard/BookStor/Authors';
+import MemberOrders from './Components/MemberDashboard/BookStor/MemberOrders';
 
 function App() {
   return (
@@ -169,6 +171,9 @@ function App() {
           <Route path="books" element={<Books />} />
           <Route path="books/:id" element={<BookDetail />} />
           <Route path="books/:id/order" element={<OrderForm />} />
+          <Route path="authors" element={<Authors />} />
+          <Route path="myOrderes" element={<MemberOrders/>} />
+          <Route path="authors/:id" element={<ViewAuthor/>} />
 
 
           {/* Session Routes */}
