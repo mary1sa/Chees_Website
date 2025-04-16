@@ -112,7 +112,7 @@ const MemberDashboard = () => {
           submenus: [
             { 
               title: "Books", 
-              path: "books",
+              path: "/member/dashboard/books",
               icon: <FiBook className="submenu-icon" />
             },
             { 

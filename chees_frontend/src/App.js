@@ -67,6 +67,10 @@ import UserAvailabilities from './Components/Coatches/Member/UserAvailabilities'
 import AdminCoachAvailability from './Components/Coatches/Admin/AdminCoachAvailability';
 import AdminCreateAvailability from './Components/Coatches/Admin/AdminCreateAvailability';
 import AdminUpdateAvailability from './Components/Coatches/Admin/AdminUpdateAvailability';
+import Books from './Components/MemberDashboard/BookStor/Books';
+import BookDetail from './Components/MemberDashboard/BookStor/BookDetail';
+import OrderForm from './Components/MemberDashboard/BookStor/OrderForm';
+import BookStoreDashboard from './Components/BookStore/BookStoreDashboard';
 
 function App() {
   return (
@@ -99,6 +103,8 @@ function App() {
           <Route path="authors/create" element={<AddAuthor />} />
           <Route path="orders" element={<OrdersList />} />
           <Route path="orders/create" element={<CreateOrder />} />
+          <Route path="books/dashboard" element={<BookStoreDashboard />} />
+
 
 
           
@@ -159,6 +165,12 @@ function App() {
           <Route path="courses/wishlist" element={<CourseWishlist />} />
           <Route path="course-content" element={<CourseContent />} />
           
+          {/* book store routes */}
+          <Route path="books" element={<Books />} />
+          <Route path="books/:id" element={<BookDetail />} />
+          <Route path="books/:id/order" element={<OrderForm />} />
+
+
           {/* Session Routes */}
           <Route path="upcoming-sessions" element={<UpcomingSessions />} />
           <Route path="my-schedule" element={<UpcomingSessions />} /> {/* Reusing UpcomingSessions component */}

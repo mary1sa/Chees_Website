@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\Author;
 use App\Models\BookCategory;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
@@ -104,11 +105,4 @@ public function destroy(Book $book)
     return response()->json(null, 204);
 }
 
-    public function getFilters()
-    {
-        return response()->json([
-            'categories' => BookCategory::all(),
-            'authors' => Author::all()
-        ]);
-    }
 }
