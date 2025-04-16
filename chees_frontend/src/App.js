@@ -56,15 +56,38 @@ import AddBook from './Components/BookStore/AddBook';
 import AuthorList from './Components/BookStore/AuthorList';
 import OrdersList from './Components/BookStore/OrdersList';
 import Roles from './Components/Roles/Roles';
-import CoachSpecialization from './Components/SpecializationCoatch/SpecializationCoach';
-// Import other event components as needed
+import CoachSpecialization from './Components/Coatches/SpecializationCoach';
+import FetchCoaches from './Components/Coatches/Admin/FetchCoatches';
+import PendingRequestsTable from './Components/Coatches/PendingRequestsTable';
+import CreateCoach from './Components/Coatches/Admin/CreateCoatch';
 
 import CourseList from './Components/AdminDashboard/CourseManagement/CourseList';
 import CourseForm from './Components/AdminDashboard/CourseManagement/CourseForm';
 import LevelList from './Components/AdminDashboard/CourseLevelManagement/LevelList';
 import LevelForm from './Components/AdminDashboard/CourseLevelManagement/LevelForm';
-
 import AdminDashboardOverview from './Components/AdminDashboard/AdminDashboardOverview';
+// import EnrollmentList from './Components/AdminDashboard/EnrollmentManagement/EnrollmentList';
+// import EnrollmentForm from './Components/AdminDashboard/EnrollmentManagement/EnrollmentForm';
+import CreateCoacheProfile from './Components/Coatches/Coches/CreateCoacheProfile';
+import UpdateCoach from './Components/Coatches/Admin/UpdateCoach';
+import CreateCoachAvailability from './Components/Coatches/Coches/CreateCoachAvailability';
+import CoachAvailability from './Components/Coatches/Coches/CoachAvailability';
+import UpdateCoachAvailability from './Components/Coatches/Coches/UpdateCoachAvailability';
+import ViewAuthor from './Components/BookStore/ViewAuthor';
+import EditAuthor from './Components/BookStore/EditAuthor';
+import AddAuthor from './Components/BookStore/AddAuthor';
+import CreateOrder from './Components/BookStore/CreateOrder';
+import UserAvailabilities from './Components/Coatches/Member/UserAvailabilities';
+import AdminCoachAvailability from './Components/Coatches/Admin/AdminCoachAvailability';
+import AdminCreateAvailability from './Components/Coatches/Admin/AdminCreateAvailability';
+import AdminUpdateAvailability from './Components/Coatches/Admin/AdminUpdateAvailability';
+import Books from './Components/MemberDashboard/BookStor/Books';
+import BookDetail from './Components/MemberDashboard/BookStor/BookDetail';
+import OrderForm from './Components/MemberDashboard/BookStor/OrderForm';
+import BookStoreDashboard from './Components/BookStore/BookStoreDashboard';
+import Authors from './Components/MemberDashboard/BookStor/Authors';
+// import MemberOrders from './Components/MemberDashboard/BookStor/MemberOrders';
+import OrderDetails from './Components/MemberDashboard/BookStor/OrderDetails';
 
 function App() {
   return (
@@ -88,6 +111,20 @@ function App() {
           <Route path="createuser" element={<CreateUser />} />
           <Route path="updateuser/:id" element={<UpdateUser />} />
           <Route path="showuser/:id" element={<ShowUser />} />
+
+          {/* Bookstore Management (moved here) */}
+          <Route path="books" element={<BookList />} />
+          <Route path="books/create" element={<AddBook />} />
+          <Route path="authors" element={<AuthorList />} />
+          <Route path="authors/show/:id" element={<ViewAuthor />} />
+          <Route path="authors/edit/:id" element={<EditAuthor />} />
+          <Route path="authors/create" element={<AddAuthor />} />
+          <Route path="orders" element={<OrdersList />} />
+          <Route path="orders/create" element={<CreateOrder />} />
+          <Route path="books/dashboard" element={<BookStoreDashboard />} />
+
+
+
           
           {/* Event Management Routes */}
           <Route path="events" element={<EventList />} />
@@ -109,6 +146,10 @@ function App() {
           <Route path="levels" element={<LevelList />} />
           <Route path="levels/create" element={<LevelForm isEditing={false} />} />
           <Route path="levels/:levelId/edit" element={<LevelForm isEditing={true} />} />
+          {/* Enrollment routes temporarily commented out due to missing components */}
+          {/* <Route path="enrollments" element={<EnrollmentList />} /> */}
+          {/* <Route path="createenrollment" element={<EnrollmentForm isEditing={false} />} /> */}
+          {/* <Route path="enrollments/edit/:enrollmentId" element={<EnrollmentForm isEditing={true} />} /> */}
           
           {/* Course Materials Management Routes */}
           <Route path="course-materials" element={<CourseMaterialList />} />
@@ -116,11 +157,18 @@ function App() {
           <Route path="course-materials/:materialId/edit" element={<CourseMaterialForm isEditing={true} />} />
           <Route path="course-materials/:materialId/view" element={<CourseMaterialView />} />
           
-          {/* Bookstore Management Routes */}
-          <Route path="books" element={<BookList />} />
-          <Route path="books/create" element={<AddBook />} />
-          <Route path="authors" element={<AuthorList />} />
-          <Route path="orders" element={<OrdersList />} />
+          {/* Roles Management Routes */}
+          <Route path="roles" element={<Roles />} />
+          
+          {/* Coach Management Routes */}
+          <Route path="CoachSpecialization" element={<CoachSpecialization />} />
+          <Route path="FetchCoatches" element={<FetchCoaches />} />
+          <Route path="CreateCoatch" element={<CreateCoach />} />
+          <Route path="updatecoach/:id" element={<UpdateCoach />} />
+          <Route path="RequestPending" element={<PendingRequestsTable />} />
+          <Route path="coachavailability" element={<AdminCoachAvailability />} />
+          <Route path="creatavailability" element={<AdminCreateAvailability />} />
+          <Route path="updateavailability/:id" element={<AdminUpdateAvailability/>} />
           
           {/* Default Route */}
           <Route index element={<AdminDashboardOverview />} />
@@ -156,9 +204,19 @@ function App() {
           <Route path="packages/:id/purchase" element={<CoursePackagePurchase />} />
           <Route path="packages/purchased" element={<MyPackages />} /> */}
           
+          {/* book store routes */}
+          <Route path="books" element={<Books />} />
+          <Route path="books/:id" element={<BookDetail />} />
+          <Route path="books/:id/order" element={<OrderForm />} />
+          <Route path="authors" element={<Authors />} />
+          {/* <Route path="myOrderes" element={<MemberOrders/>} /> */}
+          <Route path="authors/:id" element={<ViewAuthor/>} />
+          <Route path="orders/:id" element={<OrderDetails />} />
+
           {/* Session Routes */}
           <Route path="upcoming-sessions" element={<UpcomingSessions />} />
-          <Route path="my-schedule" element={<UpcomingSessions />} /> {/* Reusing UpcomingSessions component */}
+          {/* Coach Booking Route */}
+          <Route path="bookingcoach" element={<UserAvailabilities />} />
 
           {/* Default Route */}
           <Route index element={<MemberDashboardOverview />} />
@@ -173,6 +231,12 @@ function App() {
   }
 >
   <Route path="registrations" element={<UserEventRegistrations />} />
+  <Route path="CreateProfile" element={< CreateCoacheProfile />} />
+  <Route path="creatavailability" element={<  CreateCoachAvailability />} />
+  <Route path="coachavailability" element={<  CoachAvailability />} />
+  <Route path="Updateavailability/:id" element={<  UpdateCoachAvailability />} />
+
+
 </Route>
 
         <Route

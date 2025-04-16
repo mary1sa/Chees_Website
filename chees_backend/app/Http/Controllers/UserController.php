@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -20,6 +22,21 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function getCoaches()
+    {
+        $users = User::with('role')
+        ->whereHas('role', function ($query) {
+            $query->where('name', 'coach'); 
+        })
+        ->get();
+
+    return response()->json($users);
+    }
+
+
+
+
+    
     public function getUserById($id)
     {
         $user = User::with('role')->find($id);
@@ -129,19 +146,5 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User deleted successfully']);
     }
-
-    public function getCoaches()
-    {
-        // Assuming role_id 2 is for coaches - adjust if your role IDs are different
-        $coaches = User::with('role')
-            ->whereHas('role', function($query) {
-                $query->where('name', 'coach');
-            })
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $coaches
-        ]);
-    }
+    
 }

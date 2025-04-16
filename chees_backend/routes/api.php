@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\CoachesController;
+use App\Http\Controllers\CoachReviewController;
 use App\Http\Controllers\CoachSpecializationCategoryController;
+use App\Http\Controllers\MemberBookingController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -28,7 +31,6 @@ use App\Http\Controllers\TournamentMatchController;
 use App\Http\Controllers\TournamentRoundController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\SessionAttendanceController;
-use App\Http\Controllers\CoursePackageController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -232,3 +234,6 @@ Route::apiResource('books.ratings', BookRatingController::class)->only(['index',
 Route::apiResource('ratings', BookRatingController::class)->only(['update', 'destroy']);
 Route::apiResource('orders', OrderController::class)->middleware('auth:api');
 Route::apiResource('order-items', OrderItemController::class)->only(['show']);
+Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
+Route::get('/order-items', [OrderItemController::class, 'index']);
+Route::get('/orders/user/{userId}', [OrderController::class, 'getUserOrders']);

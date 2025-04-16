@@ -3,10 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Order;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -106,6 +107,11 @@ class User extends Authenticatable implements JWTSubject
                     ->wherePivot('status', 'active')
                     ->wherePivot('expiry_date', '>', now())
                     ->orWherePivot('expiry_date', null);
+    }
+    
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 
     /**

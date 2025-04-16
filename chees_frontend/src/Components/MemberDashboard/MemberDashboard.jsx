@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  FiMenu, FiX, FiHome, 
-  FiDollarSign, FiCalendar, FiSettings,
-  FiLogOut, FiBell, FiSun, FiMoon,
-  FiChevronDown, FiChevronRight, FiCreditCard, FiFileText, FiList, FiBook, FiHeart
+  FiMenu, FiX, FiHome, FiUsers, FiUserPlus,
+  FiDollarSign, FiCalendar, FiSettings, FiKey,
+  FiLogOut, FiBell, FiSearch, FiSun, FiMoon,
+  FiChevronDown, FiChevronRight, FiChevronLeft,
+  FiCreditCard, FiFileText, FiList, FiBook,
+  FiBookmark, FiPlay, FiAward, FiHeart,
+  FiUser, FiShoppingCart
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -80,7 +83,6 @@ const MemberDashboard = () => {
           path: "/member/dashboard/courses/wishlist",
           icon: <FiHeart className="submenu-icon" />
         },
-        
       ]
     },
     
@@ -103,7 +105,7 @@ const MemberDashboard = () => {
     {
       title: "My Registrations",
       icon: <FiCalendar />,
-      path: "/member/registrations"
+      path: "/member/dashboard/registrations"
     },
     {
       title: "Payments",
@@ -111,9 +113,35 @@ const MemberDashboard = () => {
       path: "/member/payments"
     },
     {
+      title: "Book Store",
+      icon: <FiBook />, 
+      submenus: [
+        { 
+          title: "Books", 
+          path: "/member/dashboard/books",
+          icon: <FiBook className="submenu-icon" />
+        },
+        { 
+          title: "Authors", 
+          path: "/member/dashboard/authors",
+          icon: <FiUser className="submenu-icon" />
+        },
+        { 
+          title: "My Orders", 
+          path: "/member/dashboard/myOrderes",
+          icon: <FiShoppingCart className="submenu-icon" />
+        }
+      ]
+    },
+    {
+      title: "Coach Booking",
+      icon: <FiCalendar />,
+      path: "/member/dashboard/bookingcoach"
+    },
+    {
       title: "Settings",
       icon: <FiSettings />,
-      path: "/member/settings"
+      path: "/member/dashboard/settings"
     }
   ];
 
@@ -226,5 +254,6 @@ const MemberDashboard = () => {
     </div>
   );
 };
+
 
 export default MemberDashboard;
