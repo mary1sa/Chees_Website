@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiBook, FiShoppingCart, FiSearch, FiFilter } from 'react-icons/fi';
 import axiosInstance from '../../config/axiosInstance';
+import PageLoading from '../../PageLoading/PageLoading';
+import './Books.css'
 
 const Books = () => {
   const [books, setBooks] = useState([]);
@@ -14,23 +16,17 @@ const Books = () => {
     minPrice: '',
     maxPrice: ''
   });
-  const [availableFilters, setAvailableFilters] = useState({
-    categories: [],
-    authors: []
-  });
   const [showFilters, setShowFilters] = useState(false);
 
+  // Extract unique categories and authors from books data
+  const categories = [...new Set(books.map(book => book.category?.name).filter(Boolean))];
+  const authors = [...new Set(books.map(book => book.author?.name).filter(Boolean))];
+
   useEffect(() => {
-    const fetchBooksAndFilters = async () => {
+    const fetchBooks = async () => {
       try {
-        // Fetch books
-        const booksResponse = await axiosInstance.get('/books');
-        setBooks(booksResponse.data);
-
-        // Fetch filters
-        const filtersResponse = await axiosInstance.get('/books/filters');
-        setAvailableFilters(filtersResponse.data);
-
+        const response = await axiosInstance.get('/books');
+        setBooks(response.data);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -38,7 +34,7 @@ const Books = () => {
       }
     };
 
-    fetchBooksAndFilters();
+    fetchBooks();
   }, []);
 
   const handleSearchChange = (e) => {
@@ -54,29 +50,31 @@ const Books = () => {
   };
 
   const applyFilters = () => {
-    // In a real app, you would make an API call with the filters
-    // For now, we'll just filter the existing books
-    let filtered = books;
+    let filtered = [...books];
 
+    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(book =>
         book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.author?.name.toLowerCase().includes(searchTerm.toLowerCase())
+        (book.author?.name && book.author.name.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
+    // Apply category filter
     if (filters.category) {
       filtered = filtered.filter(book => 
-        book.category?.id.toString() === filters.category
+        book.category?.name === filters.category
       );
     }
 
+    // Apply author filter
     if (filters.author) {
       filtered = filtered.filter(book => 
-        book.author?.id.toString() === filters.author
+        book.author?.name === filters.author
       );
     }
 
+    // Apply price range filters
     if (filters.minPrice) {
       filtered = filtered.filter(book => 
         book.price >= parseFloat(filters.minPrice)
@@ -94,7 +92,7 @@ const Books = () => {
 
   const filteredBooks = applyFilters();
 
-  if (loading) return <div className="loading">Loading books...</div>;
+  if (loading) return <PageLoading />;
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
@@ -130,9 +128,9 @@ const Books = () => {
               onChange={handleFilterChange}
             >
               <option value="">All Categories</option>
-              {availableFilters.categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
+                  {category}
                 </option>
               ))}
             </select>
@@ -146,9 +144,9 @@ const Books = () => {
               onChange={handleFilterChange}
             >
               <option value="">All Authors</option>
-              {availableFilters.authors.map(author => (
-                <option key={author.id} value={author.id}>
-                  {author.name}
+              {authors.map((author, index) => (
+                <option key={index} value={author}>
+                  {author}
                 </option>
               ))}
             </select>
@@ -163,6 +161,7 @@ const Books = () => {
                 placeholder="Min"
                 value={filters.minPrice}
                 onChange={handleFilterChange}
+                min="0"
               />
               <span>to</span>
               <input
@@ -171,6 +170,7 @@ const Books = () => {
                 placeholder="Max"
                 value={filters.maxPrice}
                 onChange={handleFilterChange}
+                min="0"
               />
             </div>
           </div>
@@ -205,11 +205,11 @@ const Books = () => {
                 <div className="price-section">
                   {book.sale_price ? (
                     <>
-                      <span className="original-price">${book.price.toFixed(2)}</span>
-                      <span className="sale-price">${book.sale_price.toFixed(2)}</span>
+                      <span className="original-price">${Number(book.price).toFixed(2)}</span>
+                      <span className="sale-price">${Number(book.sale_price).toFixed(2)}</span>
                     </>
                   ) : (
-                    <span className="price">${book.price.toFixed(2)}</span>
+                    <span className="price">${Number(book.price).toFixed(2)}</span>
                   )}
                 </div>
                 <p className="stock-status">
@@ -217,9 +217,8 @@ const Books = () => {
                     `${book.stock} available` : 'Out of stock'}
                 </p>
                 <Link 
-                  to={`/member/dashboard/books/order/${book.id}`}
-                  className="order-button"
-                  disabled={book.stock <= 0}
+                  to={`/member/dashboard/books/${book.id}/order`}
+                  className={`order-button ${book.stock <= 0 ? 'disabled' : ''}`}
                 >
                   <FiShoppingCart /> Order
                 </Link>

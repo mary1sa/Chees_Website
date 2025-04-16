@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { FiShoppingCart, FiArrowLeft } from 'react-icons/fi';
 import axiosInstance from '../../config/axiosInstance';
 import './Books.css';
+import PageLoading from '../../PageLoading/PageLoading';
 
 const OrderForm = () => {
   const { id } = useParams();
@@ -48,13 +49,7 @@ const OrderForm = () => {
     }
   };
 
-  if (!book) {
-    return (
-      <div className="loading-container">
-        <p>Loading book details...</p>
-      </div>
-    );
-  }
+  if (!book) return <PageLoading />;
 
   return (
     <div className="order-form-container">

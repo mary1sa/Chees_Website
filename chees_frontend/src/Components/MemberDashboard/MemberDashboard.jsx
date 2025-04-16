@@ -8,7 +8,8 @@ import {
   FiChevronDown, FiChevronRight, FiChevronLeft,
   FiCreditCard, FiFileText, FiList, FiBook,
   FiBookmark, FiPlay, FiAward, FiHeart,
-  FiUser
+  FiUser,
+  FiShoppingCart
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -119,6 +120,16 @@ const MemberDashboard = () => {
               title: "Authors", 
               path: "authors",
               icon: <FiUser className="submenu-icon" />
+            },
+            { 
+              title: "My Orders", 
+              path: "myOrderes",
+              icon: <FiShoppingCart className="submenu-icon" />
+            },
+            { 
+              title: "Wishlist", 
+              path: "Wishlist",
+              icon: <FiHeart className="submenu-icon" />
             }
           ]
       },
