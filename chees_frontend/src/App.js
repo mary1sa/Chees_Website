@@ -73,6 +73,7 @@ import OrderForm from './Components/MemberDashboard/BookStor/OrderForm';
 import BookStoreDashboard from './Components/BookStore/BookStoreDashboard';
 import Authors from './Components/MemberDashboard/BookStor/Authors';
 import MemberOrders from './Components/MemberDashboard/BookStor/MemberOrders';
+import OrderDetails from './Components/MemberDashboard/BookStor/OrderDetails';
 
 function App() {
   return (
@@ -174,7 +175,7 @@ function App() {
           <Route path="authors" element={<Authors />} />
           <Route path="myOrderes" element={<MemberOrders/>} />
           <Route path="authors/:id" element={<ViewAuthor/>} />
-
+          <Route path="orders/:id" element={<OrderDetails />} />
 
           {/* Session Routes */}
           <Route path="upcoming-sessions" element={<UpcomingSessions />} />
