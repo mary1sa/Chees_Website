@@ -264,19 +264,19 @@
   
   .price {
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--sidebar-bg);
     font-size: 1.1rem;
   }
   
   .sale-price {
     font-weight: 600;
-    color: var(--danger-color);
+    color: var(--sidebar-bg);
     font-size: 1.1rem;
   }
   
   .original-price {
     text-decoration: line-through;
-    color: var(--text-light);
+    color: var(--danger-color);
     font-size: 0.9rem;
   }
   
