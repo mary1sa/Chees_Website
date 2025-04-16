@@ -28,11 +28,11 @@ class OrderController extends Controller
             'payment_method' => 'required|string',
             'notes' => 'nullable|string'
         ]);
-
+    
         // Calculate totals and validate stock
         $totalAmount = 0;
         $items = [];
-
+    
         foreach ($validated['items'] as $item) {
             $book = Book::findOrFail($item['book_id']);
             
@@ -42,35 +42,51 @@ class OrderController extends Controller
                     'book_id' => $book->id
                 ], 422);
             }
-
+    
             $price = $book->sale_price ?? $book->price;
             $items[] = [
                 'book_id' => $book->id,
                 'quantity' => $item['quantity'],
                 'price' => $price
             ];
-
+    
             $totalAmount += $price * $item['quantity'];
         }
-
+    
+        // Generate unique identifiers
+        $transactionId = 'TXN-' . strtoupper(uniqid());
+        $trackingNumber = 'TRK-' . strtoupper(substr(md5(uniqid()), 0, 10));
+        
+        // Ensure uniqueness
+        while (Order::where('transaction_id', $transactionId)->exists()) {
+            $transactionId = 'TXN-' . strtoupper(uniqid());
+        }
+        
+        while (Order::where('shipping_tracking_number', $trackingNumber)->exists()) {
+            $trackingNumber = 'TRK-' . strtoupper(substr(md5(uniqid()), 0, 10));
+        }
+    
         // Create order
         $order = Auth::user()->orders()->create([
             'order_number' => 'ORD-' . strtoupper(uniqid()),
+            'transaction_id' => $transactionId,
+            'shipping_tracking_number' => $trackingNumber,
             'total_amount' => $totalAmount,
             'shipping_address' => $validated['shipping_address'],
             'billing_address' => $validated['billing_address'],
             'payment_method' => $validated['payment_method'],
-            'notes' => $validated['notes'] ?? null
+            'notes' => $validated['notes'] ?? null,
+            'status' => 'pending' // Default status
         ]);
-
+    
         // Add order items
         $order->items()->createMany($items);
-
+    
         // Update book stock
         foreach ($validated['items'] as $item) {
             Book::where('id', $item['book_id'])->decrement('stock', $item['quantity']);
         }
-
+    
         return response()->json($order->load('items.book'), 201);
     }
 

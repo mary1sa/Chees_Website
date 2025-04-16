@@ -378,3 +378,61 @@
       grid-template-columns: 1fr;
     }
   }
+
+
+  /* Order Form Styles */
+.create-book-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--light-color);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+  }
+  
+  .dark .create-book-container {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  .submit-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+  }
+  
+  .submit-button:hover {
+    background: var(--secondary-color);
+  }
+  
+  .submit-button:disabled {
+    background: var(--border-color);
+    cursor: not-allowed;
+  }
+  
+  .loading-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .spinner_button {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
