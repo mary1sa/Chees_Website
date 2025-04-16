@@ -64,7 +64,6 @@ Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 Route::get('/coaches', [UserController::class, 'getCoaches']);
-
 // Get coaches for course creation
 Route::get('/coaches', [UserController::class, 'getCoaches']);
 
@@ -246,3 +245,4 @@ Route::apiResource('orders', OrderController::class)->middleware('auth:api');
 Route::apiResource('order-items', OrderItemController::class)->only(['show']);
 Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
 Route::get('/order-items', [OrderItemController::class, 'index']);
+Route::get('/orders/user/{userId}', [OrderController::class, 'getUserOrders']);

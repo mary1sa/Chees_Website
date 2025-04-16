@@ -217,12 +217,12 @@ const Books = () => {
                     `${book.stock} available` : 'Out of stock'}
                 </p>
                 <Link 
-  to={`/member/dashboard/books/${book.id}/order`}
-  state={{ book }} // Add this line to pass the book data
-  className={`order-button ${book.stock <= 0 ? 'disabled' : ''}`}
->
-  <FiShoppingCart /> Order
-</Link>
+                  to={`/member/dashboard/books/${book.id}/order`}
+                  state={{ book }} // Add this line to pass the book data
+                  className={`order-button ${book.stock <= 0 ? 'disabled' : ''}`}
+                >
+                <FiShoppingCart /> Order
+              </Link>
               </div>
             </div>
           ))
