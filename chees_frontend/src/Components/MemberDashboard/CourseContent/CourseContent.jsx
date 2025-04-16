@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiCalendar, FiClock, FiUser, FiBook, FiVideo, FiDownload, FiList } from 'react-icons/fi';
-import axios from 'axios';
-import MaterialList from './MaterialList';
+import axiosInstance from '../../../api/axios';
 import VideoPlayer from './VideoPlayer';
 import DownloadMaterials from './DownloadMaterials';
+import PageLoading from '../../PageLoading/PageLoading';
 import './CourseContent.css';
 
 const CourseContent = () => {
@@ -28,7 +28,7 @@ const CourseContent = () => {
   const fetchCourseData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/courses/${courseId}`);
+      const response = await axiosInstance.get(`/api/courses/${courseId}`);
       if (response.data.success) {
         setCourse(response.data.data);
         // If course has featured video, set it as active
@@ -50,7 +50,7 @@ const CourseContent = () => {
   
   const fetchCourseMaterials = async () => {
     try {
-      const response = await axios.get(`/api/courses/${courseId}/materials`);
+      const response = await axiosInstance.get(`/api/courses/${courseId}/materials`);
       if (response.data.success) {
         setMaterials(response.data.data);
       }
@@ -63,7 +63,7 @@ const CourseContent = () => {
   const handleVideoComplete = async (videoId) => {
     try {
       // Mark video as watched
-      await axios.post(`/api/courses/${courseId}/videos/${videoId}/mark-watched`);
+      await axiosInstance.post(`/api/courses/${courseId}/videos/${videoId}/mark-watched`);
       // Update progress
       fetchCourseData(); // Refresh course data to get updated progress
     } catch (err) {
@@ -77,7 +77,7 @@ const CourseContent = () => {
   };
   
   if (loading) {
-    return <div className="course-content-loading">Loading course content...</div>;
+    return <PageLoading text="Loading course content..." />;
   }
   
   if (error) {

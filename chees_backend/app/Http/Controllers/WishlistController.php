@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Wishlist;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -172,51 +173,167 @@ class WishlistController extends Controller
     
     /**
      * Toggle an item in the wishlist (add if not exists, remove if exists)
+     * 
+     * @param Request $request
+     * @param string|null $course Course ID from the route
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function toggleItem(Request $request)
+    public function toggle(Request $request, $course = null)
     {
-        $validator = Validator::make($request->all(), [
-            'item_type' => 'required|string|in:book,course,event',
-            'item_id' => 'required|integer|min:1',
-        ]);
-
-        if ($validator->fails()) {
+        try {
+            // Ensure user is authenticated
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated',
+                    'errors' => ['auth' => 'User not authenticated']
+                ], 401);
+            }
+            
+            // Get user ID
+            $userId = Auth::id();
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid user ID',
+                    'errors' => ['auth' => 'Invalid user ID']
+                ], 401);
+            }
+            
+            // Prepare data from request or route parameter
+            $data = $request->all();
+            if ($course) {
+                $data['item_type'] = $request->input('item_type', 'course'); // Default to 'course' type
+                $data['item_id'] = (int)$course;  // Convert to integer
+            }
+            
+            // Validate the request data
+            $validator = Validator::make($data, [
+                'item_type' => 'required|string|in:book,course,event',
+                'item_id' => 'required|integer|min:1',
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            
+            $itemType = $data['item_type'];
+            $itemId = $data['item_id'];
+            
+            // Check if the item exists in the wishlist
+            $existingItem = Wishlist::where('user_id', $userId)
+                ->where('item_type', $itemType)
+                ->where('item_id', $itemId)
+                ->first();
+                
+            if ($existingItem) {
+                // Remove from wishlist
+                $existingItem->delete();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Item removed from wishlist',
+                    'in_wishlist' => false
+                ]);
+            } else {
+                // Add to wishlist
+                $wishlistItem = new Wishlist();
+                $wishlistItem->user_id = $userId;
+                $wishlistItem->item_type = $itemType;
+                $wishlistItem->item_id = $itemId;
+                $wishlistItem->save();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Item added to wishlist',
+                    'in_wishlist' => true,
+                    'data' => $wishlistItem
+                ], 201);
+            }
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('Wishlist toggle error: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
+            
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'An error occurred while toggling wishlist item',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        
-        $userId = Auth::id();
-        
-        $existingItem = Wishlist::where('user_id', $userId)
-            ->where('item_type', $request->item_type)
-            ->where('item_id', $request->item_id)
-            ->first();
+    }
+    
+    /**
+     * Get all wishlist items for a specific user
+     * 
+     * @param int $user User ID
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function userWishlist($user)
+    {
+        try {
+            // Ensure user is authenticated
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
             
-        if ($existingItem) {
-            // Remove from wishlist
-            $existingItem->delete();
+            // Check if the authenticated user matches the requested user
+            // or if the user has permission to view other users' wishlists
+            $currentUser = Auth::user();
+            $currentUserId = $currentUser->id;
+            
+            // Safely check admin role if applicable
+            $isAdmin = false;
+            if (method_exists($currentUser, 'hasRole')) {
+                $isAdmin = $currentUser->hasRole('admin');
+            }
+            
+            if ($currentUserId != $user && !$isAdmin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized to view this wishlist'
+                ], 403);
+            }
+            
+            // Get all wishlist items for this user where item_type is 'course'
+            $wishlistItems = Wishlist::where('user_id', $user)
+                ->where('item_type', 'course')
+                ->orderBy('created_at', 'desc')
+                ->get();
+                
+            // Manually attach course data to avoid relationship issues
+            $enhancedItems = [];
+            foreach ($wishlistItems as $item) {
+                $course = Course::find($item->item_id);
+                if ($course) {
+                    $enhancedItem = $item->toArray();
+                    $enhancedItem['course'] = $course;
+                    $enhancedItems[] = $enhancedItem;
+                }
+            }
+            
+            // Replace collection with enhanced data
+            $wishlistItems = $enhancedItems;
             
             return response()->json([
                 'success' => true,
-                'message' => 'Item removed from wishlist',
-                'in_wishlist' => false
+                'data' => $wishlistItems
             ]);
-        } else {
-            // Add to wishlist
-            $wishlistItem = Wishlist::create([
-                'user_id' => $userId,
-                'item_type' => $request->item_type,
-                'item_id' => $request->item_id
-            ]);
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('User wishlist error: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
             
             return response()->json([
-                'success' => true,
-                'message' => 'Item added to wishlist',
-                'in_wishlist' => true,
-                'data' => $wishlistItem
-            ], 201);
+                'success' => false,
+                'message' => 'An error occurred while fetching wishlist items',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

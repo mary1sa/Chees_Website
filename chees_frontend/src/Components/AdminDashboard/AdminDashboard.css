@@ -86,9 +86,10 @@
 .brand-name {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var( --text-color);
+  color: var(--text-color);
   margin: 0;
-  background: var( --text-color);
+  background: var(--text-color);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -542,4 +543,224 @@ display: none;
 
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+/* Dashboard Overview */
+.admin-dashboard-overview {
+  padding: 1.5rem;
+}
+
+.admin-dashboard-overview h1 {
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+.welcome-message {
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 9px !important;
+  margin-right: 1rem;
+  font-size: 1.6rem;
+  color: white;
+}
+
+.user-icon {
+  background-color: #C62828;
+}
+
+.course-icon {
+  background-color: #303F9F;
+}
+
+.session-icon {
+  background-color: #FBC02D;
+  color: white !important;
+}
+
+.material-icon {
+  background-color: #00796B !important;
+  color: white !important;
+}
+
+.event-icon {
+  background-color: #2E7D32;
+}
+
+.stat-details {
+  flex: 1;
+}
+
+.stat-count {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  color: var(--primary-color);
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.quick-actions {
+  margin-top: 2rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.quick-actions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+}
+
+.quick-actions h2 {
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+.quick-actions h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background-color: var(--primary-color);
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem !important;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem;
+  background-color: white;
+  color: var(--text-color);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+
+
+
+
+
+
+/* Action button different colors */
+.action-button.users-action svg { background-color: rgba(198, 40, 40, 0.1) !important; color: #C62828; }
+.action-button.courses-action svg { background-color: rgba(48, 63, 159, 0.1) !important; color: #303F9F; }
+.action-button.sessions-action svg { background-color: rgba(251, 192, 45, 0.1) !important; color: #FBC02D; }
+.action-button.events-action svg { background-color: rgba(46, 125, 50, 0.1) !important; color: #2E7D32; }
+.action-button.materials-action svg { background-color: rgba(0, 121, 107, 0.1) !important; color: #00796B; }
+
+.action-button.users-action:hover svg { background-color: #C62828 !important; color: white; }
+.action-button.courses-action:hover svg { background-color: #303F9F !important; color: white; }
+.action-button.sessions-action:hover svg { background-color: #FBC02D !important; color: white; }
+.action-button.events-action:hover svg { background-color: #2E7D32 !important; color: white; }
+.action-button.materials-action:hover svg { background-color: #00796B !important; color: white; }
+
+.book-icon {
+  background-color: #8E24AA; /* Deep purple for books */
+}
+
+.action-button.books-action svg { 
+  background-color: rgba(142, 36, 170, 0.1) !important; 
+  color: #8E24AA; 
+}
+
+.action-button.books-action:hover svg { 
+  background-color: #8E24AA !important; 
+  color: white; 
+}
+
+@media (max-width: 1200px) {
+  .action-buttons {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .action-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .action-button {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .action-button svg {
+    font-size: 2rem;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .quick-actions {
+    padding: 1.5rem;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr 1fr;
+  }
 }

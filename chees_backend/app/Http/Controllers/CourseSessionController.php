@@ -190,4 +190,36 @@ class CourseSessionController extends Controller
             'data' => $sessions
         ], 201);
     }
+
+    /**
+     * Get all upcoming sessions (sessions that start in the future)
+     */
+    public function upcoming()
+    {
+        $sessions = CourseSession::with(['course', 'coach'])
+            ->where('start_datetime', '>', now())
+            ->orderBy('start_datetime')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $sessions
+        ]);
+    }
+
+    /**
+     * Get all past sessions (sessions that have ended)
+     */
+    public function past()
+    {
+        $sessions = CourseSession::with(['course', 'coach'])
+            ->where('end_datetime', '<', now())
+            ->orderBy('start_datetime', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $sessions
+        ]);
+    }
 }

@@ -1,46 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { FiCalendar, FiList, FiX } from 'react-icons/fi';
-import axios from 'axios';
+import { FiCalendar, FiList, FiX, FiClock, FiUser, FiBook } from 'react-icons/fi';
+import axiosInstance from '../../../api/axios';
 import SessionCard from './SessionCard';
 import SessionCalendar from './SessionCalendar';
 import './Sessions.css';
 import PageLoading from '../../PageLoading/PageLoading';
 
 const UpcomingSessions = () => {
+  const [activeTab, setActiveTab] = useState('upcoming');
   const [sessions, setSessions] = useState([]);
+  const [allSessions, setAllSessions] = useState([]); // For calendar view
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [view, setView] = useState('list'); // 'list' or 'calendar'
   const [selectedDate, setSelectedDate] = useState(null);
   const [joinSessionData, setJoinSessionData] = useState(null);
-  
-  useEffect(() => {
-    fetchSessions();
-  }, []);
-  
-  const fetchSessions = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get('/api/course-sessions/upcoming');
-      if (response.data.success) {
-        setSessions(response.data.data);
-      } else {
-        setError('Failed to fetch sessions');
-      }
-    } catch (err) {
-      setError(`Error fetching sessions: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+
   const handleDaySelect = (date) => {
     setSelectedDate(date);
   };
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch sessions for the active tab
+        const response = await axiosInstance.get(`/api/course-sessions/${activeTab}`);
+        setSessions(response.data.data);
+
+        // If we're in calendar view, fetch all sessions
+        if (view === 'calendar') {
+          const [upcomingRes, pastRes] = await Promise.all([
+            axiosInstance.get('/api/course-sessions/upcoming'),
+            axiosInstance.get('/api/course-sessions/past')
+          ]);
+          setAllSessions([...upcomingRes.data.data, ...pastRes.data.data]);
+        }
+
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch sessions');
+        setLoading(false);
+      }
+    };
+
+    fetchSessions();
+  }, [activeTab, view]);
+
   
   const filteredSessions = selectedDate 
-    ? sessions.filter(session => {
-        const sessionDate = new Date(session.start_time);
+    ? (view === 'calendar' ? allSessions : sessions).filter(session => {
+        const sessionDate = new Date(session.start_datetime);
         return (
           sessionDate.getDate() === selectedDate.getDate() &&
           sessionDate.getMonth() === selectedDate.getMonth() &&
@@ -72,7 +83,7 @@ const UpcomingSessions = () => {
   
   const markAttendance = async (sessionId) => {
     try {
-      await axios.post('/api/session-attendances', {
+      await axiosInstance.post('/api/session-attendances', {
         session_id: sessionId,
         status: 'attended'
       });
@@ -94,7 +105,7 @@ const UpcomingSessions = () => {
   return (
     <div className="sessions-container">
       <div className="sessions-header">
-        <h2>Upcoming Sessions</h2>
+        <h2>Sessions</h2>
         <div className="view-toggle">
           <button 
             className={`view-toggle-btn ${view === 'list' ? 'active' : ''}`}
@@ -110,11 +121,25 @@ const UpcomingSessions = () => {
           </button>
         </div>
       </div>
+      <div className="sessions-tabs">
+        <button
+          className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
+          onClick={() => setActiveTab('upcoming')}
+        >
+          Upcoming
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'past' ? 'active' : ''}`}
+          onClick={() => setActiveTab('past')}
+        >
+          Past
+        </button>
+      </div>
       
       {view === 'calendar' ? (
         <div className="calendar-view">
           <SessionCalendar 
-            sessions={sessions}
+            sessions={allSessions}
             onDaySelect={handleDaySelect}
           />
           
@@ -139,30 +164,24 @@ const UpcomingSessions = () => {
           )}
         </div>
       ) : (
-        <div className="list-view">
-          <div className="sessions-tabs">
-            <div className="session-tab active">Upcoming</div>
-            <div className="session-tab">Past</div>
+        sessions.length === 0 ? (
+          <div className="empty-sessions">
+            <FiCalendar />
+            <h3>No {activeTab} sessions</h3>
+            <p>You don't have any {activeTab} sessions {activeTab === 'upcoming' ? 'scheduled' : 'recorded'}.</p>
           </div>
-          
-          {sessions.length === 0 ? (
-            <div className="empty-sessions">
-              <FiCalendar />
-              <h3>No upcoming sessions</h3>
-              <p>You don't have any upcoming sessions scheduled. Check your enrolled courses to book sessions.</p>
-            </div>
-          ) : (
-            <div className="sessions-list">
-              {sessions.map(session => (
-                <SessionCard 
-                  key={session.id} 
-                  session={session} 
-                  onJoin={handleJoinSession} 
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        ) : (
+          <div className={`sessions-list ${view === 'list' ? 'list-view' : ''}`}>
+            {sessions.map(session => (
+              <SessionCard 
+                key={session.id} 
+                session={session} 
+                onJoin={handleJoinSession}
+                isPastSession={activeTab === 'past'}
+              />
+            ))}
+          </div>
+        )
       )}
       
       {joinSessionData && (
@@ -175,19 +194,62 @@ const UpcomingSessions = () => {
               </button>
             </div>
             
+            {joinSessionData.coach && (
+              <div className="join-dialog-coach">
+                <div className="join-dialog-coach-avatar">
+                  {joinSessionData.coach.first_name ? joinSessionData.coach.first_name.charAt(0) : ''}
+                  {joinSessionData.coach.last_name ? joinSessionData.coach.last_name.charAt(0) : ''}
+                </div>
+                <div className="join-dialog-coach-info">
+                  <span className="join-dialog-coach-label">Your Coach</span>
+                  <span className="join-dialog-coach-name">
+                    {joinSessionData.coach.first_name} {joinSessionData.coach.last_name}
+                  </span>
+                </div>
+              </div>
+            )}
+            
             <div className="join-dialog-details">
-              <p><strong>{joinSessionData.title}</strong></p>
-              <p>
-                {new Date(joinSessionData.start_time).toLocaleString(undefined, {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </p>
-              {joinSessionData.coach && <p>Coach: {joinSessionData.coach.name}</p>}
+              <div className="join-dialog-detail">
+                <FiCalendar />
+                <div className="join-dialog-detail-content">
+                  <span className="join-dialog-detail-label">Date</span>
+                  <span className="join-dialog-detail-value">
+                    {new Date(joinSessionData.start_datetime).toLocaleDateString(undefined, {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="join-dialog-detail">
+                <FiClock />
+                <div className="join-dialog-detail-content">
+                  <span className="join-dialog-detail-label">Time</span>
+                  <span className="join-dialog-detail-value">
+                    {new Date(joinSessionData.start_datetime).toLocaleTimeString(undefined, {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })} - {new Date(joinSessionData.end_datetime).toLocaleTimeString(undefined, {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+              </div>
+              
+              {joinSessionData.course && (
+                <div className="join-dialog-detail">
+                  <FiBook />
+                  <div className="join-dialog-detail-content">
+                    <span className="join-dialog-detail-label">Course</span>
+                    <span className="join-dialog-detail-value">{joinSessionData.course.title}</span>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="join-dialog-actions">

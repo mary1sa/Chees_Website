@@ -583,9 +583,49 @@ class CourseMaterialController extends Controller
         // Determine download filename
         $extension = pathinfo($path, PATHINFO_EXTENSION);
         $filename = Str::slug($material->title) . '.' . $extension;
+
+        // Set the correct Content-Type based on file_type
+        $headers = [];
         
-        // Return file as download
-        return Storage::disk('public')->download($path, $filename);
+        // Determine proper MIME type for the file
+        if ($material->file_type === 'pdf') {
+            $headers['Content-Type'] = 'application/pdf';
+        } else if ($material->file_type === 'image') {
+            // Use proper image mime type based on extension
+            $imageTypes = [
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                'bmp' => 'image/bmp',
+                'svg' => 'image/svg+xml',
+                'webp' => 'image/webp'
+            ];
+            $headers['Content-Type'] = $imageTypes[strtolower($extension)] ?? 'image/jpeg';
+        } else if ($material->file_type === 'video') {
+            // Video MIME types
+            $videoTypes = [
+                'mp4' => 'video/mp4',
+                'webm' => 'video/webm',
+                'avi' => 'video/x-msvideo',
+                'mov' => 'video/quicktime'
+            ];
+            $headers['Content-Type'] = $videoTypes[strtolower($extension)] ?? 'video/mp4';
+        } else if ($material->file_type === 'document') {
+            // Document MIME types
+            $docTypes = [
+                'doc' => 'application/msword',
+                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'xls' => 'application/vnd.ms-excel',
+                'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'ppt' => 'application/vnd.ms-powerpoint',
+                'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            ];
+            $headers['Content-Type'] = $docTypes[strtolower($extension)] ?? 'application/octet-stream';
+        }
+        
+        // Return file as download with proper headers
+        return Storage::disk('public')->download($path, $filename, $headers);
     }
     
     /**

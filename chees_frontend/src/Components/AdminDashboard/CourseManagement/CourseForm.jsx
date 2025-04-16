@@ -463,7 +463,7 @@ const CourseForm = ({ isEditing = false, isViewOnly = false }) => {
               <button 
                 type="button" 
                 className="save-button" 
-                onClick={() => navigate(`/admin/dashboard/courses/edit/${courseId}`)}
+                onClick={() => navigate(`/admin/dashboard/courses/${courseId}/edit`)}
               >
                 <FiSave /> Edit Course
               </button>

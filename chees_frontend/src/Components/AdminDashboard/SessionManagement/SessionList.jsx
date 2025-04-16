@@ -234,7 +234,7 @@ const SessionList = ({ onLoadingChange }) => {
             </div>
             <div className="session-modal-footer">
               <button 
-                className="action-button primary-button" 
+                className=" btn-add-session" 
                 onClick={() => {
                   closeDetailsModal();
                   window.location.href = `/admin/dashboard/sessions/edit/${selectedSession.id}`;
@@ -243,7 +243,7 @@ const SessionList = ({ onLoadingChange }) => {
                 <FiEdit /> Edit Session
               </button>
               <button 
-                className="action-button secondary-button" 
+                className=" btn-close btn-secondary" 
                 onClick={closeDetailsModal}
               >
                 Close

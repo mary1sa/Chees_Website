@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
-use App\Models\Enrollment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -16,7 +15,8 @@ class CourseController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Course::query();
+        // Start with Course query and eager load the level relationship
+        $query = Course::with('level');
         
         // Filter by level if provided
         if ($request->has('level_id')) {
@@ -42,6 +42,20 @@ class CourseController extends Controller
         }
         
         $courses = $query->paginate(10);
+        
+        // Add wishlist information if requested and user is authenticated
+        if ($request->has('include_wishlist') && $request->user()) {
+            $userId = $request->user()->id;
+            $wishlistedCourseIds = \App\Models\Wishlist::where('user_id', $userId)
+                ->where('item_type', 'course')
+                ->pluck('item_id')
+                ->toArray();
+            
+            $courses->getCollection()->transform(function ($course) use ($wishlistedCourseIds) {
+                $course->is_wishlisted = in_array($course->id, $wishlistedCourseIds);
+                return $course;
+            });
+        }
         
         return response()->json([
             'success' => true,
@@ -111,10 +125,41 @@ class CourseController extends Controller
      */
     public function show(string $id)
     {
-        $course = Course::with(['sessions', 'materials'])->findOrFail($id);
+        $course = Course::with(['level', 'sessions', 'materials'])->findOrFail($id);
         
         // Add additional data for frontend compatibility
         $courseData = $course->toArray();
+        
+        // Check if user is authenticated and enrolled in this course
+        $isEnrolled = false;
+        $userId = auth()->id();
+        
+        if ($userId) {
+            // Check if user is enrolled
+            $enrollment = $course->enrollments()->where('user_id', $userId)->first();
+            $isEnrolled = !is_null($enrollment);
+            
+            // Add enrollment status to response
+            $courseData['is_enrolled'] = $isEnrolled;
+            
+            // If enrolled, calculate progress
+            if ($isEnrolled) {
+                $progress = $course->userProgress($userId);
+                $courseData['progress'] = $progress ? $progress->progress_percentage : 0;
+            }
+        } else {
+            $courseData['is_enrolled'] = false;
+        }
+        
+        // For non-enrolled users, limit material information
+        if (!$isEnrolled && isset($courseData['materials'])) {
+            foreach ($courseData['materials'] as &$material) {
+                // Keep basic info but mark as locked
+                $material['is_locked'] = true;
+                $material['file_path'] = null;
+                $material['url'] = null;
+            }
+        }
         
         // Debug the thumbnail path
         \Log::info('Course thumbnail path:', [
@@ -486,37 +531,381 @@ class CourseController extends Controller
     }
     
     /**
-     * Enroll current user in a course
+     * Purchase a course
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function enroll(Request $request, string $id)
+    public function purchaseCourse(Request $request)
     {
-        $course = Course::findOrFail($id);
-        $userId = Auth::id();
-        
-        // Check if already enrolled
-        $existingEnrollment = Enrollment::where('user_id', $userId)
-            ->where('course_id', $id)
-            ->first();
+        try {
+            $validator = Validator::make($request->all(), [
+                'course_id' => 'required|exists:courses,id',
+                'payment_method' => 'required|string|in:credit_card,paypal,direct',
+                'payment_details' => 'nullable|array',
+                'coupon_id' => 'nullable|exists:coupons,id'
+            ]);
             
-        if ($existingEnrollment) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+            
+            $userId = auth()->id();
+            $courseId = $request->input('course_id');
+            $paymentMethod = $request->input('payment_method');
+            $paymentDetails = $request->input('payment_details', []);
+            $couponId = $request->input('coupon_id');
+            
+            // Check if already purchased
+            $existing = \App\Models\Payment::where('user_id', $userId)
+                ->where('related_id', $courseId)
+                ->where('related_type', 'App\\Models\\Course')
+                ->where('status', 'completed')
+                ->first();
+                
+            if ($existing) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'You already purchased this course',
+                    'data' => [
+                        'course_id' => $courseId,
+                        'purchased' => true,
+                    ]
+                ]);
+            }
+            
+            // Create payment record for course purchase
+            $course = Course::findOrFail($courseId);
+            
+            // Calculate final price with coupon if applicable
+            $originalPrice = $course->price;
+            $discountAmount = 0;
+            $finalPrice = $originalPrice;
+            $coupon = null;
+            
+            if ($couponId) {
+                $coupon = \App\Models\Coupon::findOrFail($couponId);
+                
+                // Validate coupon is still active
+                if (!$coupon->is_active ||
+                    ($coupon->end_date !== null && $coupon->end_date < now()) ||
+                    ($coupon->start_date !== null && $coupon->start_date > now())) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Coupon is no longer valid',
+                    ], 400);
+                }
+                
+                // Calculate discount
+                if ($coupon->type === 'percentage') {
+                    $discountAmount = $originalPrice * ($coupon->value / 100);
+                    // Apply max discount if set
+                    if ($coupon->max_discount !== null && $discountAmount > $coupon->max_discount) {
+                        $discountAmount = $coupon->max_discount;
+                    }
+                } else if ($coupon->type === 'fixed') {
+                    $discountAmount = $coupon->value;
+                    // Don't allow discount to exceed the course price
+                    if ($discountAmount > $originalPrice) {
+                        $discountAmount = $originalPrice;
+                    }
+                }
+                
+                $finalPrice = max(0, $originalPrice - $discountAmount);
+                
+                // Increment coupon usage count
+                $coupon->uses_count += 1;
+                $coupon->save();
+            }
+            
+            // Prepare transaction ID based on payment method
+            $transactionId = '';
+            switch ($paymentMethod) {
+                case 'credit_card':
+                    $transactionId = 'cc-' . uniqid();
+                    break;
+                case 'paypal':
+                    $transactionId = 'pp-' . uniqid();
+                    break;
+                default:
+                    $transactionId = 'direct-' . uniqid();
+            }
+            
+            // Create payment record
+            $payment = new \App\Models\Payment([
+                'user_id' => $userId,
+                'related_id' => $courseId,
+                'related_type' => 'App\\Models\\Course',
+                'amount' => $finalPrice,
+                'original_amount' => $originalPrice,
+                'discount_amount' => $discountAmount,
+                'coupon_id' => $couponId,
+                'status' => 'completed',
+                'payment_method' => $paymentMethod,
+                'transaction_id' => $transactionId,
+                'description' => 'Course Purchase: ' . $course->title,
+                'payment_date' => now(),
+            ]);
+            
+            // If we have any payment details, store them securely
+            if (!empty($paymentDetails)) {
+                // Only store the last 4 digits of any card numbers for security
+                if (isset($paymentDetails['card_number'])) {
+                    $paymentDetails['card_number'] = 'XXXX-XXXX-XXXX-' . substr($paymentDetails['card_number'], -4);
+                }
+                
+                // Log payment details securely
+                \Log::info('Payment processed for course', [
+                    'course_id' => $courseId,
+                    'user_id' => $userId,
+                    'payment_method' => $paymentMethod,
+                    'amount' => $finalPrice,
+                    'discount' => $discountAmount,
+                    'coupon_applied' => $couponId ? true : false,
+                ]);
+            }
+            
+            $payment->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Course purchased successfully',
+                'data' => [
+                    'course_id' => $courseId,
+                    'purchased' => true,
+                    'payment_id' => $payment->id,
+                    'transaction_id' => $payment->transaction_id,
+                    'original_price' => $originalPrice,
+                    'discount' => $discountAmount,
+                    'final_price' => $finalPrice,
+                    'coupon_applied' => $couponId ? $coupon->code : null,
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error purchasing course: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'User is already enrolled in this course'
-            ], 422);
+                'message' => 'Error purchasing course: ' . $e->getMessage(),
+            ], 500);
         }
-        
-        $enrollment = Enrollment::create([
-            'user_id' => $userId,
-            'course_id' => $id,
-            'status' => 'active',
-            'progress' => 0,
-            'enrollment_date' => now()
-        ]);
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Successfully enrolled in course',
-            'data' => $enrollment
-        ], 201);
+    }
+    
+    /**
+     * Check if the authenticated user has purchased a course.
+     *
+     * @param string $courseId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkPurchaseStatus($courseId)
+    {
+        try {
+            $userId = auth()->id();
+            
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated',
+                ], 401);
+            }
+            
+            // Check if there's a payment record for this course by this user
+            $payment = \App\Models\Payment::where('user_id', $userId)
+                ->where('related_id', $courseId)
+                ->where('related_type', 'App\\Models\\Course')
+                ->where('status', 'completed')
+                ->first();
+            
+            $purchased = !is_null($payment);
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'purchased' => $purchased,
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error checking purchase status: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error checking purchase status: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+    
+    /**
+     * Get all courses the authenticated user has purchased
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getPurchasedCourses(Request $request)
+    {
+        try {
+            $userId = auth()->id();
+            
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated',
+                ], 401);
+            }
+            
+            // Get all course IDs from payment records
+            $payments = \App\Models\Payment::where('user_id', $userId)
+                ->where('related_type', 'App\\Models\\Course')
+                ->where('status', 'completed')
+                ->get();
+            
+            $courseIds = $payments->pluck('related_id')->toArray();
+            
+            // Get all purchased courses
+            $courses = Course::with(['level', 'materials'])
+                ->whereIn('id', $courseIds)
+                ->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $courses
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error fetching purchased courses: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching purchased courses: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Validate a coupon code
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function validateCoupon(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'code' => 'required|string',
+                'course_id' => 'required|exists:courses,id'
+            ]);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            
+            $code = $request->input('code');
+            $courseId = $request->input('course_id');
+            $userId = auth()->id();
+            
+            // Get course price for validation
+            $course = \App\Models\Course::findOrFail($courseId);
+            
+            // Find the coupon
+            $coupon = \App\Models\Coupon::where('code', $code)
+                ->where('is_active', true)
+                ->where(function($query) {
+                    $query->whereNull('end_date')
+                          ->orWhere('end_date', '>=', now());
+                })
+                ->where(function($query) {
+                    $query->whereNull('start_date')
+                          ->orWhere('start_date', '<=', now());
+                })
+                ->first();
+            
+            if (!$coupon) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired coupon code'
+                ], 404);
+            }
+            
+            // Check if coupon is applicable to this course
+            if ($coupon->applies_to === 'course' && $coupon->entity_id !== null && $coupon->entity_id != $courseId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This coupon is not applicable to this course'
+                ], 400);
+            }
+            
+            // Check minimum purchase requirement
+            if ($coupon->min_purchase > 0 && $course->price < $coupon->min_purchase) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Minimum purchase amount not met'
+                ], 400);
+            }
+            
+            // Check uses limit
+            if ($coupon->uses_limit !== null && $coupon->uses_count >= $coupon->uses_limit) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Coupon usage limit exceeded'
+                ], 400);
+            }
+            
+            // Check per-user limit
+            if ($coupon->per_user_limit > 0) {
+                $userUsageCount = \App\Models\Payment::where('user_id', $userId)
+                    ->where('coupon_id', $coupon->id)
+                    ->count();
+                
+                if ($userUsageCount >= $coupon->per_user_limit) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'You have already used this coupon'
+                    ], 400);
+                }
+            }
+            
+            // Calculate discount
+            $discountAmount = 0;
+            if ($coupon->type === 'percentage') {
+                $discountAmount = $course->price * ($coupon->value / 100);
+                // Apply max discount if set
+                if ($coupon->max_discount !== null && $discountAmount > $coupon->max_discount) {
+                    $discountAmount = $coupon->max_discount;
+                }
+            } else if ($coupon->type === 'fixed') {
+                $discountAmount = $coupon->value;
+                // Don't allow discount to exceed the course price
+                if ($discountAmount > $course->price) {
+                    $discountAmount = $course->price;
+                }
+            }
+            
+            // Format return data
+            $couponData = [
+                'id' => $coupon->id,
+                'code' => $coupon->code,
+                'type' => $coupon->type,
+                'value' => (float)$coupon->value,
+                'discount_amount' => (float)$discountAmount,
+                'final_price' => max(0, $course->price - $discountAmount)
+            ];
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Coupon validated successfully',
+                'data' => $couponData
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error validating coupon: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error validating coupon: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

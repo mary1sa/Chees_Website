@@ -25,17 +25,7 @@
   gap: 1rem;
 }
 
-.action-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 4px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-}
+
 
 .primary-button {
   background-color: var(--color-primary);
@@ -1015,8 +1005,8 @@
   margin-top: 24px;
 }
 
-.btn-primary {
-  background-color: var(--primary-hover) !important;
+ .btn-add-session {
+  background-color: var(--primary-color) !important;
   color: white;
   border: none;
   padding: 10px 16px;
@@ -1034,7 +1024,7 @@
 .btn-primary:disabled {
   background-color: #a0aec0;
   cursor: not-allowed;
-}
+} */
 
 .btn-secondary {
   background-color: #e2e8f0;
@@ -1091,6 +1081,8 @@
 /* SessionList styles */
 .session-list-container {
   padding: 1.5rem;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .session-grid {
@@ -1098,6 +1090,8 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-top: 1.5rem;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .session-card {
@@ -1322,14 +1316,20 @@
   padding: 1.5rem;
   overflow-y: auto;
   flex: 1;
+  background-color: #e5e5e5;
 }
 
 .session-detail-section {
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid;
+  padding: 10px;
+  border-radius: 4px;
 }
-
+.session-detail-section:first-child {
+  margin-top: -10px;
+}
 .session-detail-section:last-child {
-  margin-bottom: 0;
+  margin-bottom: -10px;
 }
 
 .session-detail-section h3 {
@@ -1345,7 +1345,7 @@
 }
 
 .session-detail-item {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -1375,21 +1375,26 @@
 
 .session-modal-footer {
   padding: 1.25rem 1.5rem;
-  border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+  background-color: #e5e5e5;
+  margin-bottom: 14px;
+}
+.action-button svg {
+  font-size: 24px;
+  transition: all 0.3s ease;
 }
 .view-style-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border: 1px solid #F2AC15;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  border: 1px solid #F2AC15 !important;
   color: #F2AC15 !important;
   background-color: rgba(242, 172, 21, 0.2) !important;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
+  padding: 0.5rem 1rem !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
 }
 
 .view-style-button.active {
@@ -1477,23 +1482,8 @@
   gap: 10px;
 }
 
-.action-button {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
 
-.action-button:hover {
-  background-color: var(--button-hover-bg);
-  color: var(--button-text);
-}
+
 
 .no-recordings {
   text-align: center;

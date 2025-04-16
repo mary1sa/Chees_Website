@@ -1,10 +1,13 @@
-import React from 'react';
-import { FiClock, FiUser, FiCalendar, FiMap, FiVideo } from 'react-icons/fi';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { FiClock, FiUser, FiCalendar, FiMap, FiVideo, FiX, FiLink, FiKey, FiInfo } from 'react-icons/fi';
 import './Sessions.css';
 
-const SessionCard = ({ session, onJoin }) => {
-  const isUpcoming = new Date(session.start_time) > new Date();
-  const canJoin = isUpcoming && new Date(session.start_time) <= new Date(Date.now() + 15 * 60 * 1000); // Can join 15 minutes before
+const SessionCard = ({ session, onJoin, isPastSession = false }) => {
+  const [showDetails, setShowDetails] = useState(false);
+  const isUpcoming = !isPastSession && new Date(session.start_datetime) > new Date();
+  const canJoin = isUpcoming && new Date(session.start_datetime) <= new Date(Date.now() + 15 * 60 * 1000); // Can join 15 minutes before
+  const isOnline = !!session.zoom_link;
   
   const formatDate = (dateString) => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -20,7 +23,7 @@ const SessionCard = ({ session, onJoin }) => {
     <div className={`session-card ${canJoin ? 'can-join' : ''}`}>
       <div className="session-header">
         <h3>{session.title}</h3>
-        {session.is_online ? (
+        {isOnline ? (
           <div className="session-badge online">
             <FiVideo /> Online
           </div>
@@ -34,17 +37,17 @@ const SessionCard = ({ session, onJoin }) => {
       <div className="session-details">
         <div className="session-detail">
           <FiCalendar className="session-icon" />
-          <span>{formatDate(session.start_time)}</span>
+          <span>{formatDate(session.start_datetime)}</span>
         </div>
         <div className="session-detail">
           <FiClock className="session-icon" />
-          <span>{formatTime(session.start_time)} - {formatTime(session.end_time)}</span>
+          <span>{formatTime(session.start_datetime)} - {formatTime(session.end_datetime)}</span>
         </div>
         <div className="session-detail">
           <FiUser className="session-icon" />
-          <span>Coach: {session.coach?.name || 'TBA'}</span>
+          <span>Coach: {session.coach ? `${session.coach.first_name} ${session.coach.last_name}` : 'TBA'}</span>
         </div>
-        {!session.is_online && (
+        {!isOnline && (
           <div className="session-detail">
             <FiMap className="session-icon" />
             <span>Location: {session.location}</span>
@@ -53,25 +56,134 @@ const SessionCard = ({ session, onJoin }) => {
       </div>
       
       <div className="session-footer">
-        {canJoin && session.is_online && (
+        <div className="session-actions">
+          {canJoin && isOnline && (
+            <button 
+              className="join-session-btn" 
+              onClick={() => onJoin(session)}
+            >
+              Join Now
+            </button>
+          )}
           <button 
-            className="join-session-btn" 
-            onClick={() => onJoin(session)}
+            className="view-more-btn" 
+            onClick={() => setShowDetails(true)}
           >
-            Join Now
+            View More
           </button>
-        )}
+        </div>
         {isUpcoming && !canJoin && (
           <div className="session-countdown">
-            Starts in: {getTimeUntilStart(session.start_time)}
+            Starts in: {getTimeUntilStart(session.start_datetime)}
           </div>
         )}
         {!isUpcoming && (
           <div className="session-completed">
-            Completed
+            {session.recording_url ? (
+              <a href={session.recording_url} target="_blank" rel="noopener noreferrer" className="recording-link">
+                <FiVideo /> Watch Recording
+              </a>
+            ) : (
+              'Completed'
+            )}
           </div>
         )}
       </div>
+
+      {showDetails && createPortal(
+        <div className="session-details-modal-overlay" onClick={() => setShowDetails(false)}>
+          <div className="session-details-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{session.title}</h3>
+              <button className="close-btn" onClick={() => setShowDetails(false)}>
+                <FiX />
+              </button>
+            </div>
+            <div className="modal-content">
+              <div className="detail-item">
+                <FiCalendar />
+                <div>
+                  <strong>Date</strong>
+                  <p>{formatDate(session.start_datetime)}</p>
+                </div>
+              </div>
+              <div className="detail-item">
+                <FiClock />
+                <div>
+                  <strong>Time</strong>
+                  <p>{formatTime(session.start_datetime)} - {formatTime(session.end_datetime)}</p>
+                </div>
+              </div>
+              <div className="detail-item">
+                <FiUser />
+                <div>
+                  <strong>Coach</strong>
+                  <p>{session.coach ? `${session.coach.first_name} ${session.coach.last_name}` : 'TBA'}</p>
+                </div>
+              </div>
+              {session.description && (
+                <div className="detail-item">
+                  <FiInfo />
+                  <div>
+                    <strong>Description</strong>
+                    <p>{session.description}</p>
+                  </div>
+                </div>
+              )}
+              {isOnline ? (
+                <>
+                  {!isPastSession ? (
+                    <>
+                      <div className="detail-item">
+                        <FiLink />
+                        <div>
+                          <strong>Zoom Link</strong>
+                          <p><a href={session.zoom_link} target="_blank" rel="noopener noreferrer">{session.zoom_link}</a></p>
+                        </div>
+                      </div>
+                      {session.meeting_id && (
+                        <div className="detail-item">
+                          <FiKey />
+                          <div>
+                            <strong>Meeting ID</strong>
+                            <p>{session.meeting_id}</p>
+                          </div>
+                        </div>
+                      )}
+                      {session.meeting_password && (
+                        <div className="detail-item">
+                          <FiKey />
+                          <div>
+                            <strong>Meeting Password</strong>
+                            <p>{session.meeting_password}</p>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : session.recording_link && (
+                    <div className="detail-item">
+                      <FiVideo />
+                      <div>
+                        <strong>Recording</strong>
+                        <p><a href={session.recording_link} target="_blank" rel="noopener noreferrer">Watch Recording</a></p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="detail-item">
+                  <FiMap />
+                  <div>
+                    <strong>Location</strong>
+                    <p>{session.location}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

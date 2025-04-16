@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './Components/ProtectedRoute';
@@ -19,17 +18,32 @@ import CreateUser from './Components/AdminDashboard/CreateUser';
 // Course Components
 import CourseCatalog from './Components/Courses/CourseCatalog';
 import CourseDetail from './Components/Courses/CourseDetail';
-import EnrolledCourses from './Components/Courses/EnrolledCourses';
 import CourseProgress from './Components/Courses/CourseProgress';
 import CourseWishlist from './Components/Courses/CourseWishlist';
+import PurchasedCourses from './Components/Courses/PurchasedCourses';
+
+// Course Package Components - Temporarily commented out
+// import CoursePackageList from './Components/Courses/Packages/CoursePackageList';
+// import CoursePackageDetail from './Components/Courses/Packages/CoursePackageDetail';
+// import CoursePackagePurchase from './Components/Courses/Packages/CoursePackagePurchase';
+// import MyPackages from './Components/Courses/Packages/MyPackages';
 
 // Session Management Components
 import SessionManagement from './Components/AdminDashboard/SessionManagement/SessionManagement';
 import SessionScheduler from './Components/AdminDashboard/SessionManagement/SessionScheduler';
+import AttendanceTracker from './Components/AdminDashboard/SessionManagement/AttendanceTracker';
+import RecordingUploader from './Components/AdminDashboard/SessionManagement/RecordingUploader';
+
+// Course Material Components
+import CourseMaterialList from './Components/AdminDashboard/CourseMaterialManagement/CourseMaterialList';
+import CourseMaterialForm from './Components/AdminDashboard/CourseMaterialManagement/CourseMaterialForm';
+import CourseMaterialView from './Components/AdminDashboard/CourseMaterialManagement/CourseMaterialView';
 
 // Member Dashboard Components
 import UpcomingSessions from './Components/MemberDashboard/UpcomingSessions/UpcomingSessions';
 import CourseContent from './Components/MemberDashboard/CourseContent/CourseContent';
+import MemberCourseMaterials from './Components/MemberDashboard/CourseContent/MemberCourseMaterials';
+import MemberDashboardOverview from './Components/MemberDashboard/MemberDashboardOverview';
 
 import EventTypes from './Components/Event/EventTypes/EventTypes';
 import EventList from './Components/Event/Events/EventList';
@@ -49,8 +63,8 @@ import CourseList from './Components/AdminDashboard/CourseManagement/CourseList'
 import CourseForm from './Components/AdminDashboard/CourseManagement/CourseForm';
 import LevelList from './Components/AdminDashboard/CourseLevelManagement/LevelList';
 import LevelForm from './Components/AdminDashboard/CourseLevelManagement/LevelForm';
-import EnrollmentList from './Components/AdminDashboard/EnrollmentManagement/EnrollmentList';
-import EnrollmentForm from './Components/AdminDashboard/EnrollmentManagement/EnrollmentForm';
+
+import AdminDashboardOverview from './Components/AdminDashboard/AdminDashboardOverview';
 
 function App() {
   return (
@@ -60,6 +74,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         {/* <Route path="/unauthorized" element={<UnauthorizedPage />} /> */}
 
+        {/* Admin Routes */}
         <Route
           path="/admin/dashboard"
           element={
@@ -81,36 +96,37 @@ function App() {
           
           {/* Session Management Routes */}
           <Route path="sessions" element={<SessionManagement />} />
+          <Route path="sessions/schedule" element={<SessionScheduler />} />
           <Route path="sessions/edit/:sessionId" element={<SessionScheduler isEditing={true} />} />
-          <Route path="sessions/scheduler" element={<SessionScheduler />} />
+          <Route path="sessions/attendance" element={<AttendanceTracker />} />
+          <Route path="sessions/recordings" element={<RecordingUploader />} />
           
           {/* Course Management Routes */}
           <Route path="courses" element={<CourseList />} />
-          <Route path="createcourse" element={<CourseForm />} />
-          <Route path="courses/edit/:courseId" element={<CourseForm isEditing={true} />} />
+          <Route path="courses/create" element={<CourseForm />} />
+          <Route path="courses/:courseId/edit" element={<CourseForm isEditing={true} />} />
           <Route path="courses/:courseId" element={<CourseForm isEditing={true} isViewOnly={true} />} />
           <Route path="levels" element={<LevelList />} />
-          <Route path="createlevel" element={<LevelForm isEditing={false} />} />
-          <Route path="levels/edit/:levelId" element={<LevelForm isEditing={true} />} />
-          <Route path="enrollments" element={<EnrollmentList />} />
-          <Route path="createenrollment" element={<EnrollmentForm isEditing={false} />} />
-          <Route path="enrollments/edit/:enrollmentId" element={<EnrollmentForm isEditing={true} />} />
-       
-
-
-          {/* Bookstore Management (moved here) */}
+          <Route path="levels/create" element={<LevelForm isEditing={false} />} />
+          <Route path="levels/:levelId/edit" element={<LevelForm isEditing={true} />} />
+          
+          {/* Course Materials Management Routes */}
+          <Route path="course-materials" element={<CourseMaterialList />} />
+          <Route path="course-materials/create" element={<CourseMaterialForm />} />
+          <Route path="course-materials/:materialId/edit" element={<CourseMaterialForm isEditing={true} />} />
+          <Route path="course-materials/:materialId/view" element={<CourseMaterialView />} />
+          
+          {/* Bookstore Management Routes */}
           <Route path="books" element={<BookList />} />
           <Route path="books/create" element={<AddBook />} />
           <Route path="authors" element={<AuthorList />} />
           <Route path="orders" element={<OrdersList />} />
           
-       {/* Roles Management Routes */}
-       <Route path="roles" element={<Roles />} />
-          {/*Coatch Management Routes */}
-          <Route path="CoachSpecialization" element={<CoachSpecialization />} />
-
+          {/* Default Route */}
+          <Route index element={<AdminDashboardOverview />} />
         </Route>
-
+        
+        {/* Frontend Routes */}
         <Route 
           path="/member/dashboard"
           element={
@@ -123,38 +139,29 @@ function App() {
         
           <Route path="profile" element={<MemberProfile />} />
           {/* Course Routes */}
+          <Route path="courses" element={<CourseCatalog />} /> {/* Added this route to fix navigation */}
           <Route path="courses/catalog" element={<CourseCatalog />} />
           <Route path="courses/:courseId" element={<CourseDetail />} />
-          <Route path="courses/enrolled" element={<EnrolledCourses />} />
           <Route path="courses/progress" element={<CourseProgress />} />
           <Route path="courses/wishlist" element={<CourseWishlist />} />
-<<<<<<< HEAD
+          <Route path="courses/purchased" element={<PurchasedCourses />} />
+
           <Route path="course-content" element={<CourseContent />} />
+          <Route path="course-materials" element={<MemberCourseMaterials />} />
+          <Route path="course-materials/:courseId" element={<MemberCourseMaterials />} />
+          
+          {/* Course Package Routes - Temporarily commented out */}
+          {/* <Route path="packages" element={<CoursePackageList />} />
+          <Route path="packages/:id" element={<CoursePackageDetail />} />
+          <Route path="packages/:id/purchase" element={<CoursePackagePurchase />} />
+          <Route path="packages/purchased" element={<MyPackages />} /> */}
           
           {/* Session Routes */}
           <Route path="upcoming-sessions" element={<UpcomingSessions />} />
           <Route path="my-schedule" element={<UpcomingSessions />} /> {/* Reusing UpcomingSessions component */}
-=======
-        </Route>
 
-        <Route 
-          path="/member/dashboard"
-          element={
-            <ProtectedRoute roles={['member']}>
-              <MemberDashboard />
-            </ProtectedRoute>
-          }
-        >
-                    <Route path="registrations" element={<UserEventRegistrations />} />
-
-          <Route path="profile" element={<MemberProfile />} />
-          {/* Course Routes */}
-          <Route path="courses/catalog" element={<CourseCatalog />} />
-          <Route path="courses/:courseId" element={<CourseDetail />} />
-          <Route path="courses/enrolled" element={<EnrolledCourses />} />
-          <Route path="courses/progress" element={<CourseProgress />} />
-          <Route path="courses/wishlist" element={<CourseWishlist />} />
->>>>>>> 98f894d84b7c545e590b81f3d3555eb3a1fc6d60
+          {/* Default Route */}
+          <Route index element={<MemberDashboardOverview />} />
         </Route>
 
         <Route
@@ -181,9 +188,6 @@ function App() {
         {/* <Route path='/EventTypes' element={<EventTypes />} /> */}
         {/* <Route path='/EventList' element={<EventList />} /> */}
         {/* <Route path='/AdminEventRegistrations' element={<AdminEventRegistrations />} /> */}
-
-
-
       </Routes>
     </Router>
   );

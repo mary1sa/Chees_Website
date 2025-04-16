@@ -43,12 +43,12 @@ const SessionManagement = () => {
         
         
         
-        <button 
+        {/* <button 
           className={`session-tab ${activeTab === 'attendance' ? 'active' : ''}`}
           onClick={() => setActiveTab('attendance')}
         >
           <FiUsers /> Attendance Tracker
-        </button>
+        </button> */}
         
         <button 
           className={`session-tab ${activeTab === 'recordings' ? 'active' : ''}`}

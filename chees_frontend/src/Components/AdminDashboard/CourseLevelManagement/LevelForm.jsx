@@ -142,7 +142,7 @@ const LevelForm = ({ isEditing = false }) => {
               max={formData.max_rating}
             />
           </div>
-          
+          <br />
           <div className="form-group">
             <label htmlFor="max_rating">Maximum Rating</label>
             <input
@@ -157,7 +157,7 @@ const LevelForm = ({ isEditing = false }) => {
         </div>
         
         <div className="form-actions">
-          <button type="submit" className="btn-primary" disabled={loading}>
+          <button type="submit" className="btn-add-session" disabled={loading}>
             <FiSave /> {loading ? `${isEditing ? 'Updating' : 'Creating'}...` : `${isEditing ? 'Update' : 'Create'} Level`}
           </button>
           <button type="button" className="btn-secondary" onClick={handleCancel}>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { Crown } from 'lucide-react';
 import './Sessions.css';
 
 const SessionCalendar = ({ sessions, onDaySelect }) => {
@@ -7,11 +8,12 @@ const SessionCalendar = ({ sessions, onDaySelect }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   
   // Generate calendar data
-  const calendarData = generateCalendarData(currentDate, sessions);
+  const today = new Date();
+  const calendarData = generateCalendarData(currentDate, sessions, today);
   
   const handleDateSelect = (day) => {
-    // Only allow selecting days in the current month that have sessions
-    if (day.isCurrentMonth && day.hasSessions) {
+    // Allow selecting any day that has sessions, including past sessions
+    if (day.hasSessions) {
       setSelectedDate(day.date);
       onDaySelect(day.date);
     }
@@ -72,7 +74,7 @@ const SessionCalendar = ({ sessions, onDaySelect }) => {
                 day.isCurrentMonth ? 'current-month' : 'other-month'
               } ${isToday ? 'today' : ''} ${
                 day.hasSessions ? 'has-session' : ''
-              } ${isSelected ? 'selected' : ''}`}
+              } ${day.hasSessions && day.date < today ? 'past-session' : ''} ${isSelected ? 'selected' : ''}`}
               onClick={() => handleDateSelect(day)}
             >
               <div className="calendar-day-number">{day.date.getDate()}</div>
@@ -80,12 +82,11 @@ const SessionCalendar = ({ sessions, onDaySelect }) => {
                 <div className="calendar-day-events">
                   {day.eventCount > 3 
                     ? <React.Fragment>
-                        <div className="calendar-day-event-marker"></div>
-                        <div className="calendar-day-event-marker"></div>
-                        <div className="calendar-day-event-marker"></div>
+                        <Crown className="calendar-day-event-icon" size={16} />
+                        <span className="calendar-day-event-count">×{day.eventCount}</span>
                       </React.Fragment>
                     : Array(day.eventCount).fill(0).map((_, i) => (
-                        <div key={i} className="calendar-day-event-marker"></div>
+                        <Crown key={i} className="calendar-day-event-icon" size={16} />
                       ))
                   }
                 </div>
@@ -99,7 +100,7 @@ const SessionCalendar = ({ sessions, onDaySelect }) => {
 };
 
 // Helper function to generate calendar data
-function generateCalendarData(currentDate, sessions) {
+function generateCalendarData(currentDate, sessions, today) {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   
@@ -129,7 +130,8 @@ function generateCalendarData(currentDate, sessions) {
   // Add days for current month
   for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
     const date = new Date(year, month, day);
-    const sessionForDate = sessions.filter(session => isSameDay(new Date(session.start_time), date));
+    const sessionForDate = sessions.filter(session => isSameDay(new Date(session.start_datetime), date));
+    const isPastDate = date < today;
     
     calendarDays.push({
       date,

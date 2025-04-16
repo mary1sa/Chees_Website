@@ -95,7 +95,7 @@ const LevelList = () => {
       <div className="level-list-container">
         <div className="level-list-header">
           <h2><FiBarChart2 /> Course Levels</h2>
-          <Link to="/admin/dashboard/createlevel" className="add-level-btn">
+          <Link to="/admin/dashboard/levels/create" className="add-level-btn">
             <FiPlus /> Add New Level
           </Link>
         </div>
@@ -109,9 +109,9 @@ const LevelList = () => {
     <div className="level-list-container">
       <div className="level-list-header">
         <h2><FiBarChart2 /> Course Levels</h2>
-        <Link to="/admin/dashboard/createlevel" className="add-level-btn">
+        {/* <Link to="/admin/dashboard/levels/create" className="add-level-btn">
           <FiPlus /> Add New Level
-        </Link>
+        </Link> */}
       </div>
       
       <div className="level-search">
@@ -163,7 +163,7 @@ const LevelList = () => {
                     </td>
                     <td className="action-buttons">
                       <Link
-                        to={`/admin/dashboard/levels/edit/${level.id}`}
+                        to={`/admin/dashboard/levels/${level.id}/edit`}
                         className="edit-button"
                         title="Edit Level"
                       >

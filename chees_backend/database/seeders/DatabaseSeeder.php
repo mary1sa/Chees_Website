@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use EventSeeder;
-
+use Illuminate\Database\Seeder;
+use Database\Seeders\UserSeeder;
 use Database\Seeders\EventTypeSeeder;
 use Database\Seeders\EventsTableSeeder;
 use Database\Seeders\TournamentRoundsTableSeeder;

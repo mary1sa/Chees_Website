@@ -1,29 +1,129 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../api/axios';
 import './Courses.css';
-import { FiHeart, FiSearch, FiFilter, FiArrowRight } from 'react-icons/fi';
+import { FiSearch, FiFilter, FiArrowRight } from 'react-icons/fi';
+import { FaHeart } from 'react-icons/fa';
+import PageLoading from '../PageLoading/PageLoading';
 
 const CourseCatalog = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [courseLevels, setCourseLevels] = useState([]);
   const [filters, setFilters] = useState({
     level: '',
-    isOnline: null,
     priceRange: [0, 10000]
   });
   const [sortBy, setSortBy] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [wishlistUpdating, setWishlistUpdating] = useState(false);
 
+  // Fetch courses when component mounts or filters change
   useEffect(() => {
-    fetchCourses();
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        // If user is logged in, get their wishlist status
+        if (token && user && user.id) {
+          const wishlistResponse = await axiosInstance.get(`/api/users/${user.id}/wishlist`);
+          if (wishlistResponse.data.success) {
+            const wishlistedIds = wishlistResponse.data.data
+              .filter(item => item.item_type === 'course')
+              .map(item => item.item_id);
+
+            // Now fetch courses with wishlist info
+            await fetchCourseLevels();
+            await fetchCourses(wishlistedIds);
+          }
+        } else {
+          // If not logged in, just fetch courses
+          await fetchCourseLevels();
+          await fetchCourses([]);
+        }
+      } catch (err) {
+        setError('Error loading courses: ' + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, [searchTerm, filters, sortBy, sortDirection]);
 
-  const fetchCourses = async () => {
+  // Toggle course wishlist status
+  const toggleWishlist = async (courseId, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    if (wishlistUpdating) return;
+    
     try {
-      setLoading(true);
+      setWishlistUpdating(true);
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+      if (!token || !user || !user.id) {
+        setError('Please log in to wishlist courses');
+        return;
+      }
+
+      const course = courses.find(c => c.id === courseId);
+      if (!course) return;
+
+      // Optimistically update UI
+      setCourses(prevCourses => 
+        prevCourses.map(c => 
+          c.id === courseId 
+            ? { ...c, is_wishlisted: !c.is_wishlisted }
+            : c
+        )
+      );
+
+      // Make API call
+      const endpoint = `/api/wishlists/toggle/${courseId}`;
+      await axiosInstance.post(endpoint, {
+        item_type: 'course'
+      });
+    } catch (err) {
+      setError('Error updating wishlist');
+      // Revert on error by refetching
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (token && user && user.id) {
+        const wishlistResponse = await axiosInstance.get(`/api/users/${user.id}/wishlist`);
+        if (wishlistResponse.data.success) {
+          const wishlistedIds = wishlistResponse.data.data
+            .filter(item => item.item_type === 'course')
+            .map(item => item.item_id);
+          await fetchCourses(wishlistedIds);
+        }
+      }
+    } finally {
+      setWishlistUpdating(false);
+    }
+  };
+
+  const fetchCourseLevels = async () => {
+    try {
+      const response = await axiosInstance.get('/api/course-levels');
+      if (response.data.success) {
+        setCourseLevels(response.data.data);
+      } else {
+        console.error('Failed to fetch course levels');
+      }
+    } catch (err) {
+      console.error('Error fetching course levels:', err.message);
+    }
+  };
+
+  const fetchCourses = async (wishlistedIds = []) => {
+    try {
       let queryParams = new URLSearchParams();
       
       if (searchTerm) {
@@ -34,38 +134,22 @@ const CourseCatalog = () => {
         queryParams.append('level_id', filters.level);
       }
       
-      if (filters.isOnline !== null) {
-        queryParams.append('is_online', filters.isOnline);
-      }
-      
       queryParams.append('sort_by', sortBy);
       queryParams.append('sort_direction', sortDirection);
       
-      const response = await axios.get(`/api/courses?${queryParams.toString()}`);
+      const response = await axiosInstance.get(`/api/courses?${queryParams.toString()}`);
+      
       if (response.data.success) {
-        setCourses(response.data.data.data);
+        const coursesData = response.data.data.data.map(course => ({
+          ...course,
+          is_wishlisted: wishlistedIds.includes(course.id)
+        }));
+        setCourses(coursesData);
       } else {
         setError('Failed to fetch courses');
       }
     } catch (err) {
       setError('Error fetching courses: ' + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const toggleWishlist = async (courseId, event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    try {
-      const response = await axios.post(`/api/wishlists/toggle/${courseId}`);
-      if (response.data.success) {
-        // Refresh the courses list to update wishlist status
-        fetchCourses();
-      }
-    } catch (err) {
-      setError('Failed to update wishlist');
     }
   };
 
@@ -87,8 +171,9 @@ const CourseCatalog = () => {
     setSortDirection(direction);
   };
 
+
   if (loading) {
-    return <div className="courses-loading">Loading courses...</div>;
+    return <PageLoading text="Loading courses..." />;
   }
 
   if (error) {
@@ -124,18 +209,11 @@ const CourseCatalog = () => {
             value={filters.level}
           >
             <option value="">All Levels</option>
-            <option value="1">Beginner</option>
-            <option value="2">Intermediate</option>
-            <option value="3">Advanced</option>
-          </select>
-          
-          <select 
-            onChange={(e) => handleFilterChange('isOnline', e.target.value === '' ? null : e.target.value === 'true')}
-            value={filters.isOnline === null ? '' : filters.isOnline.toString()}
-          >
-            <option value="">All Formats</option>
-            <option value="true">Online</option>
-            <option value="false">In-Person</option>
+            {courseLevels.map(level => (
+              <option key={level.id} value={level.id}>
+                {level.name}
+              </option>
+            ))}
           </select>
           
           <select
@@ -158,26 +236,34 @@ const CourseCatalog = () => {
       ) : (
         <div className="courses-grid">
           {courses.map(course => (
-            <Link 
-              to={`/member/courses/${course.id}`} 
-              key={course.id}
-              className="course-card"
-            >
-              <div className="course-image">
-                <img src={course.thumbnail || '/course-placeholder.jpg'} alt={course.title} />
-                <button 
-                  className={`wishlist-button ${course.is_wishlisted ? 'wishlisted' : ''}`}
-                  onClick={(e) => toggleWishlist(course.id, e)}
-                >
-                  <FiHeart />
-                </button>
-              </div>
+            <div key={course.id} className="course-card-wrapper">
+              <Link 
+                to={`/member/dashboard/courses/${course.id}`} 
+                className="course-card"
+              >
+                <div className="course-image">
+                  <img src={course.thumbnail_url || '/course-placeholder.jpg'} alt={course.title} />
+                  <div className="course-overlay">
+                    <button 
+                      className={`heart-button ${course.is_wishlisted ? 'active' : ''}`}
+                      onClick={(e) => toggleWishlist(course.id, e)}
+                    >
+                      <FaHeart size={30} />
+                    </button>
+                  </div>
+                </div>
               <div className="course-content">
-                <div className="course-level">{course.level?.name || 'All Levels'}</div>
+                <div className="course-level">
+                  {course.level && course.level.name ? (
+                    course.level.name
+                  ) : (
+                    <span className="course-level-placeholder">Level not specified</span>
+                  )}
+                </div>
                 <h3 className="course-title">{course.title}</h3>
                 <p className="course-description">{course.description.substring(0, 100)}...</p>
                 <div className="course-details">
-                  <span className="course-price">${course.price.toFixed(2)}</span>
+                  <span className="course-price">{course.price.toFixed(2)} MAD</span>
                   <span className="course-duration">{course.duration} hours</span>
                 </div>
                 <div className="course-format">{course.is_online ? 'Online' : 'In-Person'}</div>
@@ -187,6 +273,7 @@ const CourseCatalog = () => {
                 </div>
               </div>
             </Link>
+            </div>
           ))}
         </div>
       )}
