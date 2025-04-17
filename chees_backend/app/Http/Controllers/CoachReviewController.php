@@ -14,6 +14,15 @@ public function adminIndex()
         ->orderBy('created_at', 'desc')
         ->get();
 }
+public function showReview($id)
+{
+    $review = CoachReview::with(['coach', 'user'])
+               ->findOrFail($id)
+               ;
+
+               return response()->json($review);
+
+}
     public function adminUpdate(Request $request, $id)
     {
         $review = CoachReview::findOrFail($id);

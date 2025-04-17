@@ -101,7 +101,8 @@ Route::delete('/coach-reviews', [CoachReviewController::class, 'destroy']);
 
 Route::get('/adminreviews', [CoachReviewController::class, 'adminIndex']);
 
-
+Route::get('/showreview/{id}', [CoachReviewController::class, 'showReview']);
+     
 Route::delete('/admin/reviews/{id}', [CoachReviewController::class, 'adminDestroy']);
 
 

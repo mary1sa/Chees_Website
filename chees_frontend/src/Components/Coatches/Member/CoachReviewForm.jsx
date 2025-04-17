@@ -302,7 +302,7 @@ const CoachReviewForm = () => {
       <FiEdit className="pen-icon-with-border" />
     </button>
     <button
-    className="delete-btn"
+    className="delete_btn"
     onClick={(e) => {
       e.stopPropagation();
       handleDeleteClick(

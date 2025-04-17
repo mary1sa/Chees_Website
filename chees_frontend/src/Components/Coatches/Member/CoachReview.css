@@ -421,7 +421,7 @@
   color: #48bb78; 
 }
 
-.delete-btn {
+.delete_btn {
   background: transparent;
   border: none;
   padding: 0.4rem;
@@ -432,7 +432,7 @@
   cursor: pointer;
 }
 
-.delete-btn:hover {
+.delete_btn:hover {
   background: rgba(220, 53, 69, 0.1);
   border: 1px solid #dc3545;
 }
