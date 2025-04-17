@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\CoachAvailabilityController;
 use App\Http\Controllers\CoachesController;
 use App\Http\Controllers\CoachReviewController;
 use App\Http\Controllers\CoachSpecializationCategoryController;
+use App\Http\Controllers\CoursePackageController;
+use App\Http\Controllers\CourseProgressController;
 use App\Http\Controllers\MemberBookingController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -20,7 +23,6 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\EventTypeController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\BookRatingController;
-use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\TournamentController;
 use App\Http\Controllers\CourseLevelController;
 use App\Http\Controllers\CourseMediaController;
@@ -32,7 +34,6 @@ use App\Http\Controllers\TournamentMatchController;
 use App\Http\Controllers\TournamentRoundController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\SessionAttendanceController;
-use App\Http\Controllers\CoachAvailabilityController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -59,16 +60,16 @@ Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
 
 // User management routes
 Route::get('/users', [UserController::class, 'getAllUsers']);
+Route::get('/all-users', [UserController::class, 'getAllUsersWithoutRoleFilter']);
+Route::get('/users/count', [UserController::class, 'getUserCount']);
 Route::get('/users/{id}', [UserController::class, 'getUserById']);
 Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
-Route::get('/coaches', [UserController::class, 'getCoaches']);
 
 // Get coaches for course creation
 Route::get('/coaches', [UserController::class, 'getCoaches']);
 
-//coatches routes
 //CoatchSpecializationCategoryController
 Route::get('specializations', [CoachSpecializationCategoryController::class, 'index']);
 Route::post('specializations', [CoachSpecializationCategoryController::class, 'store']);
@@ -98,6 +99,13 @@ Route::get('/reviews/{coachId}', [CoachReviewController::class, 'show']);
 Route::put('/reviewsupdate/{id}', [CoachReviewController::class, 'update']);
 Route::delete('/coach-reviews', [CoachReviewController::class, 'destroy']);
 
+Route::get('/adminreviews', [CoachReviewController::class, 'adminIndex']);
+
+
+Route::delete('/admin/reviews/{id}', [CoachReviewController::class, 'adminDestroy']);
+
+
+Route::put('/admin/reviews/{id}', [CoachReviewController::class, 'adminUpdate']);
 
 // Coach API routes
 
@@ -121,6 +129,9 @@ Route::delete('/coach-reviews', [CoachReviewController::class, 'destroy']);
 
 
 
+
+//Coaches
+//Route::apiResource('coaches', CoachController::class);
 // Event Types
 Route::apiResource('event-types', EventTypeController::class);
 
@@ -163,17 +174,20 @@ Route::apiResource('course-materials', CourseMaterialController::class);
 Route::get('course-materials/{id}/download', [CourseMaterialController::class, 'download']);
 Route::get('course-materials/{id}/view', [CourseMaterialController::class, 'stream']);
 Route::get('course-materials/{id}/stream', [CourseMaterialController::class, 'stream']);
+Route::post('course-materials/{id}/update-with-file', [CourseMaterialController::class, 'updateWithFile']);
 
 // Course Media
 Route::apiResource('course-media', CourseMediaController::class);
 
-// Enrollments
-Route::apiResource('enrollments', EnrollmentController::class);
-Route::get('enrollments/export', [EnrollmentController::class, 'export']);
-Route::post('enrollments/{enrollment}/courses', [EnrollmentController::class, 'addCourses']);
-Route::delete('enrollments/{enrollment}/courses', [EnrollmentController::class, 'removeCourses']);
-Route::put('enrollments/{enrollment}/courses/{course}/progress', [EnrollmentController::class, 'updateCourseProgress']);
-Route::get('users/{user}/enrollments', [EnrollmentController::class, 'userEnrollments']);
+// Course Progress (new endpoints)
+Route::prefix('course-progress')->group(function() {
+    Route::get('/{user}/{course}', [CourseProgressController::class, 'show']);
+    Route::put('/{id}', [CourseProgressController::class, 'update']);
+    Route::post('/bulk-update', [CourseProgressController::class, 'bulkUpdate']);
+    Route::get('/user/{user}', [CourseProgressController::class, 'getUserProgress']);
+    Route::get('/course/{course}', [CourseProgressController::class, 'getCourseProgress']);
+    Route::post('/{id}/complete-lesson', [CourseProgressController::class, 'completeLesson']);
+});
 
 // Payments for courses and books and events
 Route::middleware('auth:api')->group(function () {
@@ -183,33 +197,65 @@ Route::middleware('auth:api')->group(function () {
 });
 
 // Wishlist can be used for courses and books
-Route::apiResource('wishlists', WishlistController::class);
-Route::get('users/{user}/wishlist', [WishlistController::class, 'userWishlist']);
-Route::post('wishlists/toggle/{course}', [WishlistController::class, 'toggle']);
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('wishlists', WishlistController::class);
+    Route::get('users/{user}/wishlist', [WishlistController::class, 'userWishlist']);
+    Route::post('wishlists/toggle/{course}', [WishlistController::class, 'toggle']);
+});
+
+// Course Package Routes
+Route::prefix('course-packages')->group(function() {
+    // Public routes
+    Route::get('/', [CoursePackageController::class, 'index']);
+    Route::get('/{id}', [CoursePackageController::class, 'show']);
+    
+    // Protected routes
+    Route::middleware('auth:api')->group(function() {
+        Route::post('/', [CoursePackageController::class, 'store']);
+        Route::put('/{id}', [CoursePackageController::class, 'update']);
+        Route::delete('/{id}', [CoursePackageController::class, 'destroy']);
+        Route::put('/{id}/courses', [CoursePackageController::class, 'updateCourses']);
+        Route::post('/{id}/purchase', [CoursePackageController::class, 'purchase']);
+    });
+});
 
 // Course API routes
 Route::prefix('courses')->group(function () {
     // Public course routes
     Route::get('/', [CourseController::class, 'index']);
-    Route::get('/{course}', [CourseController::class, 'show']);
     
     // Protected course routes that require authentication
     Route::middleware('auth:api')->group(function () {
+        Route::get('/purchased', [CourseController::class, 'getPurchasedCourses']);
+        Route::post('/purchase', [CourseController::class, 'purchaseCourse']);
+        Route::get('/check-purchase/{course}', [CourseController::class, 'checkPurchaseStatus']);
+        Route::post('/validate-coupon', [CourseController::class, 'validateCoupon']);
+        
         Route::post('/', [CourseController::class, 'store']);
         Route::put('/{course}', [CourseController::class, 'update']);
         Route::post('/{course}/update-with-file', [CourseController::class, 'updateWithFile']);
         Route::delete('/{course}', [CourseController::class, 'destroy']);
-        // Updated to support multiple courses in one enrollment
-        Route::post('/enroll', [EnrollmentController::class, 'store']);
     });
+    
+    // These routes must be defined after the specific routes to avoid conflicts
+    Route::get('/{course}', [CourseController::class, 'show']);
+    Route::get('/{course}/sessions', [CourseController::class, 'getSessions']);
+    Route::get('/{course}/materials', [CourseController::class, 'getMaterials']);
 });
 
-// Course-related resources
-Route::apiResource('course-levels', CourseLevelController::class);
-Route::apiResource('course-sessions', CourseSessionController::class);
-Route::apiResource('session-attendances', SessionAttendanceController::class);
+// Course-related resources - Using only auth:api for consistency with other routes
+// Public course-related resources
+Route::apiResource('course-levels', CourseLevelController::class)->only(['index', 'show']);
 
-Route::apiResource('coupons', CouponController::class);
+Route::middleware('auth:api')->group(function () {
+    // Protected course-related resources
+    Route::apiResource('course-levels', CourseLevelController::class)->except(['index', 'show']);
+    Route::get('/course-sessions/upcoming', [CourseSessionController::class, 'upcoming']);
+    Route::get('/course-sessions/past', [CourseSessionController::class, 'past']);
+    Route::apiResource('course-sessions', CourseSessionController::class);
+    Route::apiResource('session-attendances', SessionAttendanceController::class);
+    Route::apiResource('coupons', CouponController::class);
+});
 
 // Protected routes
 Route::middleware('auth:api')->group(function () {
@@ -223,15 +269,15 @@ Route::middleware('auth:api')->group(function () {
     // Course materials
     //Route::get('/course-materials/{courseMaterial}', [CourseMaterialController::class, 'show']);
     
-    // Coupons
-    Route::post('/coupons/validate', [CouponController::class, 'validate']);
+    // Course packages
+    Route::get('/me/packages', [CoursePackageController::class, 'myPackages']);
+    Route::get('/me/active-packages', [CoursePackageController::class, 'myActivePackages']);
+    Route::post('/me/packages/{id}/cancel', [CoursePackageController::class, 'cancelPackage']);
+    
+    // Course progress
     
     // Wishlist
     Route::apiResource('/wishlist', WishlistController::class);
-    
-    // My enrollments
-    Route::get('/my-enrollments', [EnrollmentController::class, 'myEnrollments']);
-    Route::put('/my-courses/{course}/progress', [EnrollmentController::class, 'updateMyProgress']);
 });
 
 // Event players
@@ -247,3 +293,5 @@ Route::apiResource('ratings', BookRatingController::class)->only(['update', 'des
 Route::apiResource('orders', OrderController::class)->middleware('auth:api');
 Route::apiResource('order-items', OrderItemController::class)->only(['show']);
 Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
+Route::get('/order-items', [OrderItemController::class, 'index']);
+Route::get('/orders/user/{userId}', [OrderController::class, 'getUserOrders']);

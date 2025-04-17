@@ -26,5 +26,26 @@ class Wishlist extends Model
     {
         return $this->morphTo();
     }
+    
+    // Specific relationship for course items
+    public function course()
+    {
+        if ($this->item_type === 'course') {
+            return $this->belongsTo(Course::class, 'item_id');
+        }
+        return null;
+    }
+    
+    // Specific relationship for book items
+    public function book()
+    {
+        return $this->belongsTo(Book::class, 'item_id')->where('item_type', 'book');
+    }
+    
+    // Specific relationship for event items
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'item_id')->where('item_type', 'event');
+    }
 }
 

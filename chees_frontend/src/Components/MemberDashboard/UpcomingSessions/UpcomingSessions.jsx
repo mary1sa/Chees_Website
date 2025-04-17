@@ -1,46 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { FiCalendar, FiList, FiX } from 'react-icons/fi';
-import axios from 'axios';
+import { FiCalendar, FiList, FiX, FiClock, FiUser, FiBook, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import axiosInstance from '../../../api/axios';
 import SessionCard from './SessionCard';
 import SessionCalendar from './SessionCalendar';
 import './Sessions.css';
+import '../../AdminDashboard/SessionManagement/SessionManagement.css';
 import PageLoading from '../../PageLoading/PageLoading';
 
 const UpcomingSessions = () => {
+  const [activeTab, setActiveTab] = useState('upcoming');
   const [sessions, setSessions] = useState([]);
+  const [allSessions, setAllSessions] = useState([]); // For calendar view
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [view, setView] = useState('list'); // 'list' or 'calendar'
   const [selectedDate, setSelectedDate] = useState(null);
   const [joinSessionData, setJoinSessionData] = useState(null);
   
-  useEffect(() => {
-    fetchSessions();
-  }, []);
-  
-  const fetchSessions = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get('/api/course-sessions/upcoming');
-      if (response.data.success) {
-        setSessions(response.data.data);
-      } else {
-        setError('Failed to fetch sessions');
-      }
-    } catch (err) {
-      setError(`Error fetching sessions: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sessionsPerPage] = useState(12);
+
   const handleDaySelect = (date) => {
     setSelectedDate(date);
   };
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch sessions for the active tab
+        const response = await axiosInstance.get(`/api/course-sessions/${activeTab}`);
+        setSessions(response.data.data);
+
+        // If we're in calendar view, fetch all sessions
+        if (view === 'calendar') {
+          const [upcomingRes, pastRes] = await Promise.all([
+            axiosInstance.get('/api/course-sessions/upcoming'),
+            axiosInstance.get('/api/course-sessions/past')
+          ]);
+          setAllSessions([...upcomingRes.data.data, ...pastRes.data.data]);
+        }
+
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch sessions');
+        setLoading(false);
+      }
+    };
+
+    fetchSessions();
+  }, [activeTab, view]);
+
   
   const filteredSessions = selectedDate 
-    ? sessions.filter(session => {
-        const sessionDate = new Date(session.start_time);
+    ? (view === 'calendar' ? allSessions : sessions).filter(session => {
+        const sessionDate = new Date(session.start_datetime);
         return (
           sessionDate.getDate() === selectedDate.getDate() &&
           sessionDate.getMonth() === selectedDate.getMonth() &&
@@ -48,6 +64,30 @@ const UpcomingSessions = () => {
         );
       })
     : sessions;
+    
+  // Calculate pagination values
+  const totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
+  const indexOfLastSession = currentPage * sessionsPerPage;
+  const indexOfFirstSession = indexOfLastSession - sessionsPerPage;
+  const currentSessions = filteredSessions.slice(indexOfFirstSession, indexOfLastSession);
+  
+  // Pagination controls
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  
+  // Reset pagination when tab or filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, selectedDate]);
   
   const handleJoinSession = (session) => {
     setJoinSessionData(session);
@@ -72,7 +112,7 @@ const UpcomingSessions = () => {
   
   const markAttendance = async (sessionId) => {
     try {
-      await axios.post('/api/session-attendances', {
+      await axiosInstance.post('/api/session-attendances', {
         session_id: sessionId,
         status: 'attended'
       });
@@ -94,7 +134,7 @@ const UpcomingSessions = () => {
   return (
     <div className="sessions-container">
       <div className="sessions-header">
-        <h2>Upcoming Sessions</h2>
+        <h2>Sessions</h2>
         <div className="view-toggle">
           <button 
             className={`view-toggle-btn ${view === 'list' ? 'active' : ''}`}
@@ -110,11 +150,25 @@ const UpcomingSessions = () => {
           </button>
         </div>
       </div>
+      <div className="sessions-tabs">
+        <button
+          className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
+          onClick={() => setActiveTab('upcoming')}
+        >
+          Upcoming
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'past' ? 'active' : ''}`}
+          onClick={() => setActiveTab('past')}
+        >
+          Past
+        </button>
+      </div>
       
       {view === 'calendar' ? (
         <div className="calendar-view">
           <SessionCalendar 
-            sessions={sessions}
+            sessions={allSessions}
             onDaySelect={handleDaySelect}
           />
           
@@ -139,30 +193,91 @@ const UpcomingSessions = () => {
           )}
         </div>
       ) : (
-        <div className="list-view">
-          <div className="sessions-tabs">
-            <div className="session-tab active">Upcoming</div>
-            <div className="session-tab">Past</div>
+        filteredSessions.length === 0 ? (
+          <div className="no-sessions">
+            <p>You don't have any {activeTab} sessions {activeTab === 'upcoming' ? 'scheduled' : 'recorded'}.</p>
           </div>
-          
-          {sessions.length === 0 ? (
-            <div className="empty-sessions">
-              <FiCalendar />
-              <h3>No upcoming sessions</h3>
-              <p>You don't have any upcoming sessions scheduled. Check your enrolled courses to book sessions.</p>
-            </div>
-          ) : (
-            <div className="sessions-list">
-              {sessions.map(session => (
+        ) : (
+          <>
+            <div className={`sessions-list ${view === 'list' ? 'list-view' : ''}`}>
+              {currentSessions.map(session => (
                 <SessionCard 
                   key={session.id} 
                   session={session} 
-                  onJoin={handleJoinSession} 
+                  onJoin={handleJoinSession}
+                  isPastSession={activeTab === 'past'}
                 />
               ))}
             </div>
-          )}
-        </div>
+            
+            {/* Pagination */}
+            {filteredSessions.length > sessionsPerPage && (
+              <div className="pagination">
+                <button 
+                  className="pagination-button pagination-nav"
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                >
+                  <FiChevronLeft className="icon" /> Previous
+                </button>
+                
+                {/* First page is always shown */}
+                {totalPages > 0 && (
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    className={`pagination-button ${currentPage === 1 ? 'active' : ''}`}
+                  >
+                    1
+                  </button>
+                )}
+                
+                {/* Show ellipsis if there's a gap between first page and other visible pages */}
+                {currentPage > 3 && (
+                  <span className="pagination-ellipsis">...</span>
+                )}
+                
+                {/* Show pages before and after current page */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    // Show pages adjacent to current, but not first or last page (we handle those separately)
+                    return page !== 1 && page !== totalPages && Math.abs(page - currentPage) <= 1;
+                  })
+                  .map(page => (
+                    <button 
+                      key={page}
+                      className={`pagination-button ${currentPage === page ? 'active' : ''}`}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                
+                {/* Show ellipsis if there's a gap between last page and other visible pages */}
+                {currentPage < totalPages - 2 && (
+                  <span className="pagination-ellipsis">...</span>
+                )}
+                
+                {/* Last page is always shown if there are multiple pages */}
+                {totalPages > 1 && (
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    className={`pagination-button ${currentPage === totalPages ? 'active' : ''}`}
+                  >
+                    {totalPages}
+                  </button>
+                )}
+                
+                <button 
+                  className="pagination-button pagination-nav"
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next <FiChevronRight className="icon" />
+                </button>
+              </div>
+            )}
+          </>
+        )
       )}
       
       {joinSessionData && (
@@ -175,19 +290,62 @@ const UpcomingSessions = () => {
               </button>
             </div>
             
+            {joinSessionData.coach && (
+              <div className="join-dialog-coach">
+                <div className="join-dialog-coach-avatar">
+                  {joinSessionData.coach.first_name ? joinSessionData.coach.first_name.charAt(0) : ''}
+                  {joinSessionData.coach.last_name ? joinSessionData.coach.last_name.charAt(0) : ''}
+                </div>
+                <div className="join-dialog-coach-info">
+                  <span className="join-dialog-coach-label">Your Coach</span>
+                  <span className="join-dialog-coach-name">
+                    {joinSessionData.coach.first_name} {joinSessionData.coach.last_name}
+                  </span>
+                </div>
+              </div>
+            )}
+            
             <div className="join-dialog-details">
-              <p><strong>{joinSessionData.title}</strong></p>
-              <p>
-                {new Date(joinSessionData.start_time).toLocaleString(undefined, {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </p>
-              {joinSessionData.coach && <p>Coach: {joinSessionData.coach.name}</p>}
+              <div className="join-dialog-detail">
+                <FiCalendar />
+                <div className="join-dialog-detail-content">
+                  <span className="join-dialog-detail-label">Date</span>
+                  <span className="join-dialog-detail-value">
+                    {new Date(joinSessionData.start_datetime).toLocaleDateString(undefined, {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="join-dialog-detail">
+                <FiClock />
+                <div className="join-dialog-detail-content">
+                  <span className="join-dialog-detail-label">Time</span>
+                  <span className="join-dialog-detail-value">
+                    {new Date(joinSessionData.start_datetime).toLocaleTimeString(undefined, {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })} - {new Date(joinSessionData.end_datetime).toLocaleTimeString(undefined, {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+              </div>
+              
+              {joinSessionData.course && (
+                <div className="join-dialog-detail">
+                  <FiBook />
+                  <div className="join-dialog-detail-content">
+                    <span className="join-dialog-detail-label">Course</span>
+                    <span className="join-dialog-detail-value">{joinSessionData.course.title}</span>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="join-dialog-actions">

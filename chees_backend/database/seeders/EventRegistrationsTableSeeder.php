@@ -13,7 +13,7 @@ class EventRegistrationsTableSeeder extends Seeder
         $registrations = [
             [
                 'event_id' => 1,
-                'user_id' => 1,
+                'user_id' => 1, // Admin
                 'registration_number' => 'EVT-2023-001',
                 'status' => 'confirmed',
                 'payment_status' => 'completed',
@@ -23,7 +23,7 @@ class EventRegistrationsTableSeeder extends Seeder
             ],
             [
                 'event_id' => 1,
-                'user_id' => 2,
+                'user_id' => 2, // Coach1
                 'registration_number' => 'EVT-2023-002',
                 'status' => 'confirmed',
                 'payment_status' => 'completed',
@@ -33,7 +33,7 @@ class EventRegistrationsTableSeeder extends Seeder
             ],
             [
                 'event_id' => 1,
-                'user_id' => 3,
+                'user_id' => 3, // Coach2
                 'registration_number' => 'EVT-2023-003',
                 'status' => 'pending',
                 'payment_status' => 'pending',
@@ -41,7 +41,7 @@ class EventRegistrationsTableSeeder extends Seeder
             ],
             [
                 'event_id' => 2,
-                'user_id' => 4,
+                'user_id' => 4, // Member1
                 'registration_number' => 'EVT-2023-004',
                 'status' => 'confirmed',
                 'payment_status' => 'completed',
@@ -50,7 +50,7 @@ class EventRegistrationsTableSeeder extends Seeder
             ],
             [
                 'event_id' => 2,
-                'user_id' => 5,
+                'user_id' => 5, // Member2
                 'registration_number' => 'EVT-2023-005',
                 'status' => 'cancelled',
                 'payment_status' => 'refunded',
@@ -60,7 +60,7 @@ class EventRegistrationsTableSeeder extends Seeder
             ],
             [
                 'event_id' => 3,
-                'user_id' => 6,
+                'user_id' => 6, // Member3
                 'registration_number' => 'EVT-2023-006',
                 'status' => 'confirmed',
                 'payment_status' => 'completed',
@@ -69,7 +69,7 @@ class EventRegistrationsTableSeeder extends Seeder
             ],
             [
                 'event_id' => 4,
-                'user_id' => 7,
+                'user_id' => 7, // Member4
                 'registration_number' => 'EVT-2023-007',
                 'status' => 'confirmed',
                 'payment_status' => 'completed',
@@ -79,7 +79,7 @@ class EventRegistrationsTableSeeder extends Seeder
             ],
             [
                 'event_id' => 5,
-                'user_id' => 8,
+                'user_id' => 7, // Changed from 8 to 7 (member4) which exists in the database
                 'registration_number' => 'EVT-2023-008',
                 'status' => 'attended',
                 'payment_status' => 'completed',
@@ -89,7 +89,14 @@ class EventRegistrationsTableSeeder extends Seeder
         ];
 
         foreach ($registrations as $registration) {
-            EventRegistration::create($registration);
+            // Use firstOrCreate to prevent duplicate entries
+            EventRegistration::firstOrCreate(
+                [
+                    'event_id' => $registration['event_id'], 
+                    'user_id' => $registration['user_id']
+                ],
+                $registration
+            );
         }
     }
 }

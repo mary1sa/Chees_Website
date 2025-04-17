@@ -34,7 +34,19 @@ class CourseMaterialController extends Controller
             $query->where('file_type', $request->file_type);
         }
         
-        $materials = $query->orderBy('created_at', 'desc')->paginate(20);
+        // Search functionality
+        if ($request->has('search')) {
+            $searchTerm = '%' . $request->search . '%';
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', $searchTerm)
+                  ->orWhere('description', 'like', $searchTerm);
+            });
+        }
+        
+        // Get per_page parameter or default to 10
+        $perPage = $request->has('per_page') ? (int)$request->per_page : 10;
+        
+        $materials = $query->orderBy('created_at', 'desc')->paginate($perPage);
         
         // Add full URLs to results
         $materials->getCollection()->transform(function ($material) {
@@ -569,11 +581,38 @@ class CourseMaterialController extends Controller
     {
         $material = CourseMaterial::findOrFail($id);
         
-        // Check if file exists
-        if (!$material->file_path || !Storage::disk('public')->exists($material->file_path)) {
+        // Log the download attempt for debugging
+        \Log::info("Attempting to download course material ID: {$id}", [
+            'file_path' => $material->file_path,
+            'file_type' => $material->file_type,
+            'title' => $material->title
+        ]);
+        
+        // Check if file_path is even set
+        if (!$material->file_path) {
+            \Log::error("File path is empty for course material ID: {$id}");
             return response()->json([
                 'success' => false,
-                'message' => 'File not found'
+                'message' => 'File path not set for this material'
+            ], 404);
+        }
+        
+        // Check if file exists in storage
+        if (!Storage::disk('public')->exists($material->file_path)) {
+            \Log::error("File not found in storage for course material ID: {$id}, path: {$material->file_path}");
+            return response()->json([
+                'success' => false,
+                'message' => 'File not found in storage'
+            ], 404);
+        }
+        
+        // Get file size and check if it's valid
+        $fileSize = Storage::disk('public')->size($material->file_path);
+        if ($fileSize <= 0) {
+            \Log::error("File has zero or negative size for course material ID: {$id}, size: {$fileSize}");
+            return response()->json([
+                'success' => false,
+                'message' => 'File appears to be empty'
             ], 404);
         }
         
@@ -584,8 +623,63 @@ class CourseMaterialController extends Controller
         $extension = pathinfo($path, PATHINFO_EXTENSION);
         $filename = Str::slug($material->title) . '.' . $extension;
         
-        // Return file as download
-        return Storage::disk('public')->download($path, $filename);
+        // Get the full storage path to verify the file is readable
+        $fullPath = Storage::disk('public')->path($path);
+        if (!is_readable($fullPath)) {
+            \Log::error("File is not readable for course material ID: {$id}, path: {$fullPath}");
+            return response()->json([
+                'success' => false,
+                'message' => 'File exists but is not readable'
+            ], 403);
+        }
+
+        // Set the correct Content-Type based on file_type
+        $headers = [];
+        
+        // Determine proper MIME type for the file
+        if ($material->file_type === 'pdf') {
+            $headers['Content-Type'] = 'application/pdf';
+        } else if ($material->file_type === 'image') {
+            // Use proper image mime type based on extension
+            $imageTypes = [
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                'bmp' => 'image/bmp',
+                'svg' => 'image/svg+xml',
+                'webp' => 'image/webp'
+            ];
+            $headers['Content-Type'] = $imageTypes[strtolower($extension)] ?? 'image/jpeg';
+        } else if ($material->file_type === 'video') {
+            // Video MIME types
+            $videoTypes = [
+                'mp4' => 'video/mp4',
+                'webm' => 'video/webm',
+                'avi' => 'video/x-msvideo',
+                'mov' => 'video/quicktime'
+            ];
+            $headers['Content-Type'] = $videoTypes[strtolower($extension)] ?? 'video/mp4';
+        } else if ($material->file_type === 'document') {
+            // Document MIME types
+            $docTypes = [
+                'doc' => 'application/msword',
+                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'xls' => 'application/vnd.ms-excel',
+                'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'ppt' => 'application/vnd.ms-powerpoint',
+                'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            ];
+            $headers['Content-Type'] = $docTypes[strtolower($extension)] ?? 'application/octet-stream';
+        }
+        
+        \Log::info("Successfully prepared file for download. Material ID: {$id}, size: {$fileSize} bytes");
+        
+        // Force Content-Length header to ensure browser receives file size information
+        $headers['Content-Length'] = $fileSize;
+        
+        // Return file as download with proper headers
+        return Storage::disk('public')->download($path, $filename, $headers);
     }
     
     /**

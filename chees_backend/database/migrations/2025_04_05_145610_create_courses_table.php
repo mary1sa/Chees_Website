@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('thumbnail', 255)->nullable();
             $table->decimal('price', 10, 2);
-            $table->integer('duration'); // in minutes
+            $table->integer('duration'); // in hours
             $table->integer('max_students')->nullable();
             $table->boolean('is_online')->default(true);
             $table->boolean('is_active')->default(true);

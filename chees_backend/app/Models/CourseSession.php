@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class CourseSession extends Model
 {
@@ -38,7 +39,7 @@ class CourseSession extends Model
 
     public function coach(): BelongsTo
     {
-        return $this->belongsTo(Coach::class);
+        return $this->belongsTo(User::class, 'coach_id');
     }
 
     public function materials(): HasMany
@@ -49,5 +50,14 @@ class CourseSession extends Model
     public function attendances(): HasMany
     {
         return $this->hasMany(SessionAttendance::class, 'session_id');
+    }
+    
+    /**
+     * Get all enrollments that include this session
+     */
+    public function enrollments(): BelongsToMany
+    {
+        return $this->belongsToMany(Enrollment::class, 'enrollment_session')
+            ->withTimestamps();
     }
 }

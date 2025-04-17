@@ -32,10 +32,18 @@ class Course extends Model
         'is_active' => 'boolean',
         'price' => 'float'
     ];
+    
+    // Append thumbnail_url to JSON response
+    protected $appends = ['thumbnail_url'];
 
     public function level(): BelongsTo
     {
         return $this->belongsTo(CourseLevel::class, 'level_id');
+    }
+
+    public function coach(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'coach_id');
     }
 
     public function sessions(): HasMany
@@ -49,36 +57,38 @@ class Course extends Model
     }
 
     /**
-     * Get users enrolled in this course directly.
-     * @deprecated Use enrollments() instead for new code.
+     * Get course progress records for this course.
      */
-    public function students(): BelongsToMany
+    public function progress(): HasMany
     {
-        return $this->belongsToMany(User::class, 'enrollments')
-            ->withPivot('status', 'progress', 'enrollment_date', 'completion_date')
-            ->withTimestamps();
+        return $this->hasMany(CourseProgress::class);
     }
-    
+
     /**
-     * Get all enrollments that include this course.
+     * Get the enrollments for this course.
      */
     public function enrollments(): BelongsToMany
     {
-        return $this->belongsToMany(Enrollment::class, 'enrollment_course')
-            ->withPivot('progress', 'started_at', 'completed_at')
-            ->withTimestamps();
+        return $this->belongsToMany(User::class, 'course_enrollments', 'course_id', 'user_id')
+                    ->withTimestamps();
     }
-    
+
     /**
-     * Get all users enrolled in this course through enrollments.
+     * Get the packages this course belongs to.
      */
-    public function enrolledUsers()
+    public function packages(): BelongsToMany
     {
-        return User::whereHas('enrollments', function($query) {
-            $query->whereHas('courses', function($q) {
-                $q->where('courses.id', $this->id);
-            });
-        });
+        return $this->belongsToMany(CoursePackage::class, 'course_package_items')
+                    ->withPivot('order')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get the progress for a specific user in this course.
+     */
+    public function userProgress($userId)
+    {
+        return $this->progress()->where('user_id', $userId)->first();
     }
     
     /**
@@ -95,5 +105,23 @@ class Course extends Model
     public function scopeOnline($query)
     {
         return $query->where('is_online', true);
+    }
+    
+    /**
+     * Get the thumbnail URL attribute.
+     *
+     * @return string|null
+     */
+    public function getThumbnailUrlAttribute()
+    {
+        if (!$this->thumbnail) {
+            return null;
+        }
+        
+        // Normalize the path (remove 'storage/' if present)
+        $thumbnailPath = str_replace('storage/', '', $this->thumbnail);
+        
+        // Generate and return the complete URL
+        return asset('storage/' . $thumbnailPath);
     }
 }

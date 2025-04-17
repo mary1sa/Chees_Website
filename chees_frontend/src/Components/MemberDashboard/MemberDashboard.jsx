@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -10,6 +9,8 @@ import {
   FiBookmark, FiPlay, FiAward, FiHeart,
   FiUser,
   FiStar
+
+  , FiShoppingCart
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -64,31 +65,38 @@ const MemberDashboard = () => {
     {
       title: "Dashboard",
       icon: <FiHome />,
-      path: "/member"
+      path: "/member/dashboard"
     },
     {
       title: "My Courses",
       icon: <FiBook />,
       submenus: [
         { 
-          title: "Enrolled Courses", 
-          path: "/member/courses/enrolled",
-          icon: <FiBookmark className="submenu-icon" />
+          title: "Purchased Courses", 
+          path: "/member/dashboard/courses/purchased",
+          icon: <FiBook className="submenu-icon" />
         },
         { 
           title: "Course Catalog", 
-          path: "/member/courses/catalog",
+          path: "/member/dashboard/courses/catalog",
           icon: <FiList className="submenu-icon" />
         },
         { 
-          title: "My Progress", 
-          path: "/member/courses/progress",
-          icon: <FiAward className="submenu-icon" />
-        },
-        { 
           title: "Wishlist", 
-          path: "/member/courses/wishlist",
+          path: "/member/dashboard/courses/wishlist",
           icon: <FiHeart className="submenu-icon" />
+        },
+      ]
+    },
+    
+    {
+      title: "Sessions",
+      icon: <FiCalendar />,
+      submenus: [
+        { 
+          title: "Upcoming Sessions", 
+          path: "/member/dashboard/upcoming-sessions",
+          icon: <FiCalendar className="submenu-icon" />
         }
       ]
     },
@@ -108,22 +116,28 @@ const MemberDashboard = () => {
       path: "/member/payments"
     },
     {
-          title: "Book Store",
-          icon: <FiBook />, 
-          submenus: [
-            { 
-              title: "Books", 
-              path: "books",
-              icon: <FiBook className="submenu-icon" />
-            },
-            { 
-              title: "Authors", 
-              path: "authors",
-              icon: <FiUser className="submenu-icon" />
-            }
-          ]
-      },
+      title: "Book Store",
+      icon: <FiBook />, 
+      submenus: [
+        { 
+          title: "Books", 
+          path: "/member/dashboard/books",
+          icon: <FiBook className="submenu-icon" />
+        },
+        { 
+          title: "Authors", 
+          path: "/member/dashboard/authors",
+          icon: <FiUser className="submenu-icon" />
+        },
+        { 
+          title: "My Orders", 
+          path: "/member/dashboard/myOrderes",
+          icon: <FiShoppingCart className="submenu-icon" />
+        }
+      ]
+    },
     {
+
       title: "bookingcoach",
       icon: <FiCalendar />,
       path: "bookingcoach"
@@ -132,6 +146,15 @@ const MemberDashboard = () => {
       title: "CoachReviewForm",
       icon:<FiStar />,
       path: "CoachReviewForm"
+    },{
+      title: "Coach Booking",
+      icon: <FiCalendar />,
+      path: "/member/dashboard/bookingcoach"
+    },
+    {
+      title: "Settings",
+      icon: <FiSettings />,
+      path: "/member/dashboard/settings"
     }
   ];
 
@@ -167,7 +190,7 @@ const MemberDashboard = () => {
           <button className="menu-toggle" onClick={toggleSidebar}>
             {sidebarOpen ? <FiX /> : <FiMenu />}
           </button>
-          {sidebarOpen && <h2 className="sidebar-brand">Admin Panel</h2>}
+          {sidebarOpen && <h2 className="sidebar-brand">Member Panel</h2>}
         </div>
         
         <div className="sidebar-menu">
@@ -244,4 +267,6 @@ const MemberDashboard = () => {
     </div>
   );
 };
+
+
 export default MemberDashboard;

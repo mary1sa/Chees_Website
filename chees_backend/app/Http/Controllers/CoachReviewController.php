@@ -7,6 +7,44 @@ use Illuminate\Http\Request;
 
 class CoachReviewController extends Controller
 {
+//admin
+public function adminIndex()
+{
+    return CoachReview::with(['user', 'coach'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+}
+    public function adminUpdate(Request $request, $id)
+    {
+        $review = CoachReview::findOrFail($id);
+        
+        $validated = $request->validate([
+            'rating' => 'sometimes|integer|min:1|max:5',
+            'review_text' => 'nullable|string',
+            'teaching_clarity_rating' => 'sometimes|integer|min:1|max:5',
+            'communication_rating' => 'sometimes|integer|min:1|max:5',
+            'knowledge_depth_rating' => 'sometimes|integer|min:1|max:5',
+        ]);
+
+        $review->update($validated);
+        
+        return response()->json([
+            'message' => 'Review updated successfully',
+            'updated_review' => $review->refresh()
+        ]);
+    }
+
+    public function adminDestroy($id)
+    {
+        $review = CoachReview::findOrFail($id);
+        $review->delete();
+        
+        return response()->json([
+            'message' => 'Review deleted successfully',
+            'deleted_review' => $review
+        ]);
+    }
+    //member
     public function store(Request $request)
     {
         $request->validate([

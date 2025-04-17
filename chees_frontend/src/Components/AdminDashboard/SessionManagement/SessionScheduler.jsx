@@ -4,7 +4,8 @@ import axiosInstance from '../../../api/axios';
 import './SessionManagement.css';
 import PageLoading from '../../PageLoading/PageLoading';
 
-const SessionScheduler = ({ isEditing, onLoadingChange }) => {
+const SessionScheduler = ({ isEditing = false, onLoadingChange = () => {} }) => {
+  const [isPastSession, setIsPastSession] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const [formData, setFormData] = useState({
     course_id: '',
@@ -60,6 +61,11 @@ const SessionScheduler = ({ isEditing, onLoadingChange }) => {
       
       if (response.data.success) {
         const sessionData = response.data.data;
+        
+        // Check if this is a past session
+        const sessionEndDate = new Date(sessionData.end_datetime);
+        const now = new Date();
+        setIsPastSession(sessionEndDate < now);
         
         // Update form data with the fetched session data
         setFormData({
@@ -167,6 +173,10 @@ const SessionScheduler = ({ isEditing, onLoadingChange }) => {
   
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    // Prevent changing start/end datetime for past sessions
+    if (isPastSession && (name === 'start_datetime' || name === 'end_datetime')) {
+      return;
+    }
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -234,24 +244,18 @@ const SessionScheduler = ({ isEditing, onLoadingChange }) => {
       }
       
       if (response.data.success) {
+        // Show success message
         setSuccess(response.data.message || 'Session(s) scheduled successfully!');
-        // Reset form after successful submission
-        setFormData({
-          course_id: '',
-          coach_id: null,
-          title: '',
-          description: '',
-          start_datetime: '',
-          end_datetime: '',
-          zoom_link: '',
-          meeting_id: '',
-          meeting_password: '',
-          max_participants: 20,
-          is_recorded: false,
-          recording_url: ''
-        });
+        
+        // Store the success status in local storage so we can show it after navigation
+        localStorage.setItem('sessionActionSuccess', 'true');
+        localStorage.setItem('sessionActionMessage', response.data.message || 'Session(s) scheduled successfully!');
+        
+        // Don't redirect here - button will handle this
+        return true;
       } else {
         setError(response.data.message || 'Failed to schedule session.');
+        return false;
       }
     } catch (err) {
       console.error('Error scheduling session:', err);
@@ -265,15 +269,25 @@ const SessionScheduler = ({ isEditing, onLoadingChange }) => {
         
         setError(`Validation errors:\n${errorMessages}`);
         console.log('Validation errors:', err.response.data.errors);
-      console.log('Form data that was sent:', sessionData);
+        console.log('Form data that was sent:', sessionData);
       } else {
         setError(err.response?.data?.message || 'An error occurred while scheduling the session.');
       }
       
       // Also log the data that was sent to help with debugging
       console.log('Form data that was sent:', sessionData);
+      return false;
     } finally {
       setLoading(false);
+    }
+  };
+  
+  // New function to handle both submission and navigation
+  const handleSubmitAndNavigate = async (e) => {
+    const success = await handleSubmit(e);
+    if (success) {
+      // Navigate immediately after successful submission
+      window.location.href = "/admin/dashboard/sessions";
     }
   };
   
@@ -328,10 +342,10 @@ const SessionScheduler = ({ isEditing, onLoadingChange }) => {
   
   return (
     <div className="session-scheduler">
-      {loading && <PageLoading />}
-      
-      {!loading && (
-        <>
+      {loading ? (
+        <PageLoading />
+      ) : (
+        <div>
           <h2>{isEditing ? 'Edit Session' : 'Schedule New Session'}</h2>
           
           {/* Error and success messages */}
@@ -351,7 +365,7 @@ const SessionScheduler = ({ isEditing, onLoadingChange }) => {
           
           {/* Session form (will render when data loading is complete) */}
           {!error && (
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmitAndNavigate}>
               <div className="form-row">
                 <div className="form-group">
                   <label>Course</label>
@@ -400,26 +414,30 @@ const SessionScheduler = ({ isEditing, onLoadingChange }) => {
               
               <div className="form-row">
                 <div className="form-group">
-                  <label><FiCalendar /> Start Date & Time</label>
+                  <label>Start Time</label>
                   <input 
                     type="datetime-local" 
                     name="start_datetime" 
                     value={formData.start_datetime} 
                     onChange={handleChange}
+                    min={getTodayString()}
                     required
-                    min={`${getTodayString()}T00:00`}
+                    disabled={isPastSession}
+                    title={isPastSession ? "Cannot modify start time of past sessions" : ""}
                   />
                 </div>
                 
                 <div className="form-group">
-                  <label><FiClock /> End Date & Time</label>
+                  <label>End Time</label>
                   <input 
                     type="datetime-local" 
                     name="end_datetime" 
                     value={formData.end_datetime} 
                     onChange={handleChange}
+                    min={formData.start_datetime || getTodayString()}
                     required
-                    min={formData.start_datetime || `${getTodayString()}T00:00`}
+                    disabled={isPastSession}
+                    title={isPastSession ? "Cannot modify end time of past sessions" : ""}
                   />
                 </div>
               </div>
@@ -534,7 +552,7 @@ const SessionScheduler = ({ isEditing, onLoadingChange }) => {
               {/* We removed the recurrence options since they're not directly in the database schema */}
               
               <div className="form-actions">
-                <button type="submit" className="btn-primary" disabled={loading}>
+                <button type="submit" className="btn-add-session" disabled={loading}>
                   <FiSave /> {loading ? (isEditing ? 'Updating...' : 'Scheduling...') : (isEditing ? 'Update Session' : 'Schedule Session')}
                 </button>
                 {!isEditing && (
@@ -553,7 +571,7 @@ const SessionScheduler = ({ isEditing, onLoadingChange }) => {
               </div>
             </form>
           )}
-        </> 
+        </div>
       )}
     </div>
   );
