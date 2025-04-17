@@ -267,9 +267,10 @@
   height: 150px;
   border-radius: 8px;
   overflow: hidden;
-  margin-top: var(--spacing-md);
+  margin: var(--spacing-md) auto 0;
   border: 2px solid var(--border-color);
   box-shadow: var(--shadow-sm);
+  display: block;
 }
 
 .thumbnail-preview img {

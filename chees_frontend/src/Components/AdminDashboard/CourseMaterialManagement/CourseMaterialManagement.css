@@ -36,6 +36,7 @@
 .data-table table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .data-table th {
@@ -46,16 +47,76 @@
   font-weight: 600;
   font-size: 0.9rem;
   border-bottom: 2px solid var(--color-border, #e5e7eb);
+  white-space: nowrap;
 }
 
 .data-table td {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--color-border, #e5e7eb);
   color: var(--color-text-primary, #1f2937);
+  vertical-align: middle;
 }
 
 .data-table tr:hover td {
   background-color: var(--color-bg-hover, #f3f4f6);
+}
+
+/* Materials table specific styles */
+.materials-table-container {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.materials-table {
+  min-width: 1000px; /* Ensures the table doesn't get too narrow */
+}
+
+.material-title-cell {
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.material-course-cell {
+  word-break: break-word;
+}
+
+.material-type-cell {
+  text-align: center;
+}
+
+.material-description-cell {
+  word-break: break-word;
+  max-width: 300px;
+}
+
+.material-downloadable-cell {
+  text-align: center;
+}
+
+.material-date-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  min-width: 60px;
+}
+
+.status-badge.active {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.status-badge.inactive {
+  background-color: #fee2e2;
+  color: #dc2626;
 }
 
 /* Actions bar */
@@ -374,6 +435,8 @@
   transition: all 0.2s;
   width: 100%;
   max-width: 500px;
+  margin: 0 auto; /* Center horizontally */
+  margin-top: var(--spacing-md);
 }
 
 .file-upload-area:hover {

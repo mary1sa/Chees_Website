@@ -168,17 +168,8 @@ const MemberDashboardOverview = () => {
         ];
       }
       
-      // Since /api/user/courses doesn't exist yet, use hardcoded enrolled course IDs
-      // This ensures we have exactly 2 courses as per the requirements
-      const enrolledCourseIds = [1, 3]; // User has exactly 2 purchased courses
-      let enrolledCourses = Array.isArray(coursesData) 
-        ? coursesData.filter(course => enrolledCourseIds.includes(course.id))
-        : [];
-      
-      if (enrolledCourses.length !== 2) {
-        // Fallback: first 2 courses if we can't find the specified ones
-        enrolledCourses = Array.isArray(coursesData) ? coursesData.slice(0, 2) : [];
-      }
+      // Use all courses from the purchased courses API response
+      let enrolledCourses = Array.isArray(coursesData) ? coursesData : [];
       
       // Try to get sessions data
       let sessionsData;
@@ -289,7 +280,7 @@ const MemberDashboardOverview = () => {
       // Filter materials for enrolled courses
       const userMaterials = Array.isArray(materialsData) 
         ? materialsData.filter(material => 
-            enrolledCourseIds.includes(material.course_id)
+            enrolledCourses.some(course => course.id === material.course_id)
           )
         : [];
       
@@ -415,12 +406,12 @@ const MemberDashboardOverview = () => {
       
       // Calculate total stats accurately
       const dashboardStats = {
-        enrolledCourses: 2, // User specified exactly 2 enrolled courses
-        upcomingSessions: 2, // User specified exactly 2 upcoming sessions
+        enrolledCourses: enrolledCourses.length, // Use actual count of enrolled courses
+        upcomingSessions: userSessions.length, // Use actual count of upcoming sessions
         completedSessions: 0, // User specified no attendance recorded yet
         availableMaterials: userMaterials.length, // Use actual count from API
-        upcomingEvents: eventsData.length,
-        availableBooks: booksData.length
+        upcomingEvents: eventsData.length, // Use actual count of upcoming events
+        availableBooks: booksData.length // Use actual count of available books
       };
       
       // Update state with accurate data
@@ -442,7 +433,7 @@ const MemberDashboardOverview = () => {
         const sortedEnrolled = [...enrolledCourses].sort((a, b) => b.id - a.id);
         setRecentMaterials(sortedEnrolled.slice(0, 1));
       }
-      setUpcomingEvents(eventsData.slice(0, 2));
+      setUpcomingEvents(eventsData); // Use all events from the API
       setRecommendedBooks(booksData.slice(0, 2));
       
       setLoading(false);

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use EventSeeder;
 use Illuminate\Database\Seeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Auth\User;
@@ -14,6 +13,11 @@ use Database\Seeders\AuthorsTableSeeder;
 use Database\Seeders\OrderItemsTableSeeder;
 use Database\Seeders\BookRatingsTableSeeder;
 use Database\Seeders\BookCategoriesTableSeeder;
+use Database\Seeders\CourseLevelSeeder;
+use Database\Seeders\CourseSeeder;
+use Database\Seeders\CourseSessionSeeder;
+use Database\Seeders\CourseMaterialSeeder;
+use Database\Seeders\PaymentSeeder;
 use Database\Seeders\TournamentRoundsTableSeeder;
 use Database\Seeders\TournamentMatchesTableSeeder;
 use Database\Seeders\EventRegistrationsTableSeeder;
@@ -38,6 +42,16 @@ class DatabaseSeeder extends Seeder
             BookRatingsTableSeeder::class,
             OrdersTableSeeder::class,
             OrderItemsTableSeeder::class,
+            
+            // Course-related seeders
+            CourseLevelSeeder::class,
+            CourseSeeder::class,
+            CourseSessionSeeder::class,
+            CourseMaterialSeeder::class,
+            
+            
+            PaymentSeeder::class,
+            
         ]);
         // User::factory(10)->create();
 

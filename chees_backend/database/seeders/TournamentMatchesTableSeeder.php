@@ -48,8 +48,8 @@ class TournamentMatchesTableSeeder extends Seeder
             ],
             [
                 'round_id' => 1,
-                'white_player_id' => 7,
-                'black_player_id' => 8,
+                'white_player_id' => 7, // Member4
+                'black_player_id' => 6, // Changed from 8 to 6 (Member3) which exists in the database
                 'result' => '1-0',
                 'start_datetime' => Carbon::parse('2023-06-15 10:00:00'),
                 'end_datetime' => Carbon::parse('2023-06-15 11:45:00'),
@@ -90,8 +90,8 @@ class TournamentMatchesTableSeeder extends Seeder
             ],
             [
                 'round_id' => 2,
-                'white_player_id' => 8,
-                'black_player_id' => 7,
+                'white_player_id' => 5, // Changed from 8 to 5 (Member2) which exists in the database
+                'black_player_id' => 7, // Member4
                 'result' => '1/2-1/2',
                 'start_datetime' => Carbon::parse('2023-06-15 16:00:00'),
                 'end_datetime' => Carbon::parse('2023-06-15 20:00:00'),
@@ -124,8 +124,8 @@ class TournamentMatchesTableSeeder extends Seeder
             // Round 1 of Event 3
             [
                 'round_id' => 12,
-                'white_player_id' => 6,
-                'black_player_id' => 8,
+                'white_player_id' => 6, // Member3
+                'black_player_id' => 4, // Changed from 8 to 4 (Member1) which exists in the database
                 'result' => '1-0',
                 'start_datetime' => Carbon::parse('2023-05-19 19:00:00'),
                 'end_datetime' => Carbon::parse('2023-05-19 19:45:00'),
@@ -146,8 +146,8 @@ class TournamentMatchesTableSeeder extends Seeder
             // Round 1 of Event 4 (scheduled matches)
             [
                 'round_id' => 13,
-                'white_player_id' => 7,
-                'black_player_id' => 8,
+                'white_player_id' => 7, // Member4
+                'black_player_id' => 3, // Changed from 8 to 3 (Coach2) which exists in the database
                 'start_datetime' => Carbon::parse('2023-08-12 11:00:00'),
                 'end_datetime' => Carbon::parse('2023-08-12 13:00:00'),
                 'table_number' => 1,
@@ -183,7 +183,16 @@ class TournamentMatchesTableSeeder extends Seeder
         ];
 
         foreach ($matches as $match) {
-            TournamentMatch::create($match);
+            // Use firstOrCreate to prevent duplicate entries
+            TournamentMatch::firstOrCreate(
+                [
+                    'round_id' => $match['round_id'],
+                    'white_player_id' => $match['white_player_id'],
+                    'black_player_id' => $match['black_player_id'],
+                    'table_number' => $match['table_number']
+                ],
+                $match
+            );
         }
     }
 }

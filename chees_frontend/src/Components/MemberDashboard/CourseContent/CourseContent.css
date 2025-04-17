@@ -177,18 +177,35 @@
 
 .material-meta {
   display: flex;
+  align-items: center;
   gap: 1rem;
   font-size: 0.8rem;
   color: #888;
+  height: 24px; /* Set fixed height for the container */
 }
 
-.material-type-badge {
-  display: inline-block;
+/* Base badge styling for all badge types */
+.material-badge-base {
+  display: inline-flex;
+  align-items: center !important;
+  justify-content: center;
   padding: 0.25rem 0.5rem;
   border-radius: 12px;
   font-size: 0.75rem;
-  text-transform: uppercase;
   font-weight: 600;
+  margin: 0;
+}
+
+.material-type-badge {
+  display: inline-flex;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
   letter-spacing: 0.5px;
   background-color: rgba(0, 123, 255, 0.1);
   color: var(--color-primary);
@@ -209,6 +226,22 @@
   background-color: #f0f0f0;
   color: #555;
   margin-left: 0.5rem;
+}
+
+.material-display-order-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0;
+  background-color: #f0f0f0;
+  color: #555;
+  margin-left: 0.5rem;
+  height: 16px; /* Fixed height for better alignment */
+  box-sizing: border-box;
 }
 
 .material-type-badge.link-badge {

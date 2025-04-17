@@ -334,50 +334,53 @@ const CourseMaterialList = () => {
         </div>
       ) : (
         <>
-          <div className="data-table">
-            <table>
+          <div className="data-table materials-table-container">
+            <table className="materials-table">
               <thead>
                 <tr>
-                  <th>Title</th>
-                  <th>Course</th>
-                  <th>Type</th>
-                  <th>Description</th>
-                  <th>Downloadable</th>
-                  <th>Created</th>
-                  <th>Actions</th>
+                  <th width="20%">Title</th>
+                  <th width="15%">Course</th>
+                  <th width="10%">Type</th>
+                  <th width="25%">Description</th>
+                  <th width="10%">Downloadable</th>
+                  <th width="10%">Created</th>
+                  <th width="10%">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {materials.map(material => (
                   <tr key={material.id}>
-                    <td>{material.title}</td>
-                    <td>
+                    <td className="material-title-cell">{material.title}</td>
+                    <td className="material-course-cell">
                       {courses.find(c => c.id === material.course_id)?.title || 'Unknown'}
                     </td>
-                    <td>
+                    <td className="material-type-cell">
                       {isUrl(material.description) && material.file_type !== 'link' ? 
                         getFileTypeIcon('link') : 
                         getFileTypeIcon(material.file_type)}
                     </td>
-                    <td>
+                    <td className="material-description-cell">
                       {material.description ? 
                         (isUrl(material.description) ? 
                           <a href={material.description} target="_blank" rel="noopener noreferrer">
-                            {material.description.length > 50 ? 
-                              `${material.description.substring(0, 50)}...` : 
+                            {material.description.length > 40 ? 
+                              `${material.description.substring(0, 40)}...` : 
                               material.description}
                           </a> :
-                          (material.description.length > 50 ? 
-                            `${material.description.substring(0, 50)}...` : 
+                          (material.description.length > 40 ? 
+                            `${material.description.substring(0, 40)}...` : 
                             material.description)) : 
                         'No description'}
                     </td>
-                    <td>
-                      <span className={`status-badge ${material.is_downloadable ? 'active' : 'inactive'}`}>
-                        {material.file_type === 'link' || isUrl(material.description) ? 'No (Link)' : material.is_downloadable ? 'Yes' : 'No'}
-                      </span>
+                    <td className="material-downloadable-cell">
+                      {material.file_type === 'link' || isUrl(material.description) ? 
+                        <span className="status-badge inactive">No</span> : 
+                        <span className={`status-badge ${material.is_downloadable ? 'active' : 'inactive'}`}>
+                          {material.is_downloadable ? 'Yes' : 'No'}
+                        </span>
+                      }
                     </td>
-                    <td>
+                    <td className="material-date-cell">
                       {new Date(material.created_at).toLocaleDateString()}
                     </td>
                     <td className="actions-cell">

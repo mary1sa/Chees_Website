@@ -41,7 +41,18 @@ const MaterialList = ({ courseId }) => {
   
   const handleDownload = async (materialId, materialName) => {
     try {
-      window.open(`${process.env.REACT_APP_API_URL}/api/course-materials/${materialId}/download`, '_blank');
+      // Create a hidden anchor element
+      const link = document.createElement('a');
+      link.href = `${process.env.REACT_APP_API_URL}/api/course-materials/${materialId}/download`;
+      // Ensure the browser treats this as a download
+      link.setAttribute('download', materialName || 'download');
+      // Hide the element and add it to the document
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      // Trigger the download
+      link.click();
+      // Clean up
+      document.body.removeChild(link);
     } catch (err) {
       setError(`Error downloading file: ${err.message}`);
     }
@@ -186,12 +197,13 @@ const MaterialList = ({ courseId }) => {
                   <span className={`material-type-badge ${isLink ? 'link-badge' : material.file_type ? `${material.file_type}-badge` : ''}`}>
                     {isLink ? 'LINK' : material.file_type ? material.file_type.toUpperCase() : 'UNKNOWN'}
                   </span>
-                  {material.order_number !== null && material.order_number !== undefined && (
-                    <span className="material-order-badge" title="Material order number">
+                  
+                </div>
+                {material.order_number !== null && material.order_number !== undefined && (
+                    <span className="material-type-badge" style={{backgroundColor: '#f0f0f0', color: '#555'}} title="Material order number">
                       #{material.order_number}
                     </span>
                   )}
-                </div>
               </div>
               
               <div className="material-actions">
@@ -207,13 +219,13 @@ const MaterialList = ({ courseId }) => {
                   </a>
                 ) : material.file_path ? (
                   <>
-                    <button 
+                    {/* <button 
                       className="material-action-button preview"
                       onClick={() => handlePreview(material.id)}
                       title="View"
                     >
                       <FiEye />
-                    </button>
+                    </button> */}
                     {material.is_downloadable && (
                       <button 
                         className="material-action-button download"

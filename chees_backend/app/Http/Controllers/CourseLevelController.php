@@ -125,21 +125,13 @@ class CourseLevelController extends Controller
     {
         $level = CourseLevel::findOrFail($id);
         
-        // Check if level is being used by any courses
-        $coursesCount = $level->courses()->count();
-        
-        if ($coursesCount > 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot delete level as it is being used by ' . $coursesCount . ' course(s)'
-            ], 422);
-        }
-        
+        // Set level_id to NULL for all related courses before deleting the level
+        $level->courses()->update(['level_id' => null]);
         $level->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Course level deleted successfully'
+            'message' => 'Course level deleted successfully (all related courses unassigned)'
         ]);
     }
     
