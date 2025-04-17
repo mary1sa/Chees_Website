@@ -467,7 +467,7 @@ const MemberDashboardOverview = () => {
       
       {/* Personal Stats Section */}
       <div className="dashboard-stats">
-        <div className="stat-card">
+        <div className="stat-cards">
           <div className="stat-icon course-icon">
             <FiBook />
           </div>
@@ -478,7 +478,7 @@ const MemberDashboardOverview = () => {
           </div>
         </div>
         
-        <div className="stat-card">
+        <div className="stat-cards">
           <div className="stat-icon session-icon">
             <FiCalendar />
           </div>
@@ -489,7 +489,7 @@ const MemberDashboardOverview = () => {
           </div>
         </div>
         
-        <div className="stat-card">
+        <div className="stat-cards">
           <div className="stat-icon user-icon">
             <FiActivity />
           </div>
@@ -500,16 +500,16 @@ const MemberDashboardOverview = () => {
           </div>
         </div>
         
-        {/* <div className="stat-card">
+        <div className="stat-cards">
           <div className="stat-icon material-icon">
             <FiFileText />
           </div>
           <div className="stat-details">
-            <h3>Materials</h3>
-            <p className="stat-count">{stats.availableMaterials}</p>
-            <p className="stat-label">Available resources</p>
+            <h3>Books</h3>
+            <p className="stat-count">{stats.availableBooks}</p>
+            <p className="stat-label">Available books</p>
           </div>
-        </div> */}
+        </div>
       </div>
       
       {/* Next Session Widget */}
@@ -673,10 +673,10 @@ const MemberDashboardOverview = () => {
         {recommendedBooks.length > 0 ? (
           <div className="books-list">
             {recommendedBooks.map(book => (
-              <div className="book-card" key={book.id}>
+              <div className="book-cards" key={book.id}>
                 <div className="book-details">
                   <h3>{book.title}</h3>
-                  <p className="book-author">by {book.author}</p>
+                  <p className="book-author">by {typeof book.author === 'object' ? book.author.name : book.author}</p>
                   <p className="book-description">{book.description}</p>
                   <p className="book-price">{book.price}</p>
                 </div>

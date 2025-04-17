@@ -570,24 +570,24 @@ display: none;
 }
 
 .stat-card {
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
+  background-color: var(--card-bg) !important;
+  border-radius: 8px !important;
+  padding: 1.5rem !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  display: flex !important;
+  align-items: center !important;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
 .stat-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   width: 60px;
   height: 60px;
   border-radius: 9px !important;
@@ -687,7 +687,7 @@ display: none;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 1rem 0.5rem;
+  padding: 1rem 0.5rem ;
   background-color: white;
   color: var(--text-color);
   border-radius: 10px;
@@ -699,10 +699,6 @@ display: none;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
-
-
-
-
 
 
 
@@ -731,6 +727,15 @@ display: none;
 .action-button.books-action:hover svg { 
   background-color: #8E24AA !important; 
   color: white; 
+}
+.action-button.orders-action svg { 
+  background-color: rgba(36, 112, 170, 0.1) !important; 
+  color: #2470aa; 
+}
+
+.action-button.orders-action:hover svg { 
+  background-color: #2470aa !important;
+  color: white !important;
 }
 
 @media (max-width: 1200px) {

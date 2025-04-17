@@ -224,7 +224,7 @@ const AdminDashboardOverview = () => {
       </p>
       
       <div className="stats-container">
-        <div className="stat-card">
+        <div className="stat-cards">
           <div className="stat-icon user-icon">
             <FiUsers />
           </div>
@@ -235,7 +235,7 @@ const AdminDashboardOverview = () => {
           </div>
         </div>
         
-        <div className="stat-card">
+        <div className="stat-cards">
           <div className="stat-icon course-icon">
             <FiBook />
           </div>
@@ -246,7 +246,7 @@ const AdminDashboardOverview = () => {
           </div>
         </div>
         
-        <div className="stat-card">
+        <div className="stat-cards">
           <div className="stat-icon session-icon">
             <FiCalendar />
           </div>
@@ -257,7 +257,7 @@ const AdminDashboardOverview = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="stat-cards">
           <div className="stat-icon material-icon">
             <FiShoppingBag />
           </div>
@@ -268,7 +268,7 @@ const AdminDashboardOverview = () => {
           </div>
         </div>
         
-        <div className="stat-card">
+        <div className="stat-cards">
           <div className="stat-icon event-icon">
             <FiActivity />
           </div>
@@ -279,7 +279,7 @@ const AdminDashboardOverview = () => {
           </div>
         </div>
         
-        <div className="stat-card">
+        <div className="stat-cards">
           <div className="stat-icon book-icon">
             <FiBookOpen />
           </div>
@@ -317,6 +317,10 @@ const AdminDashboardOverview = () => {
           <a href="/admin/dashboard/books/create" className="action-button books-action">
             <FiBookOpen />
             <span>Add Book</span>
+          </a>
+          <a href="/admin/dashboard/books/dashboard" className="action-button orders-action">
+            <FiShoppingBag />
+            <span>Manage Orders</span>
           </a>
         </div>
       </div>
