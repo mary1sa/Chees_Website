@@ -8,7 +8,8 @@ import {
   FiChevronDown, FiChevronRight, FiChevronLeft,
   FiCreditCard, FiFileText, FiList, FiBook,
   FiBookmark, FiPlay, FiAward, FiHeart,
-  FiUser
+  FiUser,
+  FiStar
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -124,8 +125,13 @@ const MemberDashboard = () => {
       },
     {
       title: "bookingcoach",
-      icon: <FiSettings />,
+      icon: <FiCalendar />,
       path: "bookingcoach"
+    },
+    {
+      title: "CoachReviewForm",
+      icon:<FiStar />,
+      path: "CoachReviewForm"
     }
   ];
 

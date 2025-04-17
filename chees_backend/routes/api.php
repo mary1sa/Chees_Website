@@ -94,7 +94,9 @@ Route::post('/book-slot', [MemberBookingController::class, 'bookSlot']);
 
 //coachs review
 Route::post('/reviews', [CoachReviewController::class, 'store']);
-Route::get('/reviews/{coachId}', [CoachReviewController::class, 'index']);
+Route::get('/reviews/{coachId}', [CoachReviewController::class, 'show']);
+Route::put('/reviewsupdate/{id}', [CoachReviewController::class, 'update']);
+Route::delete('/coach-reviews', [CoachReviewController::class, 'destroy']);
 
 
 // Coach API routes

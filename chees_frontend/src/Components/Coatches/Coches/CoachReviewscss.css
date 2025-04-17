@@ -1,0 +1,76 @@
+.coach-review-container{
+  padding-top: 0;
+
+}
+
+
+.coach-review-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .coach-review-title{
+    margin: 0;
+  }
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .reviewer-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .reviewer-name {
+    font-weight: 600;
+    color: #1a365d;
+  }
+  
+  .review-date {
+    color: #718096;
+    font-size: 0.875rem;
+  }
+  
+  .review-content {
+    color: #2d3748;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+  
+  .detailed-ratings {
+    display: grid;
+    gap: 0.75rem;
+    background: #f7fafc;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  .rating-category {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .category-stars {
+    display: flex;
+    gap: 0.25rem;
+  }
+  
+  .empty-reviews {
+    text-align: center;
+    padding: 3rem;
+    color: #718096;
+  }
+  
+  .empty-reviews .empty-icon {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+    color: #cbd5e0;
+  }

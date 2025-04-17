@@ -67,6 +67,8 @@ import UserAvailabilities from './Components/Coatches/Member/UserAvailabilities'
 import AdminCoachAvailability from './Components/Coatches/Admin/AdminCoachAvailability';
 import AdminCreateAvailability from './Components/Coatches/Admin/AdminCreateAvailability';
 import AdminUpdateAvailability from './Components/Coatches/Admin/AdminUpdateAvailability';
+import CoachReviewForm from './Components/Coatches/Member/CoachReviewForm';
+import CoachReviews from './Components/Coatches/Coches/CoachReviews';
 
 function App() {
   return (
@@ -184,6 +186,7 @@ function App() {
           {/* Cochs Routes */}
 
           <Route path="bookingcoach" element={<UserAvailabilities />} />
+          <Route path="CoachReviewForm" element={<CoachReviewForm />} />
 
 
         </Route>
@@ -201,6 +204,7 @@ function App() {
   <Route path="creatavailability" element={<  CreateCoachAvailability />} />
   <Route path="coachavailability" element={<  CoachAvailability />} />
   <Route path="Updateavailability/:id" element={<  UpdateCoachAvailability />} />
+  <Route path="coachReviews" element={< CoachReviews />} />
 
 
 </Route>

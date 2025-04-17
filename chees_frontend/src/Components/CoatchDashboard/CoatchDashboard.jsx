@@ -6,7 +6,8 @@ import {
   FiLogOut, FiBell, FiSearch, FiSun, FiMoon,
   FiChevronDown, FiChevronRight, FiChevronLeft,
   FiCreditCard, FiFileText, FiList,
-  FiAward
+  FiAward,
+  FiStar
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -108,6 +109,11 @@ const CoatchDashboard = () => {
         }
       ]
     },
+    {
+          title: "CoachReview",
+          icon:<FiStar />,
+          path: "coachReviews"
+        },
     {
       title: "Settings",
       icon: <FiSettings />,
