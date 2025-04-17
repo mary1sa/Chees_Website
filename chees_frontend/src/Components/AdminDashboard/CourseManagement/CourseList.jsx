@@ -256,12 +256,12 @@ const CourseList = () => {
                     </Link>
                     
                     <Link 
-  to={`/admin/dashboard/courses/${course.id}/edit`}
-  className="action-btn update-btn"
-  title="Edit Course"
->
-  <FiEdit className="icon" />
-</Link>
+                        to={`/admin/dashboard/courses/${course.id}/edit`}
+                        className="action-btn update-btn"
+                        title="Edit Course"
+                      >
+                        <FiEdit className="icon" />
+                      </Link>
                     
                     <button 
                       className="action-btn delete-btn"

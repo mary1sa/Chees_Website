@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FiClock, FiUser, FiCalendar, FiMap, FiVideo, FiX, FiLink, FiKey, FiInfo } from 'react-icons/fi';
-import './Sessions.css';
+import './CoachSessions.css';
 
 const SessionCard = ({ session, onJoin, isPastSession = false }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -36,15 +36,15 @@ const SessionCard = ({ session, onJoin, isPastSession = false }) => {
       
       <div className="session-details">
         <div className="session-detail">
-          <FiCalendar className="session-icon-svg" />
+          <FiCalendar className="session-icon" />
           <span>{formatDate(session.start_datetime)}</span>
         </div>
         <div className="session-detail">
-          <FiClock className="session-icon-svg" />
+          <FiClock className="session-icon" />
           <span>{formatTime(session.start_datetime)} - {formatTime(session.end_datetime)}</span>
         </div>
         <div className="session-detail">
-          <FiUser className="session-icon-svg" />
+          <FiUser className="session-icon" />
           <span>Coach: {session.coach ? `${session.coach.first_name} ${session.coach.last_name}` : 'TBA'}</span>
         </div>
         {!isOnline && (
@@ -101,21 +101,21 @@ const SessionCard = ({ session, onJoin, isPastSession = false }) => {
             </div>
             <div className="modal-content">
               <div className="detail-item">
-                <FiCalendar />
+                <FiCalendar className="session-icon-svg" />
                 <div>
                   <strong>Date</strong>
                   <p>{formatDate(session.start_datetime)}</p>
                 </div>
               </div>
               <div className="detail-item">
-                <FiClock />
+                <FiClock className="session-icon-svg" />
                 <div>
                   <strong>Time</strong>
                   <p>{formatTime(session.start_datetime)} - {formatTime(session.end_datetime)}</p>
                 </div>
               </div>
               <div className="detail-item">
-                <FiUser />
+                <FiUser className="session-icon-svg" />
                 <div>
                   <strong>Coach</strong>
                   <p>{session.coach ? `${session.coach.first_name} ${session.coach.last_name}` : 'TBA'}</p>

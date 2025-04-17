@@ -6,7 +6,7 @@ import {
   FiLogOut, FiBell, FiSearch, FiSun, FiMoon,
   FiChevronDown, FiChevronRight, FiChevronLeft,
   FiCreditCard, FiFileText, FiList,
-  FiAward
+  FiAward, FiBook
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -61,49 +61,62 @@ const CoatchDashboard = () => {
     {
       title: "Dashboard",
       icon: <FiHome />,
-      path: "/admin"
+      path: "/coach/dashboard"
     },
-   
+    {
+      title: "Upcoming Sessions",
+      icon: <FiCalendar />,
+      path: "/coach/dashboard/upcoming-sessions"
+    },
+    {
+      title: "Course Content",
+      icon: <FiFileText />,
+      submenus: [
+        {
+          title: "All Courses",
+          path: "courses",
+          icon: <FiBook className="submenu-icon" />
+        },
+      ]
+    },
     { 
-      title: "Add Coatch", 
+      title: "Add Coach", 
       path: "CreateProfile",
       icon: <FiUserPlus className="submenu-icon" />
     },
     {
-      title: "CoachAvailability",
+      title: "Coach Availability",
       icon: <FiUsers />,
       submenus: [
         {
-          title: "coachavailability",
+          title: "View Availability",
           path: "coachavailability",
           icon: <FiList className="submenu-icon" />
         },
         {
-          title: "creat vailability",
+          title: "Create Availability",
           path: "creatavailability",
           icon: <FiList className="submenu-icon" />
-        },
-       
-
-        
+        }
       ]
     },
     {
       title: "Registrations",
-      path: "registrations",  // This is now relative to /coach/dashboard
+      path: "registrations",  
       icon: <FiAward className="submenu-icon" />
-    }, {
+    }, 
+    {
       title: "Financial",
       icon: <FiDollarSign />,
       submenus: [
         {
           title: "Payments",
-          path: "/admin/payments",
+          path: "/coach/dashboard/payments",
           icon: <FiCreditCard className="submenu-icon" />
         },
         {
           title: "Invoices",
-          path: "/admin/invoices",
+          path: "/coach/dashboard/invoices",
           icon: <FiFileText className="submenu-icon" />
         }
       ]
@@ -111,7 +124,7 @@ const CoatchDashboard = () => {
     {
       title: "Settings",
       icon: <FiSettings />,
-      path: "/admin/settings"
+      path: "/coach/dashboard/settings"
     }
   ];
 
@@ -124,7 +137,7 @@ const CoatchDashboard = () => {
               <FiMenu />
             </button>
           )}
-          <h1 className="brand-name">Admin Panel</h1>
+          <h1 className="brand-name">Coach Panel</h1>
         </div>
 
         <div className="navbar-right">
@@ -154,7 +167,7 @@ const CoatchDashboard = () => {
           <button className="menu-toggle" onClick={toggleSidebar}>
             {sidebarOpen ? <FiX /> : <FiMenu />}
           </button>
-          {sidebarOpen && <h2 className="sidebar-brand">Admin Panel</h2>}
+          {sidebarOpen && <h2 className="sidebar-brand">Coach Panel</h2>}
         </div>
 
         <div className="sidebar-menu">

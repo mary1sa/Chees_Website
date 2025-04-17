@@ -16,11 +16,15 @@ import UpdateUser from './Components/AdminDashboard/UpdateUser';
 import CreateUser from './Components/AdminDashboard/CreateUser';
 
 // Course Components
+import CourseContent from './Components/MemberDashboard/CourseContent/CourseContent';
 import CourseCatalog from './Components/Courses/CourseCatalog';
 import CourseDetail from './Components/Courses/CourseDetail';
+import MemberCourseMaterials from './Components/MemberDashboard/CourseContent/MemberCourseMaterials';
+import CoachCourseCatalog from './Components/CoatchDashboard/Courses/CoachCourseCatalog';
+import CoachCourseDetail from './Components/CoatchDashboard/Courses/CoachCourseDetail';
+import PurchasedCourses from './Components/Courses/PurchasedCourses';
 import CourseProgress from './Components/Courses/CourseProgress';
 import CourseWishlist from './Components/Courses/CourseWishlist';
-import PurchasedCourses from './Components/Courses/PurchasedCourses';
 
 // Course Package Components - Temporarily commented out
 // import CoursePackageList from './Components/Courses/Packages/CoursePackageList';
@@ -41,8 +45,8 @@ import CourseMaterialView from './Components/AdminDashboard/CourseMaterialManage
 
 // Member Dashboard Components
 import UpcomingSessions from './Components/MemberDashboard/UpcomingSessions/UpcomingSessions';
-import CourseContent from './Components/MemberDashboard/CourseContent/CourseContent';
-import MemberCourseMaterials from './Components/MemberDashboard/CourseContent/MemberCourseMaterials';
+import CoachUpcomingSessions from './Components/CoatchDashboard/UpcomingSessions/CoachUpcomingSessions';
+import CoachDashboardOverview from './Components/CoatchDashboard/CoachDashboardOverview';
 import MemberDashboardOverview from './Components/MemberDashboard/MemberDashboardOverview';
 
 import EventTypes from './Components/Event/EventTypes/EventTypes';
@@ -231,12 +235,22 @@ function App() {
   }
 >
   <Route path="registrations" element={<UserEventRegistrations />} />
-  <Route path="CreateProfile" element={< CreateCoacheProfile />} />
-  <Route path="creatavailability" element={<  CreateCoachAvailability />} />
-  <Route path="coachavailability" element={<  CoachAvailability />} />
-  <Route path="Updateavailability/:id" element={<  UpdateCoachAvailability />} />
-
-
+  <Route path="CreateProfile" element={<CreateCoacheProfile />} />
+  <Route path="creatavailability" element={<CreateCoachAvailability />} />
+  <Route path="coachavailability" element={<CoachAvailability />} />
+  <Route path="Updateavailability/:id" element={<UpdateCoachAvailability />} />
+  <Route path="upcoming-sessions" element={<CoachUpcomingSessions />} />
+  <Route path="payments" element={<div>Coach Payments</div>} />
+  <Route path="invoices" element={<div>Coach Invoices</div>} />
+  <Route path="settings" element={<div>Coach Settings</div>} />
+  
+  {/* Course Content Routes */}
+  <Route path="courses" element={<CoachCourseCatalog />} />
+  <Route path="courses/:courseId" element={<CoachCourseDetail />} />
+  <Route path="course-content" element={<CourseContent />} />
+  <Route path="course-materials" element={<MemberCourseMaterials />} />
+  <Route path="course-materials/:courseId" element={<MemberCourseMaterials />} />
+  <Route index element={<CoachDashboardOverview />} />
 </Route>
 
         <Route
