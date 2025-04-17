@@ -125,13 +125,15 @@ class CourseLevelController extends Controller
     {
         $level = CourseLevel::findOrFail($id);
         
-        // Set level_id to NULL for all related courses before deleting the level
-        $level->courses()->update(['level_id' => null]);
+        // Delete all courses associated with this level
+        $level->courses()->delete();
+        
+        // Then delete the level itself
         $level->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Course level deleted successfully (all related courses unassigned)'
+            'message' => 'Course level and all associated courses deleted successfully'
         ]);
     }
     

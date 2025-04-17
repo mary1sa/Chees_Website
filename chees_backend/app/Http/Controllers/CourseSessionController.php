@@ -31,7 +31,20 @@ class CourseSessionController extends Controller
             $query->whereBetween('start_datetime', [$request->start_date, $request->end_date]);
         }
         
-        $sessions = $query->orderBy('start_datetime')->get();
+        // Search by title or description
+        if ($request->has('search')) {
+            $searchTerm = '%' . $request->search . '%';
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', $searchTerm)
+                  ->orWhere('description', 'like', $searchTerm);
+            });
+        }
+        
+        // Set default per page to 10 if not specified
+        $perPage = $request->has('per_page') ? (int)$request->per_page : 10;
+        
+        // Paginate the results
+        $sessions = $query->orderBy('start_datetime')->paginate($perPage);
         
         return response()->json([
             'success' => true,
