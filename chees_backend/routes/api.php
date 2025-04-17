@@ -73,7 +73,6 @@ Route::put('specializations/{id}', [CoachSpecializationCategoryController::class
 Route::delete('specializations/{id}', [CoachSpecializationCategoryController::class, 'destroy']);
 //Coaches
 //Route::apiResource('coaches', CoachController::class);
-
 // Event Types
 Route::apiResource('event-types', EventTypeController::class);
 

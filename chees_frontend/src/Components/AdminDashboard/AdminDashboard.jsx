@@ -206,6 +206,11 @@ const AdminDashboard = () => {
       icon: <FiBook />, 
       submenus: [
         { 
+          title: "Dashboard", 
+          path: "books/dashboard",
+          icon: <FiBarChart2 className="submenu-icon" />
+        },
+        { 
           title: "All Books", 
           path: "books",
           icon: <FiBook className="submenu-icon" />
