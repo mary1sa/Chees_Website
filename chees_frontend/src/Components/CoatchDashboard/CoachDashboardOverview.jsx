@@ -13,15 +13,18 @@ import {
 import axiosInstance from '../../api/axios';
 import PageLoading from '../PageLoading/PageLoading';
 import '../MemberDashboard/MemberDashboard.css';
+import './CoachDashboard.css';
 
 const CoachDashboardOverview = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({
     upcomingSessions: 0,
-    totalCourses: 0
+    totalCourses: 0,
+    previousSessions: 0
   });
   const [upcomingSessions, setUpcomingSessions] = useState([]);
+
 
   useEffect(() => {
     fetchCoachData();
@@ -75,10 +78,11 @@ const CoachDashboardOverview = () => {
         return;
       }
       
-      // Fetch upcoming sessions and filter by coach ID
+      // Fetch upcoming sessions and past sessions for this coach
       let sessionsData = [];
+      let pastSessionsData = [];
       try {
-        // Get all upcoming sessions then filter for this coach
+        // Get upcoming sessions for this coach
         const response = await axiosInstance.get('/api/course-sessions/upcoming');
         if (response && response.data && response.data.data) {
           // Filter to only include sessions assigned to this coach
@@ -87,6 +91,12 @@ const CoachDashboardOverview = () => {
             (session.coach && session.coach.id === coachId)
           );
         }
+        // Fetch past sessions for this coach
+        const pastResponse = await axiosInstance.get(`/api/course-sessions/past?coach_id=${coachId}`);
+        if (pastResponse && pastResponse.data && pastResponse.data.data) {
+          pastSessionsData = pastResponse.data.data;
+        }
+
       } catch (err) {
         // Fallback to mock data if API fails
         const now = new Date();
@@ -134,9 +144,8 @@ const CoachDashboardOverview = () => {
       }
       
       // Sort upcoming sessions by date
-      sessionsData.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
-      
-      // Set upcoming sessions
+      sessionsData.sort((a, b) => new Date(a.start_date || a.start_datetime || a.datetime) - new Date(b.start_date || b.start_datetime || b.datetime));
+      // Set upcoming sessions (for dashboard display)
       setUpcomingSessions(sessionsData);
       
       // Fetch all courses for course count
@@ -156,7 +165,8 @@ const CoachDashboardOverview = () => {
       // Calculate stats
       const dashboardStats = {
         upcomingSessions: sessionsData.length,
-        totalCourses: totalCourses
+        totalCourses: totalCourses,
+        previousSessions: pastSessionsData.length
       };
       
       setStats(dashboardStats);
@@ -174,6 +184,8 @@ const CoachDashboardOverview = () => {
 
   return (
     <div className="member-dashboard-overview">
+      {/* DEBUG: Show sessionsData as JSON for troubleshooting */}
+
       <h1>Coach Dashboard</h1>
       <p className="welcome-message">
         Welcome to your Coach Dashboard. Here you can manage your upcoming sessions, view student registrations, and access teaching materials.
@@ -204,6 +216,18 @@ const CoachDashboardOverview = () => {
             <p className="stat-label">Registered students</p>
           </div>
         </div>
+
+        <div className="stat-cards">
+          <div className="stat-icon session-icon">
+            <FiCalendar />
+          </div>
+          <div className="stat-details">
+            <h3>Previous Sessions</h3>
+            <p className="stat-count">{stats.previousSessions}</p>
+            <p className="stat-label">past sessions</p>
+          </div>
+        </div>
+        
       </div>
       
       {/* Upcoming Sessions Section */}
@@ -211,7 +235,7 @@ const CoachDashboardOverview = () => {
         <h2><FiClock /> Your Upcoming Sessions</h2>
         {upcomingSessions.length > 0 ? (
           <div className="sessions-grid">
-            {upcomingSessions.map(session => (
+            {upcomingSessions.slice(0, 3).map(session => (
               <div className="session-card" key={session.id}>
                 <div className="session-header">
                   <h3>{session.title}</h3>

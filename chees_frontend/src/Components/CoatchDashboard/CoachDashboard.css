@@ -463,6 +463,10 @@
 }
 
 /* Sessions List on Dashboard Overview */
+.view-toggle{
+  margin-left: 1000px;
+}
+
 .sessions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -510,41 +514,123 @@
   gap: 10px;
 }
 
-.session-course {
-  font-weight: 500;
+.session-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px 0 rgba(0,0,0,0.07);
+  padding: 28px 28px 20px 28px;
+  margin-bottom: 28px;
+  transition: box-shadow 0.2s;
+  border: 1px solid #f1f1f1;
+  position: relative;
+}
+.session-card:hover {
+  box-shadow: 0 6px 24px 0 rgba(44,62,80,0.12);
+  border-color: #e0e0e0;
 }
 
-.session-students {
+.session-header {
   display: flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--text-muted);
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.session-header h3 {
+  font-size: 1.14rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1a1a1a;
+}
+
+.countdown-timer {
+  background: #fff0f3;
+  color: #e53935;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(229,57,53,0.07);
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+.session-details {
+  margin-top: 6px;
+}
+
+.session-course {
+  font-weight: 600;
+  color: #2e7d32;
+  margin-bottom: 2px;
+  font-size: 1rem;
+}
+
+.session-time {
+  font-size: 0.97rem;
+  color: #444;
+  margin-bottom: 7px;
+}
+.session-time .date {
+  margin-right: 14px;
+  font-weight: 500;
+}
+.session-time .time {
+  font-weight: 400;
 }
 
 .session-location {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-color);
+  margin-top: 8px;
+  padding: 10px 0 0 0;
+  border-top: 1px solid #f2f2f2;
+  font-size: 0.99rem;
+  color: #555;
 }
-
 .session-location.online {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background: #e8f5e9;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin-top: 10px;
+  margin-bottom: -40px;
+  display: block;
+  color: #388e3c;
+  font-weight: 600;
+  border: none;
+  text-align: center;
+}
+.session-location.online .join-session-btn {
+  margin-left: auto;
 }
 
 .join-session-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  background-color: #4caf50;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 4px;
+  gap: 6px;
+  background: linear-gradient(90deg, #43a047 60%, #66bb6a 100%);
+  color: #fff;
+  padding: 7px 20px;
+  border-radius: 5px;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 1px 4px 0 rgba(67,160,71,0.08);
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.join-session-btn:hover {
+  background: linear-gradient(90deg, #388e3c 60%, #43a047 100%);
+  box-shadow: 0 3px 12px 0 rgba(67,160,71,0.16);
 }
 
-.join-session-btn:hover {
-  background-color: #388e3c;
+@media (max-width: 700px) {
+  .session-card {
+    padding: 16px 7px 16px 12px;
+  }
+  .session-header h3 {
+    font-size: 1rem;
+  }
+  .join-session-btn {
+    padding: 7px 10px;
+    font-size: 14px;
+  }
 }
+

@@ -27,46 +27,44 @@ const AdminDashboardOverview = () => {
       // Initialize with zeros
       const statsData = { userCount: 0, courseCount: 0, sessionCount: 0, packageCount: 0, eventCount: 0, bookCount: 0 };
       
-      // Fetch users count - try both /api/users and /users endpoints
+      // Fetch all users count - using direct database count endpoint
       try {
-        // First try the API endpoint with /api prefix
+        // Try to get total user count from a dedicated endpoint
+        const usersCountResponse = await axiosInstance.get('/api/users/count');
+        if (usersCountResponse.data && typeof usersCountResponse.data.count === 'number') {
+          statsData.userCount = usersCountResponse.data.count;
+        }
+      } catch (countErr) {
+        console.error('Error fetching from /api/users/count:', countErr);
+        
+        // Fallback 1: Try getting all users without role filtering and count them
         try {
-          const usersResponse = await axiosInstance.get('/api/users');
+          const usersResponse = await axiosInstance.get('/api/all-users');
           if (usersResponse.data) {
-            // Handle nested response structure
-            if (usersResponse.data.success) {
-              statsData.userCount = usersResponse.data.data.meta?.total || 
-                               usersResponse.data.data.total || 
-                               usersResponse.data.data.data?.length || 
-                               usersResponse.data.data.length || 0;
-            } else {
-              // Handle direct array response
-              statsData.userCount = Array.isArray(usersResponse.data) ? usersResponse.data.length : 0;
+            // Handle different response formats
+            if (Array.isArray(usersResponse.data)) {
+              statsData.userCount = usersResponse.data.length;
+            } else if (usersResponse.data.data) {
+              statsData.userCount = Array.isArray(usersResponse.data.data) ? 
+                                 usersResponse.data.data.length : 
+                                 (usersResponse.data.data.total || 0);
             }
-            // Data successfully retrieved
           }
-        } catch (apiErr) {
-          console.error('Error fetching from /api/users:', apiErr);
+        } catch (allUsersErr) {
+          console.error('Error fetching from /api/all-users:', allUsersErr);
           
-          // Try the /users endpoint without /api prefix
+          // Fallback 2: Try the standard users endpoint (but this only shows roles 2,3)
           try {
-            const usersResponse = await axiosInstance.get('/users');
-            if (usersResponse.data) {
-              // Handle different response formats
-              if (Array.isArray(usersResponse.data)) {
-                statsData.userCount = usersResponse.data.length;
-              } else if (usersResponse.data.data) {
-                statsData.userCount = Array.isArray(usersResponse.data.data) ? 
-                                   usersResponse.data.data.length : 0;
+            const standardUsersResponse = await axiosInstance.get('/api/users');
+            if (standardUsersResponse.data) {
+              if (Array.isArray(standardUsersResponse.data)) {
+                statsData.userCount = standardUsersResponse.data.length;
               }
-              // Data retrieved
             }
-          } catch (userErr) {
-            // Data retrieved
+          } catch (standardErr) {
+            console.error('Error fetching standard users endpoint:', standardErr);
           }
         }
-      } catch (userErr) {
-        // Data retrieved
       }
       
       // Fetch courses count

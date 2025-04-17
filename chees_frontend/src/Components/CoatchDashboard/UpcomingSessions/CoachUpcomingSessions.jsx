@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FiCalendar, FiList, FiX, FiClock, FiUser, FiBook } from 'react-icons/fi';
+import { FiCalendar, FiList, FiX, FiClock, FiBook, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import axiosInstance from '../../../api/axios';
 import SessionCard from './CoachSessionCard';
 import SessionCalendar from './SessionCalendar';
 import './CoachSessions.css';
+import '../../AdminDashboard/SessionManagement/SessionManagement.css';
 import PageLoading from '../../PageLoading/PageLoading';
 
 const UpcomingSessions = () => {
@@ -15,6 +16,10 @@ const UpcomingSessions = () => {
   const [view, setView] = useState('list'); // 'list' or 'calendar'
   const [selectedDate, setSelectedDate] = useState(null);
   const [joinSessionData, setJoinSessionData] = useState(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sessionsPerPage] = useState(12);
 
   const handleDaySelect = (date) => {
     setSelectedDate(date);
@@ -38,19 +43,13 @@ const UpcomingSessions = () => {
         // Use the standard session endpoints since coach-specific endpoints are not available
         const response = await axiosInstance.get(`/api/course-sessions/${activeTab}`);
         
-        // Debug: Log coachId and all fetched sessions
-        console.log('Logged-in coachId:', coachId);
-        console.log('Fetched sessions from API:', response.data.data);
-        
+       
         // Filter sessions to only include those assigned to this coach
         const allSessionsData = response.data.data || [];
         const coachSessions = allSessionsData.filter(session => 
           session.coach_id === coachId || 
           (session.coach && session.coach.id === coachId)
         );
-        
-        // Debug: Log filtered sessions for this coach
-        console.log('Filtered sessions for this coach:', coachSessions);
         
         setSessions(coachSessions);
 
@@ -95,6 +94,30 @@ const UpcomingSessions = () => {
         );
       })
     : sessions;
+    
+  // Calculate pagination values
+  const totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
+  const indexOfLastSession = currentPage * sessionsPerPage;
+  const indexOfFirstSession = indexOfLastSession - sessionsPerPage;
+  const currentSessions = filteredSessions.slice(indexOfFirstSession, indexOfLastSession);
+  
+  // Pagination controls
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  
+  // Reset pagination when tab or filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, selectedDate]);
   
   const handleJoinSession = (session) => {
     setJoinSessionData(session);
@@ -207,16 +230,85 @@ const UpcomingSessions = () => {
             <p>You don't have any {activeTab} sessions {activeTab === 'upcoming' ? 'scheduled' : 'recorded'} where you're the assigned coach.</p>
           </div>
         ) : (
-          <div className={`sessions-list ${view === 'list' ? 'list-view' : ''}`}>
-            {sessions.map(session => (
-              <SessionCard 
-                key={session.id} 
-                session={session} 
-                onJoin={handleJoinSession}
-                isPastSession={activeTab === 'past'}
-              />
-            ))}
-          </div>
+          <>
+            <div className={`sessions-list ${view === 'list' ? 'list-view' : ''}`}>
+              {currentSessions.map(session => (
+                <SessionCard 
+                  key={session.id} 
+                  session={session} 
+                  onJoin={handleJoinSession}
+                  isPastSession={activeTab === 'past'}
+                />
+              ))}
+            </div>
+            
+            {/* Pagination */}
+            {filteredSessions.length > sessionsPerPage && (
+              <div className="pagination">
+                <button 
+                  className="pagination-button pagination-nav"
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                >
+                  <FiChevronLeft className="icon" /> Previous
+                </button>
+                
+                {/* First page is always shown */}
+                {totalPages > 0 && (
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    className={`pagination-button ${currentPage === 1 ? 'active' : ''}`}
+                  >
+                    1
+                  </button>
+                )}
+                
+                {/* Show ellipsis if there's a gap between first page and other visible pages */}
+                {currentPage > 3 && (
+                  <span className="pagination-ellipsis">...</span>
+                )}
+                
+                {/* Show pages before and after current page */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    // Show pages adjacent to current, but not first or last page (we handle those separately)
+                    return page !== 1 && page !== totalPages && Math.abs(page - currentPage) <= 1;
+                  })
+                  .map(page => (
+                    <button 
+                      key={page}
+                      className={`pagination-button ${currentPage === page ? 'active' : ''}`}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                
+                {/* Show ellipsis if there's a gap between last page and other visible pages */}
+                {currentPage < totalPages - 2 && (
+                  <span className="pagination-ellipsis">...</span>
+                )}
+                
+                {/* Last page is always shown if there are multiple pages */}
+                {totalPages > 1 && (
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    className={`pagination-button ${currentPage === totalPages ? 'active' : ''}`}
+                  >
+                    {totalPages}
+                  </button>
+                )}
+                
+                <button 
+                  className="pagination-button pagination-nav"
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next <FiChevronRight className="icon" />
+                </button>
+              </div>
+            )}
+          </>
         )
       )}
       

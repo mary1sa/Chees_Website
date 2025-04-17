@@ -257,7 +257,7 @@ const CourseDetail = () => {
           </div>
         ) : (
           <div className="cd-purchase-actions">
-            <div className="cd-price">${course.price.toFixed(2)}</div>
+            <div className="cd-price">{course.price.toFixed(2)} MAD</div>
             <button
               onClick={handlePurchase}
               className="cd-purchase-button"

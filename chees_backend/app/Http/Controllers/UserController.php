@@ -21,6 +21,18 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+    
+    public function getAllUsersWithoutRoleFilter()
+    {
+        $users = User::with('role')->get();
+        return response()->json($users);
+    }
+    
+    public function getUserCount()
+    {
+        $count = User::count();
+        return response()->json(['count' => $count]);
+    }
 
     public function getCoaches()
     {

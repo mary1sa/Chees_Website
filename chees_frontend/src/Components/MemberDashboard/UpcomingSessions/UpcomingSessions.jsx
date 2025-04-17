@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FiCalendar, FiList, FiX, FiClock, FiUser, FiBook } from 'react-icons/fi';
+import { FiCalendar, FiList, FiX, FiClock, FiUser, FiBook, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import axiosInstance from '../../../api/axios';
 import SessionCard from './SessionCard';
 import SessionCalendar from './SessionCalendar';
 import './Sessions.css';
+import '../../AdminDashboard/SessionManagement/SessionManagement.css';
 import PageLoading from '../../PageLoading/PageLoading';
 
 const UpcomingSessions = () => {
@@ -15,6 +16,10 @@ const UpcomingSessions = () => {
   const [view, setView] = useState('list'); // 'list' or 'calendar'
   const [selectedDate, setSelectedDate] = useState(null);
   const [joinSessionData, setJoinSessionData] = useState(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sessionsPerPage] = useState(12);
 
   const handleDaySelect = (date) => {
     setSelectedDate(date);
@@ -59,6 +64,30 @@ const UpcomingSessions = () => {
         );
       })
     : sessions;
+    
+  // Calculate pagination values
+  const totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
+  const indexOfLastSession = currentPage * sessionsPerPage;
+  const indexOfFirstSession = indexOfLastSession - sessionsPerPage;
+  const currentSessions = filteredSessions.slice(indexOfFirstSession, indexOfLastSession);
+  
+  // Pagination controls
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  
+  // Reset pagination when tab or filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, selectedDate]);
   
   const handleJoinSession = (session) => {
     setJoinSessionData(session);
@@ -164,23 +193,90 @@ const UpcomingSessions = () => {
           )}
         </div>
       ) : (
-        sessions.length === 0 ? (
-          <div className="empty-sessions">
-            <FiCalendar />
-            <h3>No {activeTab} sessions</h3>
+        filteredSessions.length === 0 ? (
+          <div className="no-sessions">
             <p>You don't have any {activeTab} sessions {activeTab === 'upcoming' ? 'scheduled' : 'recorded'}.</p>
           </div>
         ) : (
-          <div className={`sessions-list ${view === 'list' ? 'list-view' : ''}`}>
-            {sessions.map(session => (
-              <SessionCard 
-                key={session.id} 
-                session={session} 
-                onJoin={handleJoinSession}
-                isPastSession={activeTab === 'past'}
-              />
-            ))}
-          </div>
+          <>
+            <div className={`sessions-list ${view === 'list' ? 'list-view' : ''}`}>
+              {currentSessions.map(session => (
+                <SessionCard 
+                  key={session.id} 
+                  session={session} 
+                  onJoin={handleJoinSession}
+                  isPastSession={activeTab === 'past'}
+                />
+              ))}
+            </div>
+            
+            {/* Pagination */}
+            {filteredSessions.length > sessionsPerPage && (
+              <div className="pagination">
+                <button 
+                  className="pagination-button pagination-nav"
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                >
+                  <FiChevronLeft className="icon" /> Previous
+                </button>
+                
+                {/* First page is always shown */}
+                {totalPages > 0 && (
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    className={`pagination-button ${currentPage === 1 ? 'active' : ''}`}
+                  >
+                    1
+                  </button>
+                )}
+                
+                {/* Show ellipsis if there's a gap between first page and other visible pages */}
+                {currentPage > 3 && (
+                  <span className="pagination-ellipsis">...</span>
+                )}
+                
+                {/* Show pages before and after current page */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    // Show pages adjacent to current, but not first or last page (we handle those separately)
+                    return page !== 1 && page !== totalPages && Math.abs(page - currentPage) <= 1;
+                  })
+                  .map(page => (
+                    <button 
+                      key={page}
+                      className={`pagination-button ${currentPage === page ? 'active' : ''}`}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                
+                {/* Show ellipsis if there's a gap between last page and other visible pages */}
+                {currentPage < totalPages - 2 && (
+                  <span className="pagination-ellipsis">...</span>
+                )}
+                
+                {/* Last page is always shown if there are multiple pages */}
+                {totalPages > 1 && (
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    className={`pagination-button ${currentPage === totalPages ? 'active' : ''}`}
+                  >
+                    {totalPages}
+                  </button>
+                )}
+                
+                <button 
+                  className="pagination-button pagination-nav"
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next <FiChevronRight className="icon" />
+                </button>
+              </div>
+            )}
+          </>
         )
       )}
       

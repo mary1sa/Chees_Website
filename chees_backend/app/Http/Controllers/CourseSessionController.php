@@ -223,12 +223,17 @@ class CourseSessionController extends Controller
     /**
      * Get all past sessions (sessions that have ended)
      */
-    public function past()
+    public function past(Request $request)
     {
-        $sessions = CourseSession::with(['course', 'coach'])
-            ->where('end_datetime', '<', now())
-            ->orderBy('start_datetime', 'desc')
-            ->get();
+        $query = CourseSession::with(['course', 'coach'])
+            ->where('end_datetime', '<', now());
+
+        // Filter by coach_id if provided
+        if ($request->has('coach_id')) {
+            $query->where('coach_id', $request->coach_id);
+        }
+
+        $sessions = $query->orderBy('start_datetime', 'desc')->get();
 
         return response()->json([
             'success' => true,

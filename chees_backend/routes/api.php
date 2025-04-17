@@ -57,6 +57,8 @@ Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
 
 // User management routes
 Route::get('/users', [UserController::class, 'getAllUsers']);
+Route::get('/all-users', [UserController::class, 'getAllUsersWithoutRoleFilter']);
+Route::get('/users/count', [UserController::class, 'getUserCount']);
 Route::get('/users/{id}', [UserController::class, 'getUserById']);
 Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
