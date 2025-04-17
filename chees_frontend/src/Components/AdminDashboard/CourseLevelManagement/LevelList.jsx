@@ -4,6 +4,7 @@ import { FiPlus, FiEdit, FiTrash2, FiSearch, FiBarChart2 } from 'react-icons/fi'
 import axiosInstance from '../../../api/axios';
 import './CourseLevelManagement.css';
 import PageLoading from '../../PageLoading/PageLoading';
+import ConfirmDelete from '../../Confirm/ConfirmDelete';
 
 const LevelList = () => {
   const [levels, setLevels] = useState([]);
@@ -12,6 +13,8 @@ const LevelList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [levelToDelete, setLevelToDelete] = useState(null);
   
   useEffect(() => {
     fetchLevels();
@@ -69,13 +72,12 @@ const LevelList = () => {
     }
   };
   
-  const handleDelete = async (levelId) => {
-    if (!window.confirm('Are you sure you want to delete this level? This may affect courses assigned to this level.')) {
-      return;
-    }
+  const confirmDeleteLevel = async () => {
+    if (!levelToDelete) return;
     
     try {
-      const response = await axiosInstance.delete(`/api/course-levels/${levelId}`);
+      setLoading(true);
+      const response = await axiosInstance.delete(`/api/course-levels/${levelToDelete.id}`);
       
       if (response.data.success) {
         // Refresh the levels list and course counts
@@ -87,7 +89,16 @@ const LevelList = () => {
     } catch (err) {
       console.error('Error deleting level:', err);
       setError(`Error deleting level: ${err.message}`);
+    } finally {
+      setShowDeleteModal(false);
+      setLevelToDelete(null);
+      setLoading(false);
     }
+  };
+
+  const handleDelete = (level) => {
+    setLevelToDelete(level);
+    setShowDeleteModal(true);
   };
   
   if (loading) {
@@ -95,9 +106,9 @@ const LevelList = () => {
       <div className="level-list-container">
         <div className="level-list-header">
           <h2><FiBarChart2 /> Course Levels</h2>
-          <Link to="/admin/dashboard/levels/create" className="add-level-btn">
+          {/* <Link to="/admin/dashboard/levels/create" className="add-level-btn">
             <FiPlus /> Add New Level
-          </Link>
+          </Link> */}
         </div>
         
         <PageLoading text="Loading levels..." />
@@ -107,6 +118,16 @@ const LevelList = () => {
 
   return (
     <div className="level-list-container">
+      <ConfirmDelete 
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setLevelToDelete(null);
+        }}
+        onConfirm={confirmDeleteLevel}
+        itemName={levelToDelete ? levelToDelete.name : 'this level'}
+      />
+
       <div className="level-list-header">
         <h2><FiBarChart2 /> Course Levels</h2>
         {/* <Link to="/admin/dashboard/levels/create" className="add-level-btn">
@@ -170,7 +191,7 @@ const LevelList = () => {
                         <FiEdit />
                       </Link>
                       <button
-                        onClick={() => handleDelete(level.id)}
+                        onClick={() => handleDelete(level)}
                         className="delete-button"
                         title="Delete Level"
                       >

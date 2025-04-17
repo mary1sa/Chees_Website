@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiEdit, FiTrash2, FiDownload, FiEye } from 'react-icons/fi';
+import { FiPlus, FiEdit, FiTrash2, FiDownload, FiEye, FiChevronLeft, FiChevronRight, FiList } from 'react-icons/fi';
 import axiosInstance from '../../../api/axios';
 import '../CourseManagement/CourseManagement.css';
 import '../../AdminDashboard/UserTable.css';
 import PageLoading from '../../PageLoading/PageLoading';
+import ConfirmDelete from '../../Confirm/ConfirmDelete';
 
 const CourseMaterialList = () => {
   const [materials, setMaterials] = useState([]);
@@ -16,12 +17,17 @@ const CourseMaterialList = () => {
   const [filterType, setFilterType] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
+  const ITEMS_PER_PAGE_GRID = 8;
+  const ITEMS_PER_PAGE_LIST = 10;
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [materialToDelete, setMaterialToDelete] = useState(null);
   const navigate = useNavigate();
   
   useEffect(() => {
     fetchCourses();
     fetchMaterials();
-  }, [searchTerm, filterCourse, filterType, currentPage]);
+  }, [searchTerm, filterCourse, filterType, currentPage, viewMode]);
   
   const fetchCourses = async () => {
     try {
@@ -51,30 +57,69 @@ const CourseMaterialList = () => {
         queryParams.append('file_type', filterType);
       }
       
+      // Add pagination parameters
       queryParams.append('page', currentPage);
       
-      const response = await axiosInstance.get(`/api/course-materials?${queryParams.toString()}`);
+      // Set different items per page based on view mode
+      const perPage = viewMode === 'grid' ? ITEMS_PER_PAGE_GRID : ITEMS_PER_PAGE_LIST;
+      queryParams.append('per_page', perPage);
+      
+      const url = `/api/course-materials?${queryParams.toString()}`;
+      console.log('Fetching materials with URL:', url);
+      
+      const response = await axiosInstance.get(url);
+      console.log('Materials response:', response.data);
+      
       if (response.data.success) {
-        setMaterials(response.data.data.data);
-        setTotalPages(response.data.data.last_page);
+        // Check if data is paginated by looking for the pagination structure
+        if (response.data.data && response.data.data.data && Array.isArray(response.data.data.data)) {
+          // Laravel paginated response format
+          console.log('Using paginated data format');
+          setMaterials(response.data.data.data);
+          setTotalPages(response.data.data.last_page || 1);
+          console.log(`Got ${response.data.data.data.length} materials, page ${currentPage} of ${response.data.data.last_page}`);
+        } else if (Array.isArray(response.data.data)) {
+          // Legacy format (not paginated)
+          console.log('Using legacy non-paginated format');
+          setMaterials(response.data.data);
+          // Force artificial pagination for display purposes
+          const totalItems = response.data.data.length;
+          const calculatedTotalPages = Math.ceil(totalItems / perPage);
+          setTotalPages(calculatedTotalPages || 1);
+          
+          // Manual pagination on frontend if backend doesn't support it
+          const startIndex = (currentPage - 1) * perPage;
+          const endIndex = startIndex + perPage;
+          const paginatedMaterials = response.data.data.slice(startIndex, endIndex);
+          console.log(`Manual pagination: showing ${paginatedMaterials.length} of ${totalItems} materials`);
+          setMaterials(paginatedMaterials);
+        } else {
+          console.error('Unexpected response format:', response.data);
+          setMaterials([]);
+          setTotalPages(1);
+        }
       } else {
+        console.error('API returned error:', response.data);
         setError('Failed to fetch course materials');
+        setMaterials([]);
+        setTotalPages(1);
       }
     } catch (err) {
       console.error('Error fetching course materials:', err);
       setError('Error loading course materials. Please try again later.');
+      setMaterials([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
   };
   
-  const handleDelete = async (materialId) => {
-    if (!window.confirm('Are you sure you want to delete this material?')) {
-      return;
-    }
+  const confirmDeleteMaterial = async () => {
+    if (!materialToDelete) return;
     
     try {
-      const response = await axiosInstance.delete(`/api/course-materials/${materialId}`);
+      setLoading(true);
+      const response = await axiosInstance.delete(`/api/course-materials/${materialToDelete.id}`);
       if (response.data.success) {
         // Refresh the materials list
         fetchMaterials();
@@ -83,7 +128,16 @@ const CourseMaterialList = () => {
       }
     } catch (err) {
       setError(`Error deleting course material: ${err.message}`);
+    } finally {
+      setShowDeleteModal(false);
+      setMaterialToDelete(null);
+      setLoading(false);
     }
+  };
+
+  const handleDelete = (material) => {
+    setMaterialToDelete(material);
+    setShowDeleteModal(true);
   };
   
   const handleSearchChange = (e) => {
@@ -261,6 +315,16 @@ const CourseMaterialList = () => {
   
   return (
     <div className="course-material-container">
+      <ConfirmDelete 
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setMaterialToDelete(null);
+        }}
+        onConfirm={confirmDeleteMaterial}
+        itemName={materialToDelete ? materialToDelete.title : 'this material'}
+      />
+      
       <div className="page-header">
         <h1 className="page-title"> Course Materials </h1>
         {/* <Link 
@@ -343,8 +407,7 @@ const CourseMaterialList = () => {
                   <th width="10%">Type</th>
                   <th width="25%">Description</th>
                   <th width="10%">Downloadable</th>
-                  <th width="10%">Created</th>
-                  <th width="10%">Actions</th>
+                  <th width="12%">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -380,9 +443,6 @@ const CourseMaterialList = () => {
                         </span>
                       }
                     </td>
-                    <td className="material-date-cell">
-                      {new Date(material.created_at).toLocaleDateString()}
-                    </td>
                     <td className="actions-cell">
                       <Link 
                         to={`/admin/dashboard/course-materials/${material.id}/edit`}
@@ -392,7 +452,7 @@ const CourseMaterialList = () => {
                         <FiEdit />
                       </Link>
                       <button 
-                        onClick={() => handleDelete(material.id)}
+                        onClick={() => handleDelete(material)}
                         className="action-icon-button delete-button"
                         title="Delete material"
                       >
@@ -438,24 +498,69 @@ const CourseMaterialList = () => {
             </table>
           </div>
           
+
           {totalPages > 1 && (
             <div className="pagination">
               <button 
-                onClick={handlePreviousPage} 
+                className="pagination-button pagination-nav"
+                onClick={handlePreviousPage}
                 disabled={currentPage === 1}
-                className="pagination-button"
               >
-                Previous
+                <FiChevronLeft className="icon" /> Previous
               </button>
-              <span className="pagination-info">
-                Page {currentPage} of {totalPages}
-              </span>
+              
+              {/* First page is always shown */}
+              {totalPages > 0 && (
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  className={`pagination-button ${currentPage === 1 ? 'active' : ''}`}
+                >
+                  1
+                </button>
+              )}
+              
+              {/* Show ellipsis if there's a gap between first page and other visible pages */}
+              {currentPage > 3 && (
+                <span className="pagination-ellipsis">...</span>
+              )}
+              
+              {/* Show pages before and after current page */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter(page => {
+                  // Show pages adjacent to current, but not first or last page (we handle those separately)
+                  return page !== 1 && page !== totalPages && Math.abs(page - currentPage) <= 1;
+                })
+                .map(page => (
+                  <button 
+                    key={page}
+                    className={`pagination-button ${currentPage === page ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+              
+              {/* Show ellipsis if there's a gap between last page and other visible pages */}
+              {currentPage < totalPages - 2 && (
+                <span className="pagination-ellipsis">...</span>
+              )}
+              
+              {/* Last page is always shown if there are multiple pages */}
+              {totalPages > 1 && (
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  className={`pagination-button ${currentPage === totalPages ? 'active' : ''}`}
+                >
+                  {totalPages}
+                </button>
+              )}
+              
               <button 
-                onClick={handleNextPage} 
+                className="pagination-button pagination-nav"
+                onClick={handleNextPage}
                 disabled={currentPage === totalPages}
-                className="pagination-button"
               >
-                Next
+                Next <FiChevronRight className="icon" />
               </button>
             </div>
           )}

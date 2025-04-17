@@ -5,6 +5,7 @@ import axiosInstance from '../../../api/axios';
 import './CourseManagement.css';
 import '../../AdminDashboard/UserTable.css';
 import PageLoading from '../../PageLoading/PageLoading';
+import ConfirmDelete from '../../Confirm/ConfirmDelete';
 
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
@@ -16,6 +17,8 @@ const CourseList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [levels, setLevels] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState(null);
   
   useEffect(() => {
     fetchLevels();
@@ -68,13 +71,12 @@ const CourseList = () => {
     }
   };
   
-  const handleDelete = async (courseId) => {
-    if (!window.confirm('Are you sure you want to delete this course?')) {
-      return;
-    }
+  const confirmDeleteCourse = async () => {
+    if (!courseToDelete) return;
     
     try {
-      const response = await axiosInstance.delete(`/api/courses/${courseId}`);
+      setLoading(true);
+      const response = await axiosInstance.delete(`/api/courses/${courseToDelete.id}`);
       if (response.data.success) {
         // Refresh the courses list
         fetchCourses();
@@ -83,7 +85,16 @@ const CourseList = () => {
       }
     } catch (err) {
       setError(`Error deleting course: ${err.message}`);
+    } finally {
+      setShowDeleteModal(false);
+      setCourseToDelete(null);
+      setLoading(false);
     }
+  };
+
+  const handleDelete = (course) => {
+    setCourseToDelete(course);
+    setShowDeleteModal(true);
   };
   
   const handleStatusToggle = async (courseId, currentStatus) => {
@@ -146,6 +157,16 @@ const CourseList = () => {
   
   return (
     <div className="table-container">
+      <ConfirmDelete 
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCourseToDelete(null);
+        }}
+        onConfirm={confirmDeleteCourse}
+        itemName={courseToDelete ? courseToDelete.title : 'this course'}
+      />
+
       <h1 className="table-title">Course Management</h1>
       
       
@@ -265,7 +286,7 @@ const CourseList = () => {
                     
                     <button 
                       className="action-btn delete-btn"
-                      onClick={() => handleDelete(course.id)}
+                      onClick={() => handleDelete(course)}
                       title="Delete Course"
                     >
                       <FiTrash2 className="icon" />

@@ -85,10 +85,26 @@ const CourseMaterialForm = ({ isEditing = false }) => {
     try {
       const response = await axiosInstance.get(`/api/course-sessions?course_id=${courseId}`);
       if (response.data.success) {
-        setSessions(response.data.data);
+        // Check if the response is paginated or not
+        if (response.data.data && response.data.data.data) {
+          // Handle paginated response (with data.data structure)
+          console.log('Sessions: Using paginated data format');
+          setSessions(response.data.data.data);
+        } else if (Array.isArray(response.data.data)) {
+          // Handle non-paginated response
+          console.log('Sessions: Using non-paginated data format');
+          setSessions(response.data.data);
+        } else {
+          // Fallback to empty array if format is unexpected
+          console.warn('Sessions: Unexpected data format in response:', response.data);
+          setSessions([]);
+        }
+      } else {
+        setSessions([]);
       }
     } catch (err) {
       console.error('Error fetching sessions:', err);
+      setSessions([]);
     }
   };
   
@@ -96,10 +112,26 @@ const CourseMaterialForm = ({ isEditing = false }) => {
     try {
       const response = await axiosInstance.get(`/api/course-materials?course_id=${courseId}`);
       if (response.data.success) {
-        setCourseMaterials(response.data.data.data || []);
+        // Check if the response is paginated or not
+        if (response.data.data && response.data.data.data) {
+          // Handle paginated response (with data.data structure)
+          console.log('Course Materials: Using paginated data format');
+          setCourseMaterials(response.data.data.data);
+        } else if (Array.isArray(response.data.data)) {
+          // Handle non-paginated response
+          console.log('Course Materials: Using non-paginated data format');
+          setCourseMaterials(response.data.data);
+        } else {
+          // Fallback to empty array if format is unexpected
+          console.warn('Course Materials: Unexpected data format in response:', response.data);
+          setCourseMaterials([]);
+        }
+      } else {
+        setCourseMaterials([]);
       }
     } catch (err) {
       console.error('Error fetching course materials:', err);
+      setCourseMaterials([]);
     }
   };
   
