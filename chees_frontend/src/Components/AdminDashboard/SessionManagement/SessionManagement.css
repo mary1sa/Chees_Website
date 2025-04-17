@@ -1284,12 +1284,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #e5e5e5 !important;
 }
 
 .session-modal-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: var(--color-text-primary);
+  color: var(--primary-color);
+  text-decoration: underline;
 }
 
 .session-modal-close {
