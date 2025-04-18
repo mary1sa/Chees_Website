@@ -83,7 +83,7 @@ if (user.role === 'admin') {
       <img src="./loginchees.jpg" alt="" className="login-image"/>
       </div>
       <div className='login-form-container'>
-<h2>Login</h2>   
+<h2 className='logintitle'>Login</h2>   
    {error && <div className="alert alert-danger">{error}</div>}
       
       <form onSubmit={handleLogin} className='login-form'>

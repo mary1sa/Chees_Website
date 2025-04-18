@@ -142,21 +142,26 @@ textarea.form-control {
     text-transform: uppercase;
     border: none;
     margin-top: 1rem;
+    
+    
 }
 
-.btn-primary {
+.btn-register {
     background: #113c0b;
     color: white;
     box-shadow: 0 4px 12px rgba(17, 60, 11, 0.2);
+   display: flex;
+   align-items: center;
+   justify-content: center;
 }
 
-.btn-primary:hover {
+.btn-register:hover {
     background: #0a2a06;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(17, 60, 11, 0.3);
 }
 
-.btn-primary:disabled {
+.btn-register:disabled {
     background: #a5a5a5;
     transform: none;
     box-shadow: none;
