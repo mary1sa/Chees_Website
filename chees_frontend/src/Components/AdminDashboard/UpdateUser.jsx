@@ -208,10 +208,10 @@ navigate("/admin/dashboard/fetchusers")
 />}
 
       <form onSubmit={handleSubmit} className="create-user-form" encType="multipart/form-data">
-        <div className="image-upload-section">
+        <div className="imageuploadsection">
           <label 
             htmlFor="profile_picture" 
-            className={`file-label ${previewImage ? 'has-image' : ''}`}
+            className={`filelabel ${previewImage ? 'has-image' : ''}`}
           >
             <input
               type="file"

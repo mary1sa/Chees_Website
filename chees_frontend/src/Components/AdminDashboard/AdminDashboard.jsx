@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -7,9 +9,11 @@ import {
   FiChevronDown, FiChevronRight,
   FiCreditCard, FiFileText, FiList, 
   FiLayers, FiAward, FiBook, FiPlusCircle,
-  FiBarChart2, FiUser, FiPlus, FiShoppingCart,
+  FiBarChart2, FiUserCheck, FiUser, FiPlus, FiShoppingCart,FiGrid
+
 } from 'react-icons/fi';
 import './AdminDashboard.css';
+import { Star } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -41,14 +45,12 @@ const AdminDashboard = () => {
       setActiveMenu('Session Management');
     } else if (location.pathname.includes('/admin/dashboard/courses')) {
       setActiveMenu('Course Management');
-    } else if (location.pathname.includes('/admin/dashboard/packages')) {
-      setActiveMenu('Course Package Management');
     } else if (location.pathname.includes('/admin/dashboard/levels')) {
       setActiveMenu('Course Level Management');
+    } else if (location.pathname.includes('/admin/dashboard/enrollments')) {
+      setActiveMenu('Enrollments');
     } else if (location.pathname.includes('/admin/dashboard/books')) {
       setActiveMenu('Book Store');
-    } else if (location.pathname.includes('/admin/dashboard/course-materials')) {
-      setActiveMenu('Course Materials');
     }
 
     const handleResize = () => {
@@ -84,6 +86,8 @@ const AdminDashboard = () => {
       icon: <FiHome />,
       path: "/admin/dashboard"
     },
+
+   
     {
       title: "User Management",
       icon: <FiUsers />,
@@ -126,6 +130,55 @@ const AdminDashboard = () => {
         }
       ]
     },
+
+
+    {
+      title: "Coatchs",
+      icon: <FiAward />,
+      submenus: [
+        { 
+          title: " All Coatches", 
+          path: "Fetchcoatches",
+          // icon: <FiFileText className="submenu-icon" />
+          icon: <FiList className="submenu-icon" />
+
+        },
+        { 
+          
+          title: "CoatchCategorys", 
+          path: "CoachSpecialization",
+          icon: <FiGrid className="submenu-icon" />       },
+          { 
+          
+            title: "Request Pending", 
+            path: "RequestPending",
+            icon: <FiFileText className="submenu-icon" />
+ 
+               },
+               { 
+                 title: "Add coach", 
+                 path: "CreateCoatch",
+                 icon: <FiUserPlus className="submenu-icon" />
+               },
+      ]
+    },
+    {
+      title: "Coach Availability",
+      icon: <FiCalendar />,  
+      submenus: [
+        {
+          title: "Coach Availability",
+          icon: <FiList />,  
+          path: "coachavailability"
+        },
+        { 
+          title: "Add Availability", 
+          path: "creatavailability",
+          icon: <FiPlusCircle className="submenu-icon" /> 
+        },
+      ]
+    }
+,    
     {
       title: "Courses",
       icon: <FiBook />,
@@ -143,22 +196,6 @@ const AdminDashboard = () => {
       ]
     },
     {
-      title: "Course Materials",
-      icon: <FiFileText />,
-      submenus: [
-        { 
-          title: "All Course Materials", 
-          path: "course-materials",
-          icon: <FiList className="submenu-icon" />
-        },
-        { 
-          title: "Add Course Material", 
-          path: "course-materials/create",
-          icon: <FiPlusCircle className="submenu-icon" />
-        }
-      ]
-    },
-    {
       title: "Sessions",
       icon: <FiCalendar />,
       submenus: [
@@ -167,6 +204,32 @@ const AdminDashboard = () => {
           path: "sessions",
           icon: <FiList className="submenu-icon" />
         },
+      ]
+    },
+    {
+      title: "Enrollments",
+      icon: <FiCreditCard />,
+      submenus: [
+        { 
+          title: "All Enrollments", 
+          path: "enrollments",
+          icon: <FiList className="submenu-icon" />
+        },
+        { 
+          title: "Enrollment Packages", 
+          path: "enrollments/packages",
+          icon: <FiShoppingCart className="submenu-icon" />
+        },
+        { 
+          title: "Create Enrollment", 
+          path: "enrollments/create",
+          icon: <FiPlusCircle className="submenu-icon" />
+        },
+        { 
+          title: "Enrollment Sessions", 
+          path: "enrollments/sessions",
+          icon: <FiCalendar className="submenu-icon" />
+        }
       ]
     },
     {
@@ -180,36 +243,14 @@ const AdminDashboard = () => {
         },
         { 
           title: "Add Level", 
-          path: "levels/create",
+          path: "createlevel",
           icon: <FiPlusCircle className="submenu-icon" />
         }
       ]
-    },
-    {
-      title: "Financial",
-      icon: <FiDollarSign />,
-      submenus: [
-        { 
-          title: "Payments", 
-          path: "payments",
-          icon: <FiCreditCard className="submenu-icon" />
-        },
-        { 
-          title: "Invoices", 
-          path: "invoices",
-          icon: <FiFileText className="submenu-icon" />
-        }
-      ]
-    },
-    {
+    },{
       title: "Book Store",
       icon: <FiBook />, 
       submenus: [
-        { 
-          title: "Dashboard", 
-          path: "books/dashboard",
-          icon: <FiBarChart2 className="submenu-icon" />
-        },
         { 
           title: "All Books", 
           path: "books",
@@ -231,6 +272,27 @@ const AdminDashboard = () => {
           icon: <FiShoppingCart className="submenu-icon" />
         }
       ]
+    },
+    {
+      title: "Financial",
+      icon: <FiDollarSign />,
+      submenus: [
+        { 
+          title: "Payments", 
+          path: "payments",
+          icon: <FiCreditCard className="submenu-icon" />
+        },
+        { 
+          title: "Invoices", 
+          path: "invoices",
+          icon: <FiFileText className="submenu-icon" />
+        }
+      ]
+    },
+    {
+      title: "reviewTable",
+      icon: <Star />,
+      path: "reviewTable"
     },
     {
       title: "Settings",
@@ -265,10 +327,11 @@ const AdminDashboard = () => {
           
           <div className="admin-profile">
             <img src={
-                   adminData.profile_picture
-                      ? `http://localhost:8000/storage/${adminData.profile_picture}`
-                      : '/anony.jpg'
-                  } alt={adminData.name} className="admin-avatar" />
+              adminData.profile_picture
+                ? `http://localhost:8000/storage/${adminData.profile_picture}`
+                : '/anony.jpg'
+            } alt={adminData.name} className="admin-avatar" />
+
             <div className="profile-info">
               <span className="admin-name">{adminData.first_name} {adminData.last_name}</span>
               <span className="admin-role">{adminData.role}</span>
@@ -303,8 +366,7 @@ const AdminDashboard = () => {
                   </Link>
                 ) : (
                   <>
-                    <div
-                      className={`menu-item ${activeMenu === item.title ? 'active' : ''}`}
+                    <div className={`menu-item ${activeMenu === item.title ? 'active' : ''}`}
                       onClick={() => toggleMenu(item.title)}
                     >
                       <span className="menu-icon">{item.icon}</span>

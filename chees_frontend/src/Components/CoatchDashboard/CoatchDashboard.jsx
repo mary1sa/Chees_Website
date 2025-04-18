@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -6,7 +7,7 @@ import {
   FiLogOut, FiBell, FiSearch, FiSun, FiMoon,
   FiChevronDown, FiChevronRight, FiChevronLeft,
   FiCreditCard, FiFileText, FiList,
-  FiAward, FiBook
+  FiAward, FiBook,FiStar
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -120,6 +121,11 @@ const CoatchDashboard = () => {
           icon: <FiFileText className="submenu-icon" />
         }
       ]
+    },
+    {
+      title: "CoachReview",
+      icon:<FiStar />,
+      path: "coachReviews"
     },
     {
       title: "Settings",
@@ -244,5 +250,6 @@ const CoatchDashboard = () => {
     </div>
   );
 };
+
 
 export default CoatchDashboard;

@@ -85,6 +85,10 @@ import UserAvailabilities from './Components/Coatches/Member/UserAvailabilities'
 import AdminCoachAvailability from './Components/Coatches/Admin/AdminCoachAvailability';
 import AdminCreateAvailability from './Components/Coatches/Admin/AdminCreateAvailability';
 import AdminUpdateAvailability from './Components/Coatches/Admin/AdminUpdateAvailability';
+
+import CoachReviewForm from './Components/Coatches/Member/CoachReviewForm';
+import CoachReviews from './Components/Coatches/Coches/CoachReviews';
+
 import Books from './Components/MemberDashboard/BookStor/Books';
 import BookDetail from './Components/MemberDashboard/BookStor/BookDetail';
 import OrderForm from './Components/MemberDashboard/BookStor/OrderForm';
@@ -92,6 +96,8 @@ import BookStoreDashboard from './Components/BookStore/BookStoreDashboard';
 import Authors from './Components/MemberDashboard/BookStor/Authors';
 // import MemberOrders from './Components/MemberDashboard/BookStor/MemberOrders';
 import OrderDetails from './Components/MemberDashboard/BookStor/OrderDetails';
+import ReviewTable from './Components/Coatches/Admin/ReviewTable';
+
 
 function App() {
   return (
@@ -173,7 +179,9 @@ function App() {
           <Route path="coachavailability" element={<AdminCoachAvailability />} />
           <Route path="creatavailability" element={<AdminCreateAvailability />} />
           <Route path="updateavailability/:id" element={<AdminUpdateAvailability/>} />
-          
+          {/* review table */}
+          <Route path="reviewTable" element={<ReviewTable />} />
+
           {/* Default Route */}
           <Route index element={<AdminDashboardOverview />} />
         </Route>
@@ -221,6 +229,7 @@ function App() {
           <Route path="upcoming-sessions" element={<UpcomingSessions />} />
           {/* Coach Booking Route */}
           <Route path="bookingcoach" element={<UserAvailabilities />} />
+          <Route path="CoachReviewForm" element={<CoachReviewForm />} />
 
           {/* Default Route */}
           <Route index element={<MemberDashboardOverview />} />
@@ -235,6 +244,15 @@ function App() {
   }
 >
   <Route path="registrations" element={<UserEventRegistrations />} />
+
+  {/* <Route path="CreateProfile" element={< CreateCoacheProfile />} />
+  <Route path="creatavailability" element={<  CreateCoachAvailability />} />
+  <Route path="coachavailability" element={<  CoachAvailability />} />
+  <Route path="Updateavailability/:id" element={<  UpdateCoachAvailability />} /> */}
+  <Route path="coachReviews" element={< CoachReviews />} />
+
+
+
   <Route path="CreateProfile" element={<CreateCoacheProfile />} />
   <Route path="creatavailability" element={<CreateCoachAvailability />} />
   <Route path="coachavailability" element={<CoachAvailability />} />
@@ -251,6 +269,7 @@ function App() {
   <Route path="course-materials" element={<MemberCourseMaterials />} />
   <Route path="course-materials/:courseId" element={<MemberCourseMaterials />} />
   <Route index element={<CoachDashboardOverview />} />
+
 </Route>
 
         <Route

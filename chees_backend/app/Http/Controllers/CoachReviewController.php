@@ -3,12 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Models\CoachReview;
-use App\Models\Coach;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class CoachReviewController extends Controller
 {
+//admin
+public function adminIndex()
+{
+    return CoachReview::with(['user', 'coach'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+}
+public function showReview($id)
+{
+    $review = CoachReview::with(['coach', 'user'])
+               ->findOrFail($id)
+               ;
+
+               return response()->json($review);
+
+}
+    public function adminUpdate(Request $request, $id)
+    {
+        $review = CoachReview::findOrFail($id);
+        
+        $validated = $request->validate([
+            'rating' => 'sometimes|integer|min:1|max:5',
+            'review_text' => 'nullable|string',
+            'teaching_clarity_rating' => 'sometimes|integer|min:1|max:5',
+            'communication_rating' => 'sometimes|integer|min:1|max:5',
+            'knowledge_depth_rating' => 'sometimes|integer|min:1|max:5',
+        ]);
+
+        $review->update($validated);
+        
+        return response()->json([
+            'message' => 'Review updated successfully',
+            'updated_review' => $review->refresh()
+        ]);
+    }
+
+    public function adminDestroy($id)
+    {
+        $review = CoachReview::findOrFail($id);
+        $review->delete();
+        
+        return response()->json([
+            'message' => 'Review deleted successfully',
+            'deleted_review' => $review
+        ]);
+    }
+    //member
     public function store(Request $request)
     {
         $request->validate([
@@ -42,10 +87,62 @@ class CoachReviewController extends Controller
         return response()->json(['message' => 'Review submitted successfully!'], 200);
     }
 
-    public function show($coachId)
+    public function update(Request $request)
     {
-        $reviews = CoachReview::where('coach_id', $coachId)->get();
+        $request->validate([
+            'coach_id' => 'required|exists:coaches,id',
+            'user_id' => 'required|exists:users,id',
+            'rating' => 'required|integer|min:1|max:5',
+            'review_text' => 'nullable|string',
+            'teaching_clarity_rating' => 'nullable|integer|min:1|max:5',
+            'communication_rating' => 'nullable|integer|min:1|max:5',
+            'knowledge_depth_rating' => 'nullable|integer|min:1|max:5',
+        ]);
 
-        return response()->json($reviews);
+        $review = CoachReview::where('coach_id', $request->coach_id)
+            ->where('user_id', $request->user_id)
+            ->first();
+
+        if (!$review) {
+            return response()->json(['message' => 'Review not found.'], 404);
+        }
+
+        $review->rating = $request->rating;
+        $review->review_text = $request->review_text;
+        $review->teaching_clarity_rating = $request->teaching_clarity_rating;
+        $review->communication_rating = $request->communication_rating;
+        $review->knowledge_depth_rating = $request->knowledge_depth_rating;
+        $review->save();
+
+        return response()->json(['message' => 'Review updated successfully!'], 200);
     }
+
+    public function show($coachId)
+{
+    $reviews = CoachReview::with('user')->where('coach_id', $coachId)->get();
+
+    return response()->json($reviews);
+}
+
+public function destroy(Request $request)
+{
+    $request->validate([
+        'coach_id' => 'required|exists:coaches,id',
+        'user_id' => 'required|exists:users,id',
+    ]);
+
+    $review = CoachReview::where('coach_id', $request->coach_id)
+        ->where('user_id', $request->user_id)
+        ->first();
+
+    if (!$review) {
+        return response()->json(['message' => 'Review not found.'], 404);
+    }
+
+    $review->delete();
+
+    return response()->json(['message' => 'Review deleted successfully!'], 200);
+}
+
+
 }

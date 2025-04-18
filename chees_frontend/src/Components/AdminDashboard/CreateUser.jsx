@@ -183,10 +183,10 @@ const navigate=useNavigate()
 />}
       <form onSubmit={handleCreateUser} className="create-user-form">
 
-      <div className="image-upload-section">
+      <div className="imageuploadsection">
   <label 
-    htmlFor="profile_picture" 
-    className={`file-label ${previewImage ? 'has-image' : ''}`}
+    htmlFor="profilepicture" 
+    className={`filelabel ${previewImage ? 'has-image' : ''}`}
   >
     <input
       type="file"

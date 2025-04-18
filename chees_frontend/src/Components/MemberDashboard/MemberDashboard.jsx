@@ -7,7 +7,10 @@ import {
   FiChevronDown, FiChevronRight, FiChevronLeft,
   FiCreditCard, FiFileText, FiList, FiBook,
   FiBookmark, FiPlay, FiAward, FiHeart,
-  FiUser, FiShoppingCart
+  FiUser,
+  FiStar
+
+  , FiShoppingCart
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -134,6 +137,16 @@ const MemberDashboard = () => {
       ]
     },
     {
+
+      title: "bookingcoach",
+      icon: <FiCalendar />,
+      path: "bookingcoach"
+    },
+    {
+      title: "CoachReviewForm",
+      icon:<FiStar />,
+      path: "CoachReviewForm"
+    },{
       title: "Coach Booking",
       icon: <FiCalendar />,
       path: "/member/dashboard/bookingcoach"

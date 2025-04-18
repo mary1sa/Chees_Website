@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\CoachAvailabilityController;
 use App\Http\Controllers\CoachesController;
 use App\Http\Controllers\CoachReviewController;
 use App\Http\Controllers\CoachSpecializationCategoryController;
+use App\Http\Controllers\CoursePackageController;
+use App\Http\Controllers\CourseProgressController;
 use App\Http\Controllers\MemberBookingController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -73,6 +76,61 @@ Route::post('specializations', [CoachSpecializationCategoryController::class, 's
 Route::get('specializations/{id}', [CoachSpecializationCategoryController::class, 'show']);
 Route::put('specializations/{id}', [CoachSpecializationCategoryController::class, 'update']);
 Route::delete('specializations/{id}', [CoachSpecializationCategoryController::class, 'destroy']);
+//Coach availability
+Route::get('coach_availability', [CoachAvailabilityController::class, 'index']); 
+
+Route::get('coach_availability/{coachId}', [CoachAvailabilityController::class, 'show']); 
+Route::post('coach_availability', [CoachAvailabilityController::class, 'store']); 
+Route::put('coach_availability/{id}', [CoachAvailabilityController::class, 'update']); 
+Route::delete('coach_availability/{id}', [CoachAvailabilityController::class, 'destroy']);
+Route::get('show_availability/{id}', [CoachAvailabilityController::class, 'showavail']); 
+
+Route::get('/coachby-user/{user_id}', [CoachesController::class, 'getCoachByUser']);
+
+//member bookin coach
+Route::get('/available-slots', [MemberBookingController::class, 'getAvailableSlots']);
+Route::post('/book-slot', [MemberBookingController::class, 'bookSlot']);
+
+
+
+//coachs review
+Route::post('/reviews', [CoachReviewController::class, 'store']);
+Route::get('/reviews/{coachId}', [CoachReviewController::class, 'show']);
+Route::put('/reviewsupdate/{id}', [CoachReviewController::class, 'update']);
+Route::delete('/coach-reviews', [CoachReviewController::class, 'destroy']);
+
+Route::get('/adminreviews', [CoachReviewController::class, 'adminIndex']);
+
+Route::get('/showreview/{id}', [CoachReviewController::class, 'showReview']);
+     
+Route::delete('/admin/reviews/{id}', [CoachReviewController::class, 'adminDestroy']);
+
+
+Route::put('/admin/reviews/{id}', [CoachReviewController::class, 'adminUpdate']);
+
+// Coach API routes
+
+
+    Route::get('fetchcoaches', [CoachesController::class, 'adminIndex']);
+    Route::get('approved-coaches', [CoachesController::class, 'indexApprovedRejected']);
+    Route::get('/coaches/{id}', [CoachesController::class, 'show']);
+
+    Route::get('pending-coaches', [CoachesController::class, 'pendingCoaches']);
+
+    Route::post('/coaches', [CoachesController::class, 'store']);
+
+    Route::put('/coaches/{id}', [CoachesController::class, 'update']);
+
+    Route::delete('/coaches/{id}', [CoachesController::class, 'destroy']);
+
+    Route::put('/approve-coach/{id}', [CoachesController::class, 'approve']);
+
+    Route::put('/reject-coach/{id}', [CoachesController::class, 'reject']);
+
+
+
+
+
 //Coaches
 //Route::apiResource('coaches', CoachController::class);
 // Event Types
