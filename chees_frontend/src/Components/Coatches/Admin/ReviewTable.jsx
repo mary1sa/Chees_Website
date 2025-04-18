@@ -221,10 +221,10 @@ const ReviewTable = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const renderStars = (rating) => {
-    return [...Array(5)].map((_, i) => (
+    return [...Array(rating)].map((_, i) => (
       <StarIcon
         key={i}
-        className={`star-icon ${i < rating ? 'text-amber-400' : 'text-gray-300'}`}
+        className="star-icon text-amber-400"
       />
     ));
   };
@@ -331,86 +331,86 @@ const ReviewTable = () => {
           <div className="modal-content">
             <button className="modal-close-btn" onClick={closeViewModal}>X</button>
             <div className="view-modal-content">
-              <h3 className="modal-title">Review Details</h3>
+              <h3 className="modaltitle">Review Details</h3>
 
-              <div className="review-section">
-                <h4>Coach Information</h4>
-                {selectedViewReview.coach?.user ? (
-                  <div className="info-card">
-                    <p>
-                      <strong>Name:</strong> {selectedViewReview.coach.user.first_name}{' '}
-                      {selectedViewReview.coach.user.last_name}
-                    </p>
-                    <p>
-                      <strong>Specialization:</strong> {selectedViewReview.coach.specialization || 'N/A'}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-muted">Coach information not available</p>
-                )}
-              </div>
+              <div className="reviewsection">
+  <div className="infocard">
+    {selectedViewReview.coach?.user ? (
+      <>
+        <p>
+          <strong>Coach Name:</strong> {selectedViewReview.coach.user.first_name} {selectedViewReview.coach.user.last_name}
+        </p>
+        <p>
+          <strong>Specialization:</strong> {selectedViewReview.coach.specialization || 'N/A'}
+        </p>
+      </>
+    ) : (
+      <p className="textmuted">Coach information not available</p>
+    )}
 
-              <div className="review-section">
-                <h4>Reviewer Information</h4>
-                {selectedViewReview.user ? (
-                  <div className="info-card">
-                    <p>
-                      <strong>Name:</strong> {selectedViewReview.user.first_name}{' '}
-                      {selectedViewReview.user.last_name}
-                    </p>
-                    <p>
-                      <strong>Email:</strong> {selectedViewReview.user.email}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-muted">Reviewer information not available</p>
-                )}
-              </div>
+    <hr style={{ margin: '12px 0', borderTop: '1px solid #e5e7eb' }} />
 
-              <div className="review-section">
+    {selectedViewReview.user ? (
+      <>
+        <p>
+          <strong>Reviewer Name:</strong> {selectedViewReview.user.first_name} {selectedViewReview.user.last_name}
+        </p>
+        <p>
+          <strong>Reviewer Email:</strong> {selectedViewReview.user.email}
+        </p>
+      </>
+    ) : (
+      <p className="textmuted">Reviewer information not available</p>
+    )}
+  </div>
+</div>
+
+
+              <div className="reviewsection">
                 <h4>Ratings</h4>
-                <div className="ratings-grid">
-                  <div className="rating-item">
+                <div className="ratingsgrid">
+                  <div className="ratingitem">
                     <span>Overall Rating:</span>
-                    <div className="stars">
+                    <div className="starss">
                       {renderStars(selectedViewReview.rating)}
                       <span>({selectedViewReview.rating}/5)</span>
                     </div>
                   </div>
-                  <div className="rating-item">
+                  <div className="ratingitem">
                     <span>Teaching Clarity:</span>
-                    <div className="stars">
+                    <div className="starss">
                       {renderStars(selectedViewReview.teaching_clarity_rating)}
                       <span>({selectedViewReview.teaching_clarity_rating}/5)</span>
                     </div>
                   </div>
-                  <div className="rating-item">
+                  <div className="ratingitem">
                     <span>Communication:</span>
-                    <div className="stars">
+                    <div className="starss">
                       {renderStars(selectedViewReview.communication_rating)}
                       <span>({selectedViewReview.communication_rating}/5)</span>
                     </div>
                   </div>
-                  <div className="rating-item">
+                  <div className="ratingitem">
                     <span>Knowledge Depth:</span>
-                    <div className="stars">
+                    <div className="starss">
                       {renderStars(selectedViewReview.knowledge_depth_rating)}
                       <span>({selectedViewReview.knowledge_depth_rating}/5)</span>
                     </div>
+                    
                   </div>
                 </div>
               </div>
 
               {selectedViewReview.review_text && (
-                <div className="review-section">
+                <div className="reviewsection">
                   <h4>Review Content</h4>
-                  <div className="review-content">
+                  <div className="reviewcontent">
                     <p>"{selectedViewReview.review_text}"</p>
                   </div>
                 </div>
               )}
 
-              <div className="review-meta">
+              <div className="reviewmeta">
                 <p>
                   <strong>Reviewed on:</strong>{' '}
                   {new Date(selectedViewReview.created_at).toLocaleDateString('en-US', {
@@ -468,7 +468,7 @@ const ReviewTable = () => {
                 />
               </div>
 
-              <button type="submit" className="submit-button">
+              <button type="submit" className="submit-button-review">
                 Update Review
                 <StarIcon className="submit-icon" />
               </button>
@@ -542,7 +542,7 @@ const ReviewTable = () => {
               
               <div className="table-cell">
                 <div className="rating-stars">
-                  {renderStars(review.rating)}
+                {/* {renderStars(review.rating)} */}
                   <span className="rating-text">({review.rating}/5)</span>
                 </div>
               </div>

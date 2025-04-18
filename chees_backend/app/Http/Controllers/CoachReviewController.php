@@ -10,13 +10,13 @@ class CoachReviewController extends Controller
 //admin
 public function adminIndex()
 {
-    return CoachReview::with(['user', 'coach'])
+    return CoachReview::with(['user', 'coach.user'])
         ->orderBy('created_at', 'desc')
         ->get();
 }
 public function showReview($id)
 {
-    $review = CoachReview::with(['coach', 'user'])
+    $review = CoachReview::with(['coach.user', 'user'])
                ->findOrFail($id)
                ;
 

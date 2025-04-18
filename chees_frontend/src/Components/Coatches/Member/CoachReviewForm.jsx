@@ -388,7 +388,7 @@ const CoachReviewForm = () => {
                 <RatingDropdown coachId={selectedCoachId} label="Knowledge Depth" ratingType="knowledge_depth_rating" />
               </div>
 
-              <button type="submit" className="submit-button">
+              <button type="submit" className="submit-button-review">
                 {editingReviewId ? 'Update Review' : 'Submit Review'}
                 <StarIcon className="submit-icon" />
               </button>
