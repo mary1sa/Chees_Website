@@ -232,7 +232,7 @@ const CoachDashboardOverview = () => {
       
       {/* Upcoming Sessions Section */}
       <div className="upcoming-sessions-section">
-        <h2><FiClock /> Your Upcoming Sessions</h2>
+        <h2 style={{ marginBottom: '1rem' }}><FiClock /> Your Upcoming Sessions</h2>
         {upcomingSessions.length > 0 ? (
           <div className="sessions-grid">
             {upcomingSessions.slice(0, 3).map(session => (

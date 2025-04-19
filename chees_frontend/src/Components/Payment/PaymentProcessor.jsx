@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 import { CreditCard, AlertCircle, CheckCircle, LoaderCircle, X } from 'lucide-react';
-import './PaymentProcessor.css';
-import PromoCodeSection from './PromoCodeSection';
+import './PaymentProcessor.css';  
 import axiosInstance from '../../api/axios';
 
 // Error types focused on user experience
@@ -232,20 +232,13 @@ const PaymentForm = ({ method, onSubmit, amount, originalAmount, loading, applie
           <span>Total:</span>
           {originalAmount !== amount && (
             <div className="payment-discount-indicator">
-              <span className="original-amount">${originalAmount.toFixed(2)}</span>
+              <span className="original-amount">{originalAmount.toFixed(2)} MAD</span>
               <span className="discount-arrow">→</span>
             </div>
           )}
-          <span className="price">${amount.toFixed(2)}</span>
+          <span className="price">{amount.toFixed(2)} MAD</span>
         </div>
       </div>
-
-      {/* <PromoCodeSection 
-        onApply={handlePromoApply} 
-        appliedPromo={appliedPromo}
-        disabled={loading}
-        courseId={courseId}
-      /> */}
 
       <div className="payment-details-container">
         {method === 'credit_card' && (
@@ -337,9 +330,44 @@ const PaymentForm = ({ method, onSubmit, amount, originalAmount, loading, applie
         )}
         
         {method === 'paypal' && (
-          <div className="paypal-info">
-            <p>You will be redirected to PayPal to complete payment.</p>
-            <p className="demo-note">Note: This is a demo only. No actual PayPal payment will be processed.</p>
+          <div className="paypal-buttons-wrapper">
+            <PayPalScriptProvider options={{ "client-id": "sb", currency: "USD" }}>
+              <PayPalButtons
+                style={{ layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' }}
+                createOrder={(data, actions) => {
+                  return actions.order.create({
+                    purchase_units: [
+                      {
+                        amount: {
+                          value: amount.toFixed(2),
+                        },
+                        description: courseTitle
+                      },
+                    ],
+                  });
+                }}
+                onApprove={async (data, actions) => {
+                  const details = await actions.order.capture();
+                  onSubmit({
+                    method: 'paypal',
+                    details: {
+                      orderID: data.orderID,
+                      payerID: data.payerID,
+                      email: details.payer.email_address,
+                      name: details.payer.name.given_name + ' ' + details.payer.name.surname,
+                      amount: details.purchase_units[0].amount.value,
+                      courseId,
+                    },
+                  });
+                }}
+                onError={(err) => {
+                  onSubmit({ method: 'paypal', error: 'PROCESSING_ERROR' });
+                }}
+                onCancel={() => {
+                  onSubmit({ method: 'paypal', cancelled: true });
+                }}
+              />
+            </PayPalScriptProvider>
           </div>
         )}
         
@@ -363,7 +391,7 @@ const PaymentForm = ({ method, onSubmit, amount, originalAmount, loading, applie
                 Processing...
               </>
             ) : (
-              `Pay $${amount.toFixed(2)}`
+              `Pay ${amount.toFixed(2)} MAD`
             )}
           </button>
         </div>

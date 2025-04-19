@@ -625,7 +625,7 @@ const MemberDashboardOverview = () => {
         <h2><FiActivity /> Popular Events</h2>
         {upcomingEvents.length > 0 ? (
           <div className="events-list">
-            {upcomingEvents.map(event => (
+            {upcomingEvents.slice(0, 2).map(event => (
               <div className="event-card" key={event.id}>
                 <div className="event-details">
                   <h3>{event.title}</h3>

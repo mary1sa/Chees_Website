@@ -7,26 +7,8 @@
     --rci-black: #1d1d1d;
     --rci-cream: #f5efe0;
   }
-  
-  /* Base styling */
-  body {
-    /* font-family: 'Cormorant Garamond', 'Playfair Display', serif; */
-    
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Chess-themed background pattern */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230a4d3c' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    z-index: -1;
-  }
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
   
   /* Main container */
   .home-container {
@@ -50,6 +32,16 @@
     transition: none; /* Remove default transitions for GSAP control */
     filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
   }
+  .logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Remove any existing box-shadow */
+    box-shadow: none;
+    /* Ensure transparency is preserved */
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter 0.5s ease;
+  }
   
   .logo-container img {
     width: 100%;
@@ -61,7 +53,16 @@
   .logo-container:hover img {
     filter: brightness(1.1);
   }
-  
+  .logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Remove any existing box-shadow */
+    box-shadow: none;
+    /* Ensure transparency is preserved */
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter 0.5s ease;
+  }
   /* Section styling */
   .section {
     min-height: 100vh;
@@ -84,18 +85,16 @@
   .section-2 {
     background-color: var(--rci-cream);
     background-image: linear-gradient(to right, rgba(245, 239, 224, 0.9) 0%, rgba(245, 239, 224, 0.98) 100%),
-                      url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%230a4d3c' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
   }
   
   .section-3 {
     background-color: var(--rci-green);
-    background-image: linear-gradient(45deg, rgba(36, 169, 106, 0.95) 0%, rgba(36, 169, 106, 0.98) 100%),
-                      url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: linear-gradient(45deg, rgba(36, 169, 106, 0.95) 0%, rgba(36, 169, 106, 0.98) 100%);
     min-height: 100vh;
 }
 
 
-.section-3 .content-wrapper {
+.section-3 .main-content-wrapper {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -140,7 +139,7 @@
 .section-3 h2 {
     font-size: 2rem;
     color: var(--rci-dark-green, #0a4d3c);
-    font-family: 'Cinzel', serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: bold;
     margin-bottom: 1rem;
     text-align: left;
@@ -157,7 +156,7 @@
 }
 
 @media (max-width: 900px) {
-    .section-3 .content-wrapper {
+    .section-3 .main-content-wrapper {
         flex-direction: column;
         gap: 2rem;
         padding: 1rem 0;
@@ -175,8 +174,7 @@
   
   .section-4 {
     background-color: var(--rci-black);
-    background-image: linear-gradient(to bottom, rgba(29, 29, 29, 0.95) 0%, rgba(29, 29, 29, 0.98) 100%),
-                      url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f7b731' fill-opacity='0.07' fill-rule='evenodd'%3E%3Cpath d='M0 20h40v20H0V20zm40 0V0H20v20h20z'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: linear-gradient(to bottom, rgba(29, 29, 29, 0.95) 0%, rgba(29, 29, 29, 0.98) 100%);
   }
   
   /* Headers */
@@ -186,7 +184,7 @@
     text-align: center;
     color: white;
     font-weight: bold;
-    font-family: 'Cinzel', 'Playfair Display', serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     letter-spacing: 1.5px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: relative;
@@ -215,7 +213,7 @@
     padding-bottom: 0.5rem;
     text-align: center !important;
     font-weight: bold;
-    font-family: 'Cinzel', 'Playfair Display', serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     letter-spacing: 1.5px;
     color: var(--rci-dark-green, #0a4d3c);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -233,16 +231,27 @@
     border-radius: 2px;
 }
 
+
 .section-2 .paragraph {
     text-align: left ;
 }
-  h2 {
-    font-family: 'Cinzel', serif;
-    color: white;
+.section-2 {
     position: relative;
+    overflow: hidden; /* This ensures the pattern stays within the section */
   }
-  
-  h2::after {
+.section-2::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    opacity: 0.9 ;
+    z-index: 1;
+    pointer-events: none;
+    transform: rotate(-5deg) scale(1.2);
+  }
+  .about-us-header::after {
     content: '';
     position: absolute;
     bottom: -10px;
@@ -279,7 +288,7 @@
   }
   
   /* Content wrapper */
-  .content-wrapper {
+  .main-content-wrapper {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -290,21 +299,95 @@
     position: relative;
   }
   
-  .content-wrapper::before {
+  .main-content-wrapper::before {
     content: '';
     position: absolute;
     width: 40px;
     height: 40px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f7b731' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6h1.5v1.5H9zM12 6h1.5v1.5H12zM15 6h1.5v1.5H15zM7.5 9H9v1.5H7.5zM12 9h1.5v1.5H12zM15 9h1.5v1.5H15zM6 12h1.5v1.5H6zM9 12h1.5v1.5H9zM12 12h1.5v1.5H12zM15 12h1.5v1.5H15z'/%3E%3C/svg%3E");
     opacity: 0.2;
   }
+  .section-2 {
+    position: relative;
+    overflow: hidden; /* This ensures the pattern stays within the section */
+  }
   
+  /* Add this new rule for the decorative pattern */
+  .section-2::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 16c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zm33.414-6l5.95-5.95L45.95.636 40 6.586 34.05.636 32.636 2.05 38.586 8l-5.95 5.95 1.414 1.414L40 9.414l5.95 5.95 1.414-1.414L41.414 8zM40 48c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM9.414 40l5.95-5.95-1.414-1.414L8 38.586l-5.95-5.95L.636 34.05 6.586 40l-5.95 5.95 1.414 1.414L8 41.414l5.95 5.95 1.414-1.414L9.414 40z' fill='%23f7b731' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 1;
+    z-index: 1;
+    pointer-events: none;
+    transform: rotate(-5deg) scale(1.2);
+  }
   @media (max-width: 768px) {
-    .content-wrapper {
+    .main-content-wrapper {
       flex-direction: column;
     }
   }
+
+@media (max-width: 1400px) and (min-width: 1200px) {
+  .section-2 .main-content-wrapper {
+    justify-content: flex-start !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .section-2 .about-us-container {
+    padding-left: 200px !important;
+    margin-left: 0 !important;
+    text-align: left !important;
+  }
+  .section-2 .paragraph {
+    text-align: left !important;
+  }
+  .section-3 .main-content-wrapper {
+    justify-content: flex-start !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .section-3 .image-wrapper {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: -10%;
+    width: 150px !important;
+  }
+  .section-3 .image-wrapper img:hover {
+    transform: scale(1.02) rotate(-2deg);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+}
+  .section-3 .content-item {
+    flex: 1 1 auto;
+    min-width: 300px;
+    max-width: 660px;
+    padding: 0;
+    margin-top: -110px;
+    margin-left: 20%;
+  }
+  .player-header{
+    margin-top: -8rem !important;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .join h2{
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 1.25rem !important;
+    margin-bottom: -1.4rem !important;
+    margin-top: -1.7rem !important;
+    color: var(--rci-cream) !important;
+  }
+  .join button{
+    margin-top: -1rem !important;
+    margin-bottom: -2rem !important;
+  }
   
+}
+
   /* Player showcase */
   .player-showcase {
     flex: 1;
@@ -341,7 +424,7 @@
   .player-showcase h3 {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
-    font-family: 'Cinzel', serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: var(--rci-dark-green);
     position: relative;
   }
@@ -383,7 +466,7 @@
   .call-to-action button {
     background: linear-gradient(135deg, var(--rci-gold) 0%, #e6a618 100%);
     color: var(--rci-black);
-    font-family: 'Cinzel', serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: bold;
     letter-spacing: 1px;
     border: none;
@@ -411,5 +494,252 @@
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
     text-align: center;
-
   }
+
+
+/* General responsive adjustments */
+@media (max-width: 1440px) {
+    .header {
+      font-size: 2.5rem;
+      margin-top: 30rem;
+    }
+    
+    .about-us-header {
+      font-size: 2rem;
+    }
+    
+    .paragraph {
+      font-size: 1.1rem;
+      max-width: 600px;
+    }
+  }
+  
+  /* Medium screens (laptops, smaller desktops) */
+  @media (max-width: 1200px) {
+    /* Logo size adjustments for medium screens */
+    .logo-container {
+      width: 250px !important;
+      height: 250px !important;
+    }
+    
+    .main-content-wrapper {
+      width: 95%;
+      gap: 1.5rem;
+    }
+    
+    .header {
+      margin-top: 25rem;
+      font-size: 2.2rem;
+    }
+    
+    .section-3 .main-content-wrapper {
+      padding: 2rem 10rem 3rem 1rem;
+    }
+    
+    /* Adjust player showcases */
+    .player-showcase {
+      padding: 1.5rem;
+    }
+    
+    .player-showcase img {
+      width: 130px;
+      height: 130px;
+    }
+  }
+  
+  /* Small screens (tablets) */
+  @media (max-width: 992px) {
+    /* Logo adjustment for tablets */
+    .logo-container {
+      width: 200px !important;
+      height: 200px !important;
+    }
+    
+    .header {
+      margin-top: 22rem;
+      font-size: 2rem;
+    }
+    
+    .paragraph {
+      font-size: 1rem;
+      margin: 1.5rem 0;
+    }
+    
+    .section-3 .main-content-wrapper {
+      padding: 2rem 5rem 3rem 1rem;
+    }
+    
+    .main-content-wrapper {
+      gap: 1rem;
+    }
+    
+    /* Adjust player showcases */
+    .player-showcase h3 {
+      font-size: 1.3rem;
+    }
+    
+    .player-showcase p {
+      font-size: 0.9rem;
+    }
+    
+    .player-showcase small {
+      font-size: 0.8rem;
+    }
+    
+    .call-to-action button {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+    }
+  }
+  
+  /* Mobile landscape */
+  @media (max-width: 768px) {
+    /* Logo adjustment for mobile landscape */
+    .logo-container {
+      width: 180px !important;
+      height: 180px !important;
+    }
+    
+    .header {
+      margin-top: 18rem;
+      font-size: 1.8rem;
+    }
+    
+    .about-us-header {
+      font-size: 1.7rem;
+      margin-top: 1.5rem;
+    }
+    
+    .section {
+      padding: 1.5rem;
+    }
+    
+    .section-3 .main-content-wrapper {
+      padding: 1rem;
+      gap: 1.5rem;
+    }
+    
+    .section-3 .image-wrapper img {
+      width: 260px;
+      height: 260px;
+    }
+    
+    /* Adjust player showcases for mobile landscape */
+    .main-content-wrapper {
+      flex-direction: column;
+    }
+    
+    .player-showcase {
+      margin-bottom: 1.5rem;
+      width: 80%;
+    }
+    
+    .call-to-action {
+      margin-top: 1rem;
+    }
+    
+    .call-to-action h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem !important;
+    }
+    
+    .cta-login-button {
+      top: 20px;
+      right: 30px;
+    }
+  }
+  
+  /* Mobile portrait */
+  @media (max-width: 576px) {
+    /* Logo adjustment for mobile portrait */
+    .logo-container {
+      width: 150px !important;
+      height: 150px !important;
+    }
+    
+    .header {
+      margin-top: 15rem;
+      font-size: 1.5rem;
+    }
+    
+    .about-us-header {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+    }
+    
+    .paragraph {
+      font-size: 0.95rem;
+      margin: 1rem 0;
+      max-width: 100%;
+    }
+    
+    .section {
+      padding: 1rem;
+    }
+    
+    .section-3 .image-wrapper img {
+      width: 200px;
+      height: 200px;
+      border-radius: 12px;
+    }
+    
+    /* Adjust player showcases for mobile portrait */
+    .player-showcase {
+      padding: 1rem;
+      width: 100%;
+    }
+    
+    .player-showcase img {
+      width: 100px;
+      height: 100px;
+    }
+    
+    .player-showcase h3 {
+      font-size: 1.2rem;
+    }
+    
+    .player-showcase p {
+      font-size: 0.85rem;
+    }
+    
+    .player-showcase small {
+      font-size: 0.75rem;
+    }
+    
+    .call-to-action button {
+      padding: 0.8rem 1.6rem;
+      font-size: 1rem;
+    }
+    
+    .cta-login-button {
+      top: 15px;
+      right: 15px;
+      padding: 0.6rem 1.2rem !important;
+      font-size: 0.9rem !important;
+    }
+    
+    /* Player header adjustment */
+    .player-header {
+      font-size: 1.5rem !important;
+      margin-bottom: 1.5rem !important;
+    }
+  }
+  
+  /* Very small screens */
+  @media (max-width: 375px) {
+    .logo-container {
+      width: 130px !important;
+      height: 130px !important;
+    }
+    
+    .header {
+      margin-top: 12rem;
+      font-size: 1.3rem;
+    }
+    
+    .section-3 .image-wrapper img {
+      width: 180px;
+      height: 180px;
+    }
+  }
+  

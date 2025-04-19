@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiUpload, FiVideo, FiX, FiFile, FiCalendar, FiClock, FiUsers, FiSave, FiDownload, FiEye, FiTrash2 } from 'react-icons/fi';
 import axiosInstance from '../../../api/axios';
+import ConfirmDelete from '../../Confirm/ConfirmDelete';
 import './SessionManagement.css';
 
 const RecordingUploader = ({ onLoadingChange }) => {
@@ -662,37 +663,13 @@ const RecordingUploader = ({ onLoadingChange }) => {
         </div>
       )}
       
-      {/* Delete Confirmation Modal */}
-      {deleteModalOpen && recordingToDelete && (
-        <div className="modal-overlay">
-          <div className="delete-modal">
-            <div className="delete-modal-header">
-              <h4>Confirm Deletion</h4>
-              <button className="close-modal-btn" onClick={closeDeleteModal}>×</button>
-            </div>
-            <div className="delete-modal-body">
-              <p>Are you sure you want to delete the recording: <strong>{recordingToDelete.title}</strong>?</p>
-              <p className="warning-text">This action cannot be undone and will permanently remove this recording.</p>
-            </div>
-            <div className="delete-modal-footer">
-              <button 
-                className="cancel-button" 
-                onClick={closeDeleteModal}
-                disabled={deleting}
-              >
-                Cancel
-              </button>
-              <button 
-                className="delete-button" 
-                onClick={handleDeleteRecording}
-                disabled={deleting}
-              >
-                {deleting ? 'Deleting...' : 'Delete Recording'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Delete Confirmation Modal using reusable ConfirmDelete */}
+      <ConfirmDelete
+        isOpen={deleteModalOpen && !!recordingToDelete}
+        onClose={closeDeleteModal}
+        onConfirm={handleDeleteRecording}
+        itemName={recordingToDelete ? recordingToDelete.title : 'this recording'}
+      />
     </div>
   );
 };

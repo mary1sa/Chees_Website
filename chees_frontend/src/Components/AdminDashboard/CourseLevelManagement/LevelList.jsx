@@ -136,8 +136,8 @@ const LevelList = () => {
       </div>
       
       <div className="level-search">
-        <div className="search-box">
-          <FiSearch className="search-icon" />
+        <div className="filer-input">
+          <FiSearch className="filer-icon" />
           <input
             type="text"
             placeholder="Search course levels..."

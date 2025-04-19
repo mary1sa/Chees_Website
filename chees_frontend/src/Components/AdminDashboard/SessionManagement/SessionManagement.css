@@ -1404,6 +1404,46 @@
   color: white !important;
 }
 
+.session-list-actions {
+  gap: 1rem !important;
+  display: flex !important;
+  justify-content: flex-end !important; /* aligns items to the right horizontally */
+  align-items: center !important;       /* vertically center items (optional) */
+  position: relative !important;
+  right: 0 !important;
+  flex: 1 1 100%;
+  margin-right: 10px !important;
+}
+.filter-controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.filter-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.filter-select {
+  max-height: 300px;
+  overflow-y: auto;
+  appearance: auto; /* Enable native select appearance with scrollbar */
+}
+
+.filter-icon {
+  position: absolute;
+  left: 12px;
+  color: #6b7280;
+}
+
+.filter-input, .filter-select {
+  padding: 8px 12px 8px 36px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  min-width: 200px;
+}
 @media (max-width: 576px) {
   .session-modal {
     max-height: 100vh;

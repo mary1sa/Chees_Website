@@ -93,7 +93,7 @@ const Books = () => {
   const filteredBooks = applyFilters();
 
   if (loading) return <PageLoading />;
-  if (error) return <div className="error">Error: {error}</div>;
+  if (error) return <div className="book-error">Error: {error}</div>;
 
   return (
     <div className="books-container">

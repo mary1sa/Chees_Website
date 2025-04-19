@@ -163,9 +163,23 @@ const UpcomingSessions = () => {
   
   return (
     <div className="sessions-container">
-      <div className="sessions-header">
-        <h2>Sessions</h2>
-        <div className="view-toggle">
+      <div className="sessions-header-flex">
+        <div className="sessions-tabs-flex">
+          <button
+            className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
+            onClick={() => setActiveTab('upcoming')}
+          >
+            Upcoming
+          </button>
+          <button
+            className={`tab-button ${activeTab === 'past' ? 'active' : ''}`}
+            onClick={() => setActiveTab('past')}
+          >
+            Past
+          </button>
+        </div>
+        <h2 style={{marginBottom: '50px', flex: '0 1 auto'}}>Sessions</h2>
+        <div className="view-toggle-flex">
           <button 
             className={`view-toggle-btn ${view === 'list' ? 'active' : ''}`}
             onClick={() => setView('list')}
@@ -179,20 +193,6 @@ const UpcomingSessions = () => {
             <FiCalendar /> Calendar
           </button>
         </div>
-      </div>
-      <div className="sessions-tabs">
-        <button
-          className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
-          onClick={() => setActiveTab('upcoming')}
-        >
-          Upcoming
-        </button>
-        <button
-          className={`tab-button ${activeTab === 'past' ? 'active' : ''}`}
-          onClick={() => setActiveTab('past')}
-        >
-          Past
-        </button>
       </div>
       
       {view === 'calendar' ? (
