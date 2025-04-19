@@ -5,7 +5,7 @@ import PageLoading from '../../PageLoading/PageLoading';
 import ConfirmDelete from '../../Confirm/ConfirmDelete';
 import SuccessAlert from '../../Alerts/SuccessAlert';
 import ErrorAlert from '../../Alerts/ErrorAlert';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "./modelavail.css"
 const CoachAvailability = () => {
   const [availabilities, setAvailabilities] = useState([]);
@@ -23,11 +23,14 @@ const CoachAvailability = () => {
   const itemsPerPage = 5;
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
+const navigate=useNavigate()
   useEffect(() => {
     fetchCoachAvailability();
   }, []);
 
+  const gotocreate=()=>{
+    navigate("/coach/dashboard/creatavailability")
+  }
   useEffect(() => {
     filterAvailabilities();
   }, [availabilities, dateFilter, typeFilter, locationFilter]);
@@ -282,13 +285,14 @@ const CoachAvailability = () => {
           />
         </div>
 
-        <Link 
-          to="/coach/dashboard/add-availability"
-          className="add-new-btn"
-        >
-          <FiPlus className="icon" />
-          Add New 
-        </Link>
+       <button 
+                onClick={gotocreate}
+                className="add-new-btn"
+      
+              >
+                <FiPlus className="icon" />
+                Create Avaibility
+              </button>
       </div>
 
       <div className="data-table">

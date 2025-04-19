@@ -151,7 +151,19 @@ const UpdateCoach = () => {
     const updatedLinks = coachForm.social_media_links.filter((_, i) => i !== index);
     setCoachForm({ ...coachForm, social_media_links: updatedLinks });
   };
-
+  const teachingFormatOptions = [
+    { value: 'One-on-One', label: 'One-on-One Lessons' },
+    { value: 'Group', label: 'Group Classes' },
+    { value: 'Video Lessons', label: 'Video Lessons' },
+    { value: 'Tournament Preparation', label: 'Tournament Preparation' }
+  ];
+  
+  const communicationMethodOptions = [
+    { value: 'Email', label: 'Email' },
+    { value: 'Phone', label: 'Phone' },
+    { value: 'Video Call', label: 'Video Call' },
+    { value: 'In-Person', label: 'In-Person' }
+  ];
   return (
     <div className="create-user-container">
       <h1 className="create-user-title">Update Coach Profile</h1>
@@ -288,6 +300,8 @@ const UpdateCoach = () => {
   options={[
     { value: 'English', label: 'English' },
     { value: 'French', label: 'French' },
+    { value: 'Arabic', label: 'Arabic' },
+
   ]}
   className="form-select"
 />
@@ -322,7 +336,58 @@ const UpdateCoach = () => {
             Add Link
           </button>
         </div>
+        <div className="form-group">
+  <label>Teaching Formats</label>
+  <Select
+    isMulti
+    name="teaching_formats"
+    value={coachForm.teaching_formats.map(format => ({ value: format, label: format }))}
+    onChange={selected => setCoachForm({ 
+      ...coachForm, 
+      teaching_formats: selected.map(option => option.value) 
+    })}
+    options={teachingFormatOptions}
+    className="form-select"
+  />
+</div>
 
+<div className="form-group">
+  <label>Communication Methods</label>
+  <Select
+    isMulti
+    name="communication_methods"
+    value={coachForm.communication_methods.map(method => ({ value: method, label: method }))}
+    onChange={selected => setCoachForm({ 
+      ...coachForm, 
+      communication_methods: selected.map(option => option.value) 
+    })}
+    options={communicationMethodOptions}
+    className="form-select"
+  />
+</div>
+
+
+<div className="form-group">
+          <textarea
+            name="professional_bio"
+            placeholder="Professional Bio"
+            value={coachForm.professional_bio}
+            onChange={handleChange}
+            className={`form-textarea ${errors.professional_bio ? 'is-invalid' : ''}`}
+          />
+          {errors.professional_bio && <div className="error-message">{errors.professional_bio}</div>}
+        </div>
+
+        <div className="form-group">
+          <input
+            type="text"
+            name="video_introduction_url"
+            placeholder="Video Introduction URL"
+            value={coachForm.video_introduction_url}
+            onChange={handleChange}
+            className="form-input"
+          />
+        </div>
         <button type="submit" className="submit-button" disabled={loading}>
           {loading ? 'Updating...' : 'Update Profile'}
         </button>

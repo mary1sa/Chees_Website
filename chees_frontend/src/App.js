@@ -97,6 +97,8 @@ import Authors from './Components/MemberDashboard/BookStor/Authors';
 // import MemberOrders from './Components/MemberDashboard/BookStor/MemberOrders';
 import OrderDetails from './Components/MemberDashboard/BookStor/OrderDetails';
 import ReviewTable from './Components/Coatches/Admin/ReviewTable';
+import ProfileCoach from './Components/CoatchDashboard/ProfileCoach';
+import UpdateCoachProfile from './Components/CoatchDashboard/UpdateCoachProfile';
 
 
 function App() {
@@ -250,10 +252,13 @@ function App() {
   <Route path="coachavailability" element={<  CoachAvailability />} />
   <Route path="Updateavailability/:id" element={<  UpdateCoachAvailability />} /> */}
   <Route path="coachReviews" element={< CoachReviews />} />
+  <Route path="profileCoach" element={< ProfileCoach />} />
 
 
 
   <Route path="CreateProfile" element={<CreateCoacheProfile />} />
+  <Route path="UpdateCoachProfile/:id" element={<UpdateCoachProfile />} />
+
   <Route path="creatavailability" element={<CreateCoachAvailability />} />
   <Route path="coachavailability" element={<CoachAvailability />} />
   <Route path="Updateavailability/:id" element={<UpdateCoachAvailability />} />

@@ -16,6 +16,10 @@ class CoachesController extends Controller
         return response()->json($coaches);
     }
 
+
+
+  
+
     // Admin: Get approved coaches
     public function indexApprovedRejected()
     {

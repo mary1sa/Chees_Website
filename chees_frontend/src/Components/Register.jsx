@@ -210,6 +210,8 @@ const Register = () => {
         >
           {loading ? 'Registering...' : 'Register'}
         </button>
+        <p className="signup-link">Return to login <a href="/login">click here </a></p>
+
       </form>
     </div>
   );

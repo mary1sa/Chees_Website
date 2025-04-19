@@ -1,0 +1,376 @@
+.coach-profiles {
+    max-width: 1200px;
+    margin: 0;
+  }
+  
+  .coach-profile-cards {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  
+  .coach-profile-header {
+    background: linear-gradient(135deg,#213529, #27ae60);
+    padding: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    color: white;
+    position: relative;
+  }
+  
+  .coach-avatar-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+  }
+  
+  .coach-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+  }
+  
+  .coach-status-dot {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+  
+  .coach-status-dot.active { background: #2ecc71; }
+  .coach-status-dot.inactive { background: #e74c3c; }
+  
+  .coach-titles {
+    flex: 1;
+  }
+  
+  .coach-name {
+    margin: 0;
+    font-size: 2.2rem;
+    letter-spacing: -0.5px;
+  }
+  
+  .coach-role {
+    margin: 0.3rem 0;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+  
+  .coach-username {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.9;
+    font-size: 0.95rem;
+  }
+  
+  .chess-icon {
+    font-size: 0.8em;
+  }
+  
+  .coach-rating-badge {
+    background: rgba(255,255,255,0.15);
+    padding: 1rem 1.5rem;
+    border-radius: 0.8rem;
+    text-align: center;
+    backdrop-filter: blur(5px);
+  }
+  
+  .rating-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+  
+  .rating-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  
+  .coach-profile-content {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 2rem;
+    padding: 2.5rem;
+  }
+  .coach-about-section{
+    margin-bottom: 20px;
+  }
+  .coach-section-title {
+    color: #213529;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #27ae60;
+    font-family: 'Cinzel', serif
+  }
+  
+  .coach-info-grid {
+    display: grid;
+    gap: 1.2rem;
+  }
+  
+  .coach-info-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 0.8rem;
+  }
+  
+  .info-icon {
+    font-size: 1.2rem;
+    color: #213529;
+  }
+  
+  .coach-info-item label {
+    display: block;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 0.2rem;
+  }
+  
+  .coach-info-item p {
+    margin: 0;
+    font-weight: 500;
+    color: #2c3e50;
+  }
+  
+  .coach-bio {
+    line-height: 1.6;
+    color: #34495e;
+    margin: 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 0.8rem;
+  }
+  
+  .coach-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .coach-detail-item {
+    padding: 1.2rem;
+    background: #f8f9fa;
+    border-radius: 0.8rem;
+  }
+  
+  .coach-detail-item.full-width {
+    grid-column: 1 / -1;
+  }
+  
+  .detail-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 0.5rem;
+  }
+  
+  .detail-value {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  
+  .premium {
+    color: #213529;
+    font-weight: 700;
+  }
+  
+  .rate {
+    color:#213529;
+    font-size: 1.1rem;
+  }
+  
+  .specializations {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  
+  .specialization-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .primary {
+    background: #27ae60;
+    color: white;
+  }
+  
+  .secondary {
+    background: #bdc3c7;
+    color: #2c3e50;
+  }
+  
+  .video-link {
+    color: #e74c3c;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .video-link:hover {
+    color: #c0392b;
+  }
+  
+  @media (max-width: 768px) {
+    .coach-profile-content {
+      grid-template-columns: 1fr;
+    }
+    
+    .coach-profile-header {
+      flex-direction: column;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .coach-rating-badge {
+      margin-top: 1rem;
+    }
+  }
+
+
+
+ 
+.methods-container {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  
+  .method-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: #f0f8ff;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .method-icon {
+    font-size: 0.9rem;
+    color: #3498db;
+  }
+  
+ 
+  .social-links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    color: #2c3e50;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+  }
+  
+  .social-link:hover {
+    transform: translateX(5px);
+    background: #f1f5f9;
+  }
+  
+  .social-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  
+ 
+  .twitter { color: #1da1f2; }
+  .facebook { color: #1877f2; }
+  .instagram { color: #e4405f; }
+  .linkedin { color: #0a66c2; }
+  
+  
+.language-container {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  
+  .language-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .language-icon {
+    color: #3498db;
+    font-size: 0.9rem;
+  }
+  
+ 
+  .format-container {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  
+  .format-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: #dbefe4;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid #27ae60;
+  }
+  
+  .format-icon {
+    color: #27ae60;
+    font-size: 0.9rem;
+  }
+  .update-coach{
+    color: #fff;
+    font-weight: 600;
+  }
+  .communication-container {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  
+  .method-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: #e8f4ff;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid #3498db33;
+  }
+  
+  .method-icon {
+    color: #3498db;
+    font-size: 0.9rem;
+  }
+  
+ 

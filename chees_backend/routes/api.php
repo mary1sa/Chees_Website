@@ -69,6 +69,7 @@ Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
 // Get coaches for course creation
 Route::get('/coaches', [UserController::class, 'getCoaches']);
+// Route::get('/coachesbyuser/{id}', [UserController::class, 'getCoachByIdUser']);
 
 //CoatchSpecializationCategoryController
 Route::get('specializations', [CoachSpecializationCategoryController::class, 'index']);

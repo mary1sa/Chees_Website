@@ -65,6 +65,11 @@ const CoatchDashboard = () => {
       path: "/coach/dashboard"
     },
     {
+      title: "profile Coach",
+      icon: <FiUsers />,
+      path: "profileCoach"
+    },
+    {
       title: "Upcoming Sessions",
       icon: <FiCalendar />,
       path: "/coach/dashboard/upcoming-sessions"

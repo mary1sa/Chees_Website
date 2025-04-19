@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../config/axiosInstance';
-import { Link } from 'react-router-dom';
-import { FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight, FiPlus } from 'react-icons/fi';
 import PageLoading from '../../PageLoading/PageLoading';
 import ConfirmDelete from '../../Confirm/ConfirmDelete';
 
@@ -15,9 +15,11 @@ const FetchCoaches = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [coachToDelete, setCoachToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  
+  const navigate=useNavigate()
   const itemsPerPage = 5;
-
+const Createnew=()=>{
+  navigate("/admin/dashboard/CreateCoatch")
+}
   useEffect(() => {
     fetchCoaches();
   }, []);
@@ -208,6 +210,9 @@ const FetchCoaches = () => {
             <option value="rejected">Rejected</option>
           </select>
         </div>
+        <button onClick={Createnew} className="btn-create">
+                  <FiPlus className="icon" /> Create Coach
+                </button>
       </div>
 
       <div className="data-table">

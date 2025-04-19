@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../config/axiosInstance';
-import { Link } from 'react-router-dom';
-import { FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight, FiPlus } from 'react-icons/fi';
 import './UserTable.css';
 
 import PageLoading from '../PageLoading/PageLoading';
@@ -19,7 +19,10 @@ const FetchUsers = () => {
   const [uniqueRoles, setUniqueRoles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
+const navigate=useNavigate()
+const Createnew=()=>{
+  navigate("/admin/dashboard/createuser")
+}
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -216,6 +219,9 @@ const FetchUsers = () => {
             ))}
           </select>
         </div>
+        <button onClick={Createnew} className="btn-create">
+                  <FiPlus className="icon" /> Create User
+                </button>
       </div>
       
       <div className="data-table">

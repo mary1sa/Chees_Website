@@ -55,7 +55,19 @@ const CreateCoacheProfile = () => {
       setErrors({ ...errors, [name]: '' });
     }
   };
-
+  const teachingFormatOptions = [
+    { value: 'One-on-One', label: 'One-on-One Lessons' },
+    { value: 'Group', label: 'Group Classes' },
+    { value: 'Video Lessons', label: 'Video Lessons' },
+    { value: 'Tournament Preparation', label: 'Tournament Preparation' }
+  ];
+  
+  const communicationMethodOptions = [
+    { value: 'Email', label: 'Email' },
+    { value: 'Phone', label: 'Phone' },
+    { value: 'Video Call', label: 'Video Call' },
+    { value: 'In-Person', label: 'In-Person' }
+  ];
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
@@ -308,6 +320,8 @@ const CreateCoacheProfile = () => {
             options={[
               { value: 'English', label: 'English' },
               { value: 'French', label: 'French' },
+              { value: 'Arabic', label: 'Arabic' },
+
             ]}
             className="form-select"
           />
@@ -333,7 +347,35 @@ const CreateCoacheProfile = () => {
             Add Social Media Link
           </button>
         </div>
+        <div className="form-group">
+  <label>Teaching Formats</label>
+  <Select
+    isMulti
+    name="teaching_formats"
+    value={coachForm.teaching_formats.map(format => ({ value: format, label: format }))}
+    onChange={selected => setCoachForm({ 
+      ...coachForm, 
+      teaching_formats: selected.map(option => option.value) 
+    })}
+    options={teachingFormatOptions}
+    className="form-select"
+  />
+</div>
 
+<div className="form-group">
+  <label>Communication Methods</label>
+  <Select
+    isMulti
+    name="communication_methods"
+    value={coachForm.communication_methods.map(method => ({ value: method, label: method }))}
+    onChange={selected => setCoachForm({ 
+      ...coachForm, 
+      communication_methods: selected.map(option => option.value) 
+    })}
+    options={communicationMethodOptions}
+    className="form-select"
+  />
+</div>
         <div className="form-group">
           <textarea
             name="professional_bio"

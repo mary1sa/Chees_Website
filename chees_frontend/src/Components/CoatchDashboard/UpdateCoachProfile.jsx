@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../config/axiosInstance';
-import SuccessAlert from '../../Alerts/SuccessAlert';
-import ErrorAlert from '../../Alerts/ErrorAlert';
-import { useNavigate } from 'react-router-dom';
-import Select from 'react-select';  
+import axiosInstance from '../config/axiosInstance';
+import SuccessAlert from '../Alerts/SuccessAlert';
+import ErrorAlert from '../Alerts/ErrorAlert';
+import { useNavigate, useParams } from 'react-router-dom';
+import Select from 'react-select';
 import { FiTrash2 } from 'react-icons/fi';
 
-const CreateCoach = () => {
+const UpdateCoachProfile = () => {
+  const { id } = useParams();
   const [coachForm, setCoachForm] = useState({
-    user_id: '',
     title: '',
     fide_id: '',
     national_title: '',
@@ -16,7 +16,7 @@ const CreateCoach = () => {
     rating: '',
     peak_rating: '',
     years_teaching_experience: '',
-    primary_specialization_id: '', 
+    primary_specialization_id: '',
     secondary_specialization_id: '',
     hourly_rate: '',
     preferred_languages: [],
@@ -24,74 +24,52 @@ const CreateCoach = () => {
     communication_methods: [],
     professional_bio: '',
     video_introduction_url: '',
-    social_media_links: [''], 
+    social_media_links: [''],
   });
 
-  const [users, setUsers] = useState([]);
-  const [specializations, setSpecializations] = useState([]); 
+  const [specializations, setSpecializations] = useState([]);
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
-  const [showAlert, setShowAlert] = useState(true);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
-  const status = user && user.role === 'admin' ? 'approved' : 'pending';
 
   useEffect(() => {
-    const fetchCoachUsers = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axiosInstance.get('/coaches');
-        setUsers(response.data);
+        const specsResponse = await axiosInstance.get('/specializations');
+        setSpecializations(specsResponse.data);
+
+        const coachResponse = await axiosInstance.get(`/coaches/${id}`);
+        const coachData = coachResponse.data;
+        console.log(coachResponse.data)
+        setCoachForm({
+          ...coachData,
+          preferred_languages: Array.isArray(coachData.preferred_languages) ? coachData.preferred_languages : [],
+          teaching_formats: Array.isArray(coachData.teaching_formats) ? coachData.teaching_formats : [],
+          communication_methods: Array.isArray(coachData.communication_methods) ? coachData.communication_methods : [],
+          social_media_links: Array.isArray(coachData.social_media_links) ? coachData.social_media_links : [''],
+          primary_specialization_id: coachData.primary_specialization_id || '',
+          secondary_specialization_id: coachData.secondary_specialization_id || '',
+        });
+        
+
       } catch (error) {
-        console.error('Error fetching coach users:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    const fetchSpecializations = async () => { 
-      try {
-        const response = await axiosInstance.get('/specializations');
-        setSpecializations(response.data);
-      } catch (error) {
-        console.error('Error fetching specializations:', error);
-      }
-    };
-
-    fetchCoachUsers();
-    fetchSpecializations(); 
-  }, []);
+    fetchData();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCoachForm({ ...coachForm, [name]: value });
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: '' });
-    }
-  };
-
-  const handleSelectChange = (selectedOption) => {
-    setCoachForm({ ...coachForm, user_id: selectedOption ? selectedOption.value : '' });
-    if (errors.user_id) {
-      setErrors({ ...errors, user_id: '' });
-    }
-  };
-
-  const handleArrayChange = (e) => {
-    const { name, options } = e.target;
-    const selectedValues = Array.from(options)
-      .filter(option => option.selected)
-      .map(option => option.value);
-    
-    setCoachForm({ ...coachForm, [name]: selectedValues });
+    if (errors[name]) setErrors({ ...errors, [name]: '' });
   };
 
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
-
-    if (!coachForm.user_id) {
-      newErrors.user_id = 'User selection is required';
-      isValid = false;
-    }
 
     if (!coachForm.rating) {
       newErrors.rating = 'Rating is required';
@@ -117,13 +95,11 @@ const CreateCoach = () => {
     return isValid;
   };
 
-  const handleCreateCoach = async (e) => {
+  const handleUpdateCoach = async (e) => {
     e.preventDefault();
     setSuccessMessage('');
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       setLoading(true);
@@ -136,60 +112,29 @@ const CreateCoach = () => {
         social_media_links: coachForm.social_media_links,
       };
 
-      await axiosInstance.post('/coaches', {
-        ...formData,
-        status: status,
-      });
-
-      setSuccessMessage('Coach profile created successfully!');
+      await axiosInstance.put(`/coaches/${id}`, formData);
+      setSuccessMessage('Coach profile updated successfully!');
       setErrors({});
-
-      setCoachForm({
-        user_id: '',
-        title: '',
-        fide_id: '',
-        national_title: '',
-        certification_level: '',
-        rating: '',
-        peak_rating: '',
-        years_teaching_experience: '',
-        primary_specialization_id: '', 
-        secondary_specialization_id: '', 
-        hourly_rate: '',
-        preferred_languages: [],
-        teaching_formats: [],
-        communication_methods: [],
-        professional_bio: '',
-        video_introduction_url: '',
-        social_media_links: [''], 
-      });
+      navigate("/coach/dashboard/profilecoach");
 
     } catch (error) {
-      if (error.response) {
-        if (error.response.status === 422) {
-          const serverErrors = {};
-          Object.keys(error.response.data.errors).forEach(key => {
-            serverErrors[key] = error.response.data.errors[key][0];
-          });
-          setErrors(serverErrors);
-        } else {
-          setErrors({ ...errors, form: 'Error creating coach profile' });
-        }
+      if (error.response?.status === 422) {
+        const serverErrors = {};
+        Object.keys(error.response.data.errors).forEach(key => {
+          serverErrors[key] = error.response.data.errors[key][0];
+        });
+        setErrors(serverErrors);
       } else {
-        setErrors({ ...errors, form: 'Network error. Please try again.' });
+        setErrors({ form: error.response?.data?.message || 'An error occurred' });
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCloseAlert = () => {
-    setShowAlert(false);
-  };
-
-  const userOptions = users.map(user => ({
-    value: user.id,
-    label: `${user.first_name} ${user.last_name} (${user.email})`
+  const specializationOptions = specializations.map(spec => ({
+    value: spec.id,
+    label: spec.name,
   }));
   const teachingFormatOptions = [
     { value: 'One-on-One', label: 'One-on-One Lessons' },
@@ -204,11 +149,6 @@ const CreateCoach = () => {
     { value: 'Video Call', label: 'Video Call' },
     { value: 'In-Person', label: 'In-Person' }
   ];
-  const specializationOptions = specializations.map(spec => ({
-    value: spec.id,
-    label: spec.name,
-  }));
-
   const handleSocialMediaChange = (index, value) => {
     const updatedLinks = [...coachForm.social_media_links];
     updatedLinks[index] = value;
@@ -226,24 +166,12 @@ const CreateCoach = () => {
 
   return (
     <div className="create-user-container">
-      <h1 className="create-user-title">Create Coach Profile</h1>
+      <h1 className="create-user-title">Update Coach Profile</h1>
       
-      {successMessage && <SuccessAlert message={successMessage} onClose={handleCloseAlert} />}
-      {errors.form && <ErrorAlert message={errors.form} onClose={handleCloseAlert} />}
+      {successMessage && <SuccessAlert message={successMessage} />}
+      {errors.form && <ErrorAlert message={errors.form} />}
 
-      <form onSubmit={handleCreateCoach} className="create-user-form">
-        <div className="form-group">
-          <label>Select Coach User</label>
-          <Select
-            name="user_id"
-            value={userOptions.find(option => option.value === coachForm.user_id)}
-            onChange={handleSelectChange}
-            options={userOptions}
-            className={`form-select ${errors.user_id ? 'is-invalid' : ''}`}
-          />
-          {errors.user_id && <div className="error-message">{errors.user_id}</div>}
-        </div>
-
+      <form onSubmit={handleUpdateCoach} className="create-user-form">
         <div className="form-group">
           <label>Title</label>
           <input
@@ -312,7 +240,7 @@ const CreateCoach = () => {
         </div>
 
         <div className="form-group">
-          <label>Years of Teaching Experience</label>
+          <label>Years of Experience</label>
           <input
             type="number"
             name="years_teaching_experience"
@@ -338,40 +266,44 @@ const CreateCoach = () => {
         <div className="form-group">
           <label>Primary Specialization</label>
           <Select
-            name="primary_specialization_id"
-            value={specializationOptions.find(option => option.value === coachForm.primary_specialization_id)}
-            onChange={selectedOption => setCoachForm({ ...coachForm, primary_specialization_id: selectedOption ? selectedOption.value : '' })}
+            value={specializationOptions.find(opt => opt.value === coachForm.primary_specialization_id)}
+            onChange={opt => setCoachForm({ ...coachForm, primary_specialization_id: opt?.value || '' })}
             options={specializationOptions}
-            className={`form-select ${errors.primary_specialization_id ? 'is-invalid' : ''}`}
+            className="form-select"
+            isClearable
           />
-          {errors.primary_specialization_id && <div className="error-message">{errors.primary_specialization_id}</div>}
         </div>
 
         <div className="form-group">
           <label>Secondary Specialization</label>
           <Select
-            name="secondary_specialization_id"
-            value={specializationOptions.find(option => option.value === coachForm.secondary_specialization_id)}
-            onChange={selectedOption => setCoachForm({ ...coachForm, secondary_specialization_id: selectedOption ? selectedOption.value : '' })}
+            value={specializationOptions.find(opt => opt.value === coachForm.secondary_specialization_id)}
+            onChange={opt => setCoachForm({ ...coachForm, secondary_specialization_id: opt?.value || '' })}
             options={specializationOptions}
-            className={`form-select ${errors.secondary_specialization_id ? 'is-invalid' : ''}`}
+            className="form-select"
+            isClearable
           />
-          {errors.secondary_specialization_id && <div className="error-message">{errors.secondary_specialization_id}</div>}
         </div>
 
         <div className="form-group">
           <label>Preferred Languages</label>
           <Select
-            isMulti
-            name="preferred_languages"
-            value={coachForm.preferred_languages.map(lang => ({ value: lang, label: lang }))}
-            onChange={selectedOptions => setCoachForm({ ...coachForm, preferred_languages: selectedOptions.map(option => option.value) })}
-            options={[
-              { value: 'English', label: 'English' },
-              { value: 'French', label: 'French' },
-            ]}
-            className="form-select"
-          />
+  isMulti
+  name="preferred_languages"
+  value={(coachForm.preferred_languages || []).map(lang => ({ value: lang, label: lang }))}
+  onChange={selected =>
+    setCoachForm({
+      ...coachForm,
+      preferred_languages: selected.map(option => option.value),
+    })
+  }
+  options={[
+    { value: 'English', label: 'English' },
+    { value: 'French', label: 'French' },
+  ]}
+  className="form-select"
+/>
+
         </div>
 
         <div className="form-group">
@@ -385,14 +317,21 @@ const CreateCoach = () => {
                 className="form-input"
                 placeholder="Social Media URL"
               />
-              <button type="button" onClick={() => removeSocialMediaLink(index)} className="remove-link-button">
-                                 <FiTrash2 className="icon" />
-               
+              <button 
+                type="button" 
+                onClick={() => removeSocialMediaLink(index)} 
+                className="remove-link-button"
+              >
+                <FiTrash2 />
               </button>
             </div>
           ))}
-          <button type="button" onClick={addSocialMediaLink} className="add-link-button">
-            Add Social Media Link
+          <button 
+            type="button" 
+            onClick={addSocialMediaLink} 
+            className="add-link-button"
+          >
+            Add Link
           </button>
         </div>
         <div className="form-group">
@@ -446,22 +385,12 @@ const CreateCoach = () => {
           />
         </div>
 
-        <button
-          type="submit"
-          className="submit-button"
-          disabled={loading}
-        >
-          {loading ? (
-            <span className="loading-button">
-              <span className="spinner_button"></span> Creating...
-            </span>
-          ) : (
-            "Create Coach Profile"
-          )}
+        <button type="submit" className="submit-button" disabled={loading}>
+          {loading ? 'Updating...' : 'Update Profile'}
         </button>
       </form>
     </div>
   );
 };
 
-export default CreateCoach;
+export default UpdateCoachProfile;

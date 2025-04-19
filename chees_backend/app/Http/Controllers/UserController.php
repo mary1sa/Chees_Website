@@ -45,6 +45,21 @@ class UserController extends Controller
     return response()->json($users);
     }
 
+public function getCoachById($id)
+{
+    $user = User::with('role')
+        ->where('id', $id)
+        ->whereHas('role', function ($query) {
+            $query->where('name', 'coach');
+        })
+        ->first();
+
+    if (!$user) {
+        return response()->json(['message' => 'Coach not found'], 404);
+    }
+
+    return response()->json($user);
+}
 
 
 

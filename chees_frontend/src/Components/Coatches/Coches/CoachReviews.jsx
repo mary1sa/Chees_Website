@@ -68,6 +68,15 @@ const CoachReviews = () => {
     filterResults();
   }, [searchTerm, searchDate, reviews]);
 
+
+   const renderStars = (rating) => {
+      return [...Array(rating)].map((_, i) => (
+        <StarIcon
+          key={i}
+          className="star-icon text-amber-400"
+        />
+      ));
+    };
   if (loading) return <PageLoading />;
 
   return (
@@ -118,14 +127,7 @@ const CoachReviews = () => {
                   </span>
                 </div>
                 <div className="overall-rating">
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon
-                      key={i}
-                      className={`star-icon ${
-                        i < review.rating ? 'text-amber-400' : 'text-gray-200'
-                      }`}
-                    />
-                  ))}
+                 {renderStars(review.rating)}
                 </div>
               </div>
 
@@ -136,47 +138,21 @@ const CoachReviews = () => {
               <div className="detailed-ratings">
                 <div className="rating-category">
                   <span>Teaching Clarity:</span>
+                  
                   <div className="category-stars">
-                    {[...Array(5)].map((_, i) => (
-                      <StarIcon
-                        key={i}
-                        className={`star-icon ${
-                          i < review.teaching_clarity_rating
-                            ? 'text-amber-400'
-                            : 'text-gray-200'
-                        }`}
-                      />
-                    ))}
+                  {renderStars(review.teaching_clarity_rating)}
                   </div>
                 </div>
                 <div className="rating-category">
                   <span>Communication:</span>
                   <div className="category-stars">
-                    {[...Array(5)].map((_, i) => (
-                      <StarIcon
-                        key={i}
-                        className={`star-icon ${
-                          i < review.communication_rating
-                            ? 'text-amber-400'
-                            : 'text-gray-200'
-                        }`}
-                      />
-                    ))}
+                  {renderStars(review.communication_rating)}
                   </div>
                 </div>
                 <div className="rating-category">
                   <span>Knowledge Depth:</span>
                   <div className="category-stars">
-                    {[...Array(5)].map((_, i) => (
-                      <StarIcon
-                        key={i}
-                        className={`star-icon ${
-                          i < review.knowledge_depth_rating
-                            ? 'text-amber-400'
-                            : 'text-gray-200'
-                        }`}
-                      />
-                    ))}
+                  {renderStars(review.knowledge_depth_rating)}
                   </div>
                 </div>
               </div>
