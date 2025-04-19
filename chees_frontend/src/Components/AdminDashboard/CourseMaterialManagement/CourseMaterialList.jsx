@@ -1,11 +1,112 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiEdit, FiTrash2, FiDownload, FiEye, FiChevronLeft, FiChevronRight, FiList } from 'react-icons/fi';
+import { FiPlus, FiEdit, FiTrash2, FiDownload, FiEye, FiChevronLeft, FiChevronRight, FiList, FiChevronDown } from 'react-icons/fi';
 import axiosInstance from '../../../api/axios';
 import '../CourseManagement/CourseManagement.css';
 import '../../AdminDashboard/UserTable.css';
 import PageLoading from '../../PageLoading/PageLoading';
 import ConfirmDelete from '../../Confirm/ConfirmDelete';
+
+function ScrollableDropdown({ options, value, onChange, placeholder }) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const dropdownRef = React.useRef(null);
+
+  // Get selected option display text
+  const selectedOption = options.find(option => option.value === value);
+  const displayText = selectedOption ? selectedOption.label : placeholder || "Select an option";
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div className="custom-dropdown" ref={dropdownRef}>
+      <div 
+        className="custom-dropdown-header" 
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className="custom-dropdown-selected">{displayText}</div>
+        <FiChevronDown className={`custom-dropdown-arrow ${isOpen ? 'open' : ''}`} />
+      </div>
+      {isOpen && (
+        <div className="custom-dropdown-options">
+          {options.map(option => (
+            <div 
+              key={option.value} 
+              className={`custom-dropdown-option ${option.value === value ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+      {/* Styles for the custom dropdown */}
+      <style jsx>{`
+        .custom-dropdown {
+          position: relative;
+          width: 100%;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          background: #fafafa;
+          cursor: pointer;
+          user-select: none;
+        }
+        .custom-dropdown-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 15px;
+          background: #fafafa;
+          border-radius: 4px;
+        }
+        .custom-dropdown-arrow {
+          transition: transform 0.2s ease;
+        }
+        .custom-dropdown-arrow.open {
+          transform: rotate(180deg);
+        }
+        .custom-dropdown-options {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          max-height: 250px;
+          overflow-y: auto;
+          background: #fafafa;
+          border: 1px solid #ddd;
+          border-top: none;
+          border-radius: 0 0 4px 4px;
+          z-index: 10;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .custom-dropdown-option {
+          padding: 10px 15px;
+          transition: background 0.2s;
+        }
+        .custom-dropdown-option:hover {
+          background: #f5f5f5;
+        }
+        .custom-dropdown-option.selected {
+          background: #e6f7ff;
+          color: #1890ff;
+        }
+      `}</style>
+    </div>
+  );
+}
 
 const CourseMaterialList = () => {
   const [materials, setMaterials] = useState([]);
@@ -31,10 +132,31 @@ const CourseMaterialList = () => {
   
   const fetchCourses = async () => {
     try {
-      const response = await axiosInstance.get('/api/courses');
-      if (response.data.success) {
-        setCourses(response.data.data.data);
+      // Fetch the first page to get pagination info
+      const firstPageRes = await axiosInstance.get('/api/courses?per_page=10&page=1');
+      console.log('Courses API response (first page):', firstPageRes.data);
+      if (!firstPageRes.data.success) return;
+      const pageData = firstPageRes.data.data;
+      let allCourses = Array.isArray(pageData.data) ? pageData.data : [];
+      const total = pageData.total || allCourses.length;
+      const perPage = pageData.per_page || 10;
+      const totalPages = pageData.last_page || Math.ceil(total / perPage);
+
+      // Fetch additional pages if needed
+      if (totalPages > 1) {
+        const requests = [];
+        for (let page = 2; page <= totalPages; page++) {
+          requests.push(axiosInstance.get(`/api/courses?per_page=${perPage}&page=${page}`));
+        }
+        const responses = await Promise.all(requests);
+        responses.forEach(res => {
+          if (res.data.success && res.data.data && Array.isArray(res.data.data.data)) {
+            allCourses = allCourses.concat(res.data.data.data);
+          }
+        });
       }
+      console.log('Fetched', allCourses.length, 'courses for dropdown:', allCourses);
+      setCourses(allCourses);
     } catch (err) {
       console.error('Error fetching courses:', err);
     }
@@ -361,16 +483,12 @@ const CourseMaterialList = () => {
         </div>
         
         <div className="filter-group">
-          <select 
-            value={filterCourse} 
-            onChange={handleCourseFilterChange}
-            className="filter-select"
-          >
-            <option value="all">All Courses</option>
-            {courses.map(course => (
-              <option key={course.id} value={course.id}>{course.title}</option>
-            ))}
-          </select>
+          <ScrollableDropdown
+  options={[{ value: 'all', label: 'All Courses' }, ...courses.map(course => ({ value: course.id, label: course.title }))]}
+  value={filterCourse}
+  onChange={(val) => { setFilterCourse(val); setCurrentPage(1); }}
+  placeholder="Select Course"
+/>
         </div>
         
         <div className="filter-group">
@@ -402,12 +520,12 @@ const CourseMaterialList = () => {
             <table className="materials-table">
               <thead>
                 <tr>
-                  <th width="20%">Title</th>
-                  <th width="15%">Course</th>
+                  <th width="18%">Title</th>
+                  <th width="14%">Course</th>
                   <th width="10%">Type</th>
-                  <th width="25%">Description</th>
-                  <th width="10%">Downloadable</th>
-                  <th width="12%">Actions</th>
+                  <th width="22%">Description</th>
+                  <th width="11%">Downloadable</th>
+                  <th width="17%">Actions</th>
                 </tr>
               </thead>
               <tbody>

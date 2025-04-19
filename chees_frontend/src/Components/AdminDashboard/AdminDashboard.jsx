@@ -177,8 +177,7 @@ const AdminDashboard = () => {
           icon: <FiPlusCircle className="submenu-icon" /> 
         },
       ]
-    }
-,    
+    },
     {
       title: "Courses",
       icon: <FiBook />,
@@ -196,6 +195,23 @@ const AdminDashboard = () => {
       ]
     },
     {
+      title: "Course Material",
+      icon: <FiBook />,
+      submenus: [
+        { 
+          title: "All Courses Material", 
+          path: "course-materials",
+          icon: <FiList className="submenu-icon" />
+        },
+        { 
+          title: "Add Course Material", 
+          path: "course-materials/create",
+          icon: <FiPlusCircle className="submenu-icon" />
+        }
+      ]
+    },
+    
+    {
       title: "Sessions",
       icon: <FiCalendar />,
       submenus: [
@@ -206,32 +222,7 @@ const AdminDashboard = () => {
         },
       ]
     },
-    {
-      title: "Enrollments",
-      icon: <FiCreditCard />,
-      submenus: [
-        { 
-          title: "All Enrollments", 
-          path: "enrollments",
-          icon: <FiList className="submenu-icon" />
-        },
-        { 
-          title: "Enrollment Packages", 
-          path: "enrollments/packages",
-          icon: <FiShoppingCart className="submenu-icon" />
-        },
-        { 
-          title: "Create Enrollment", 
-          path: "enrollments/create",
-          icon: <FiPlusCircle className="submenu-icon" />
-        },
-        { 
-          title: "Enrollment Sessions", 
-          path: "enrollments/sessions",
-          icon: <FiCalendar className="submenu-icon" />
-        }
-      ]
-    },
+   
     {
       title: "Course Levels",
       icon: <FiBarChart2 />,
@@ -243,7 +234,7 @@ const AdminDashboard = () => {
         },
         { 
           title: "Add Level", 
-          path: "createlevel",
+          path: "levels/create",
           icon: <FiPlusCircle className="submenu-icon" />
         }
       ]

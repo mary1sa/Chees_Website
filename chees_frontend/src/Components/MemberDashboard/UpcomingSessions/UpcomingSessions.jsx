@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiCalendar, FiList, FiX, FiClock, FiUser, FiBook, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiCalendar, FiList, FiX, FiClock, FiBook, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import axiosInstance from '../../../api/axios';
 import SessionCard from './SessionCard';
 import SessionCalendar from './SessionCalendar';
@@ -133,9 +133,25 @@ const UpcomingSessions = () => {
   
   return (
     <div className="sessions-container">
-      <div className="sessions-header">
-        <h2>Sessions</h2>
-        <div className="view-toggle">
+      <div className="sessions-header-flex">
+        <div className="sessions-header-left">
+          <button
+            className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
+            onClick={() => setActiveTab('upcoming')}
+          >
+            Upcoming
+          </button>
+          <button
+            className={`tab-button ${activeTab === 'past' ? 'active' : ''}`}
+            onClick={() => setActiveTab('past')}
+          >
+            Past
+          </button>
+        </div>
+        <div className="sessions-header-title">
+          <h2>Sessions</h2>
+        </div>
+        <div className="sessions-header-right">
           <button 
             className={`view-toggle-btn ${view === 'list' ? 'active' : ''}`}
             onClick={() => setView('list')}
@@ -149,20 +165,6 @@ const UpcomingSessions = () => {
             <FiCalendar /> Calendar
           </button>
         </div>
-      </div>
-      <div className="sessions-tabs">
-        <button
-          className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
-          onClick={() => setActiveTab('upcoming')}
-        >
-          Upcoming
-        </button>
-        <button
-          className={`tab-button ${activeTab === 'past' ? 'active' : ''}`}
-          onClick={() => setActiveTab('past')}
-        >
-          Past
-        </button>
       </div>
       
       {view === 'calendar' ? (

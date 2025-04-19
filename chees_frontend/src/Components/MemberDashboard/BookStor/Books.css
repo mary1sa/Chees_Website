@@ -336,7 +336,7 @@
     color: var(--text-light);
   }
   
-  .error {
+  .book-error {
     text-align: center;
     padding: 2rem;
     color: var(--danger-color);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import SuccessAlert from '../Alerts/SuccessAlert';
 import ErrorAlert from '../Alerts/ErrorAlert';
 import axiosInstance from '../config/axiosInstance';
+import './BookStoreDashboard.css';
 
 const AddBook = () => {
     const [formData, setFormData] = useState({
@@ -166,13 +167,13 @@ const AddBook = () => {
               name="cover_image"
               id="cover_image"
               onChange={handleFileChange}
-              className="file-input"
+              className={`booklabel ${previewImage ? 'has-image' : ''}`}
               accept="image/*"
             />
             
             {!previewImage && (
               <div className="default-cover">
-                <svg className="book-icon" viewBox="0 0 24 24">
+                <svg className="books-icon" viewBox="0 0 24 24">
                   <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
                 </svg>
                 <span>Upload Cover Image</span>
@@ -181,7 +182,7 @@ const AddBook = () => {
 
             {previewImage && (
               <div className="image-preview">
-                <img src={previewImage} alt="Book cover preview" />
+                <img src={previewImage} alt="Book cover preview" className="cover-image-preview" />
               </div>
             )}
           </label>

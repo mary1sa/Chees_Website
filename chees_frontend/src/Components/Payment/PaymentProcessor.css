@@ -139,7 +139,14 @@
   color: #2d3748;
   font-weight: 600;
 }
-
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--danger-color);
+  background: rgba(247, 37, 133, 0.1);
+  border-radius: 8px;
+  padding: 2rem 0 !important;
+}
 .course-title {
   margin: 0.5rem 0;
   color: #4a5568;

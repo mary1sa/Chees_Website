@@ -463,8 +463,15 @@
 }
 
 /* Sessions List on Dashboard Overview */
-.view-toggle{
-  margin-left: 1000px;
+.sessions-tabs{
+  gap: 1rem !important;
+  display: flex !important;
+  justify-content: flex-end !important; /* aligns items to the right horizontally */
+  align-items: center !important;       /* vertically center items (optional) */
+  position: relative !important;
+  right: 0 !important;
+  flex: 1 1 100%;
+  margin-right: 10px !important;
 }
 
 .sessions-grid {

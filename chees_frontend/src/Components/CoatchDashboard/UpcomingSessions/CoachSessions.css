@@ -21,11 +21,35 @@
   margin-bottom: 2rem;
 }
 
-.sessions-header {
+.sessions-header-flex {
   margin-bottom: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+}
+
+.sessions-tabs-flex {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  align-items: center;
+}
+
+.view-toggle-flex {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.sessions-header-flex h2 {
+  flex: 0 1 auto;
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--color-text-primary);
+  margin: 0 1.5rem;
 }
 
 .view-toggle {

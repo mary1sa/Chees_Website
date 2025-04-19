@@ -7,12 +7,37 @@
   margin-bottom: 2rem;
 }
 
-.sessions-header {
-  margin-bottom: 1.5rem;
+.sessions-header-flex {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
 }
+
+.sessions-header-left {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1 1 0;
+}
+
+.sessions-header-title {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.sessions-header-right {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1 1 0;
+  justify-content: flex-end;
+}
+
+/* Remove or override the old .sessions-header if needed */
+.sessions-header { display: none; }
 
 .view-toggle {
   display: flex;

@@ -1,11 +1,122 @@
-import React, { useState, useEffect } from 'react';
-import { FiCalendar, FiClock, FiEdit, FiTrash2, FiUsers, FiVideo, FiMap, FiFilter, FiSearch, FiGrid, FiList, FiEye, FiX, FiLink, FiInfo, FiCheck, FiLock, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import React, { useState, useEffect, useRef } from 'react';
+import { FiCalendar, FiClock, FiEdit, FiTrash2, FiUsers, FiVideo, FiSearch, FiGrid, FiList, FiEye, FiX, FiLink, FiInfo, FiCheck, FiLock, FiChevronLeft, FiChevronRight, FiChevronDown } from 'react-icons/fi';
 import axiosInstance from '../../../api/axios';
 import { format } from 'date-fns';
 import './SessionManagement.css';
 import '../../AdminDashboard/UserTable.css';
-import PageLoading from '../../PageLoading/PageLoading';
 import ConfirmDelete from '../../Confirm/ConfirmDelete';
+
+// Custom Dropdown Component
+const ScrollableDropdown = ({ options, value, onChange, placeholder }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  
+  // Get selected option display text
+  const selectedOption = options.find(option => option.value === value);
+  const displayText = selectedOption ? selectedOption.label : placeholder || "Select an option";
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
+  return (
+    <div className="custom-dropdown" ref={dropdownRef}>
+      <div 
+        className="custom-dropdown-header" 
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className="custom-dropdown-selected">{displayText}</div>
+        <FiChevronDown className={`custom-dropdown-arrow ${isOpen ? 'open' : ''}`} />
+      </div>
+      
+      {isOpen && (
+        <div className="custom-dropdown-options">
+          {options.map(option => (
+            <div 
+              key={option.value} 
+              className={`custom-dropdown-option ${option.value === value ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {/* Styles for the custom dropdown */}
+      <style jsx>{`
+        .custom-dropdown {
+          position: relative;
+          width: 100%;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          background: #fafafa;
+          cursor: pointer;
+          user-select: none;
+        }
+        
+        .custom-dropdown-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 15px;
+          background: #fafafa;
+          border-radius: 4px;
+        }
+        
+        .custom-dropdown-arrow {
+          transition: transform 0.2s ease;
+        }
+        
+        .custom-dropdown-arrow.open {
+          transform: rotate(180deg);
+        }
+        
+        .custom-dropdown-options {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          max-height: 250px;
+          overflow-y: auto;
+          background: #fafafa;
+          border: 1px solid #ddd;
+          border-top: none;
+          border-radius: 0 0 4px 4px;
+          z-index: 10;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .custom-dropdown-option {
+          padding: 10px 15px;
+          transition: background 0.2s;
+        }
+        
+        .custom-dropdown-option:hover {
+          background: #f5f5f5;
+        }
+        
+        .custom-dropdown-option.selected {
+          background: #e6f7ff;
+          color: #1890ff;
+        }
+      `}</style>
+    </div>
+  );
+};
 
 const SessionList = ({ onLoadingChange }) => {
   const [sessions, setSessions] = useState([]);
@@ -62,17 +173,36 @@ const SessionList = ({ onLoadingChange }) => {
   useEffect(() => {
     // Reset to page 1 when course filter changes
     setCurrentPage(1);
-    if (courseFilter) {
-      fetchSessions();
-    }
+    fetchSessions();
   }, [courseFilter]);
 
   const fetchCourses = async () => {
     try {
-      const response = await axiosInstance.get('/api/courses');
-      if (response.data.success) {
-        setCourses(response.data.data.data);
+      // Fetch the first page to get pagination info
+      const firstPageRes = await axiosInstance.get('/api/courses?per_page=10&page=1');
+      console.log('Courses API response (first page):', firstPageRes.data);
+      if (!firstPageRes.data.success) return;
+      const pageData = firstPageRes.data.data;
+      let allCourses = Array.isArray(pageData.data) ? pageData.data : [];
+      const total = pageData.total || allCourses.length;
+      const perPage = pageData.per_page || 10;
+      const totalPages = pageData.last_page || Math.ceil(total / perPage);
+
+      // Fetch additional pages if needed
+      if (totalPages > 1) {
+        const requests = [];
+        for (let page = 2; page <= totalPages; page++) {
+          requests.push(axiosInstance.get(`/api/courses?per_page=${perPage}&page=${page}`));
+        }
+        const responses = await Promise.all(requests);
+        responses.forEach(res => {
+          if (res.data.success && res.data.data && Array.isArray(res.data.data.data)) {
+            allCourses = allCourses.concat(res.data.data.data);
+          }
+        });
       }
+      console.log('Fetched', allCourses.length, 'courses for dropdown:', allCourses);
+      setCourses(allCourses);
     } catch (err) {
       console.error('Error fetching courses:', err);
     }
@@ -289,6 +419,19 @@ const SessionList = ({ onLoadingChange }) => {
     return 'Coach Name Not Available';
   };
 
+  // Format courses for the custom dropdown
+  const courseOptions = [
+    { value: '', label: 'All Courses' },
+    ...courses.map(course => ({
+      value: course.id,
+      label: course.title
+    }))
+  ];
+
+  const handleCourseFilterChange = (value) => {
+    setCourseFilter(value);
+  };
+
   return (
     <div className="session-list-container">
       <ConfirmDelete 
@@ -405,9 +548,10 @@ const SessionList = ({ onLoadingChange }) => {
           </div>
         </div>
       )}
+      
       <div className="section-header">
         <h2 className="section-title">Course Sessions</h2>
-        <div className="section-actions">
+        <div className="section-actions session-list-actions">
           <button 
             className={`action-button view-style-button ${viewMode === 'grid' ? 'active' : ''}`}
             onClick={() => setViewMode('grid')}
@@ -425,29 +569,25 @@ const SessionList = ({ onLoadingChange }) => {
       
       <div className="course-list-container">
         <div className="course-list-header">
-          <div className="course-search-filter">
-            <div className="search-box">
-              <FiSearch className="search-icon" />
+          <div className="filter-controls">
+            <div className="filter-group">
               <input 
                 type="text" 
                 placeholder="Search sessions by title or description"
                 value={searchTerm}
                 onChange={handleSearchChange}
+                className="filter-input"
               />
             </div>
             
-            <div className="filter-dropdown">
-              <select 
-                value={courseFilter} 
-                onChange={(e) => setCourseFilter(e.target.value)}
-              >
-                <option value="">All Courses</option>
-                {courses.map(course => (
-                  <option key={course.id} value={course.id}>
-                    {course.title}
-                  </option>
-                ))}
-              </select>
+            <div className="filter-group">
+              {/* Replace the select with our custom dropdown */}
+              <ScrollableDropdown
+                options={courseOptions}
+                value={courseFilter}
+                onChange={handleCourseFilterChange}
+                placeholder="All Courses"
+              />
             </div>
           </div>
         </div>
