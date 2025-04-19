@@ -50,7 +50,7 @@
   .card-icon {
     width: 24px;
     height: 24px;
-    color: #4f46e5;
+    color: #0f5438;
   }
   
   .card-body {
@@ -144,12 +144,13 @@
   }
   
   .book-now-btn {
-    background: #4f46e5;
+    background: #009E60;
     color: white;
   }
   
   .book-now-btn:hover:not(:disabled) {
-    background: #4338ca;
+    background: #9dd6bf;
+    color: black;
   }
   
   .book-now-btn:disabled {
