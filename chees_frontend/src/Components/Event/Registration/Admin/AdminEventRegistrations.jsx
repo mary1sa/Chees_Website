@@ -310,7 +310,7 @@ const AdminEventRegistrations = () => {
       
       <div className="filter-controls">
         <div className="search-container">
-          <FiSearch className="search-icon" />
+          {/* <FiSearch className="search-icon" /> */}
           <input
             type="text"
             value={searchTerm}
@@ -374,7 +374,7 @@ const AdminEventRegistrations = () => {
                 </button>
                 <button 
                   onClick={() => openEditModal(reg)} 
-                  className="action-btn update-btn"
+                  className="action-btn update-btn "
                   title="Edit"
                 >
                   <FiEdit className="icon" />
@@ -568,13 +568,13 @@ const AdminEventRegistrations = () => {
                 <button 
                   type="button" 
                   onClick={() => setEditModal({ show: false, registration: null, formData: {} })}
-                  className="btn btn-secondary"
+                  className="btn btn-secondary submit-button cancel-button "
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="btn btn-primary"
+                  className="btn btn-primary submit-button "
                   disabled={loading}
                 >
                   {loading ?

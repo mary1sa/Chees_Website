@@ -100,11 +100,7 @@ const MemberDashboard = () => {
         }
       ]
     },
-    {
-      title: "Events",
-      icon: <FiCalendar />,
-      path: "/member/events"
-    },
+   
     {
       title: "My Registrations",
       icon: <FiCalendar />,

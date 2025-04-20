@@ -227,7 +227,7 @@ const GettingRegistrations = () => {
       <div className="tab-navigation">
         <button 
           onClick={() => handleTabChange('all')}
-          className={`tab-button ${activeTab === 'all' ? 'active' : ''}`}
+          className={`tab-button ${activeTab === 'all' ? 'active' : ''}` }
         >
           All Registrations
         </button>
@@ -287,7 +287,7 @@ const GettingRegistrations = () => {
 
         {/* Search Input */}
         <div className="search-container">
-          <FiSearch className="search-icon" />
+          {/* <FiSearch className="search-icon" /> */}
           <input
             type="text"
             value={searchTerm}

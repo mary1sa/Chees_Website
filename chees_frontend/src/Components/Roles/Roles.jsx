@@ -484,7 +484,7 @@ const FetchRoles = () => {
             className="filter-input"
           />
         </div>
-        <button onClick={openCreateModal} className="btn-create">
+        <button onClick={openCreateModal} className="add-new-btn">
           <FiPlus className="icon" /> Create New Role
         </button>
       </div>

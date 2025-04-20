@@ -219,7 +219,7 @@ const Createnew=()=>{
             ))}
           </select>
         </div>
-        <button onClick={Createnew} className="btn-create">
+        <button onClick={Createnew} className="add-new-btn">
                   <FiPlus className="icon" /> Create User
                 </button>
       </div>

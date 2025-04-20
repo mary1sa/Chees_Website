@@ -377,7 +377,7 @@ const openEditModal = (round) => {
 
       <div className="filter-controls"> 
         <div className="search-container"> 
-          <FiSearch className="search-icon" /> 
+          {/* <FiSearch className="search-icon" />  */}
           <input 
             type="text" 
             value={searchTerm} 
@@ -391,7 +391,6 @@ const openEditModal = (round) => {
               onClick={clearSearch} 
               className="clear-search-btn" 
             > 
-              <FiX /> 
             </button> 
           )} 
         </div> 
@@ -560,13 +559,13 @@ const openEditModal = (round) => {
                 <button  
                   type="button" 
                   onClick={() => setShowCreateModal(false)} 
-                  className="btn btn-secondary" 
+                  className="btn btn-secondary submit-button cancel-button" 
                 > 
                   Cancel 
                 </button> 
                 <button  
                   type="submit" 
-                  className="btn btn-primary" 
+                  className= " submit-button btn btn-primary" 
                   disabled={loading} 
                 > 
                   {loading ? ( 
@@ -651,13 +650,13 @@ const openEditModal = (round) => {
           <button  
             type="button" 
             onClick={() => setShowEditModal(false)} 
-            className="btn btn-secondary" 
+            className="btn btn-secondary submit-button cancel-button" 
           > 
             Cancel 
           </button> 
           <button  
             type="submit" 
-            className="btn btn-primary" 
+            className="btn btn-primary submit-button" 
             disabled={loading} 
           > 
             {loading ? ( 

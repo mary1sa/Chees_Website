@@ -113,7 +113,7 @@ width: 90%;
 }
   
   .submit-button:hover {
-    background-color: #b6edd1;
+    background-color: #b6edd1 !important;
     color: #64748b;    transform: translateY(-3px);
   }
   
@@ -199,8 +199,12 @@ width: 90%;
   
 
   /*hajar  */
+
+  .checkbox-label{
+    display: flex !important;
+  }
   .cancel-button {
-    background-color: #f44336;
+    background-color: #f44336 !important;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -210,7 +214,7 @@ width: 90%;
   }
   
   .cancel-button:hover {
-    background-color: #d32f2f;
+    /* background-color: #d32f2f; */
     opacity: 0.8;
     color: rgb(188, 187, 187);
   }
@@ -248,8 +252,8 @@ width: 90%;
 
 .search-input:focus {
   outline: none;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  /* border-color: #4f46e5; */
+  /* box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); */
 }
 
 .clear-search-btn {
@@ -392,6 +396,21 @@ width: 90%;
   display: flex;
   justify-content: center;
   align-items: center;
+  border: none;
+  color: #fff;
+  background-color: #009E60;
+  cursor: pointer;
+  
+  /* padding: 10px 20px; */
+}
+.add-new-btn:hover{
+  background-color: #009E60;
+  opacity: 0.8;
+  transform:  translateY(-1px);
+  transform:  translateX(-1px);
+
+
+
 }
 /* Tab Navigation */
 .tab-navigation {
@@ -418,7 +437,7 @@ width: 90%;
 }
 
 .tab-button.active {
-  background-color: #28a745;
+  background-color: #28a745 !important;
   color: white;
 }
 

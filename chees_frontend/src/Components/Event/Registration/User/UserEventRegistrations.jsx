@@ -346,7 +346,7 @@ const UserEventRegistrations = () => {
           <button 
         onClick={handleAddReg} 
         style={{width:'fit-content'}}
-        className={`btn ${toggleForm ? 'btn-secondary' : 'btn-primary'}`}
+        className="btn  create-registration-btn  btn-create add-new-btn"
         disabled={availableEvents.length === 0}
       >
         Create Registration<FiPlus className="icon" />
@@ -505,14 +505,14 @@ const UserEventRegistrations = () => {
                 <div className="modal-footer form-groupp">
                   <button 
                     onClick={handleAddReg}
-                    className="btn btn-secondary"
+                    className="btn btn-secondary submit-button cancel-button"
                     // style={{width:'fit-content'}}
                   >
                     Cancel
                   </button>
                   <button 
                     onClick={handleSubmit} 
-                    className="btn btn-primary"
+                    className="btn btn-primary submit-button  "
                     // style={{width:'fit-content'}}
                   >
                     Register

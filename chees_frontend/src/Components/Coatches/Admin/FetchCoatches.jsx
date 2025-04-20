@@ -210,7 +210,7 @@ const Createnew=()=>{
             <option value="rejected">Rejected</option>
           </select>
         </div>
-        <button onClick={Createnew} className="btn-create">
+        <button onClick={Createnew} className="add-new-btn">
                   <FiPlus className="icon" /> Create Coach
                 </button>
       </div>

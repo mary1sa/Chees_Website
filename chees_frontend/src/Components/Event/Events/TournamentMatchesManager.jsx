@@ -445,7 +445,7 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
       
       <div className="filter-controls">
         <div className="search-container">
-          <FiSearch className="search-icon" />
+          {/* <FiSearch className="search-icon" /> */}
           <input
             type="text"
             value={searchTerm}
@@ -648,13 +648,13 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
                 <button 
                   type="button" 
                   onClick={() => setShowCreateModal(false)}
-                  className="btn btn-secondary"
+                  className="btn btn-secondary submit-button cancel-button"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="btn btn-primary"
+                  className="btn btn-primary submit-button"
                   disabled={loading}
                 >
                   {loading ? (
@@ -763,13 +763,13 @@ const TournamentMatchesManager = ({ roundId, eventId, onClose }) => {
                 <button 
                   type="button" 
                   onClick={() => setShowEditModal(false)}
-                  className="btn btn-secondary"
+                  className="btn btn-secondary submit-button cancel-button"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="btn btn-primary"
+                  className="btn btn-primary submit-button"
                   disabled={loading}
                 >
                   {loading ? (
