@@ -328,7 +328,7 @@
   gap: var(--spacing-md);
 }
 
-.cancel-button, 
+.cancel-course-button, 
 .save-button {
   padding: 12px 24px;
   border: none;
@@ -342,13 +342,13 @@
   transition: var(--transition);
 }
 
-.cancel-button {
+.cancel-course-button {
   background-color: transparent;
   color: var(--danger-color);
   border: 1px solid var(--danger-color);
 }
 
-.cancel-button:hover {
+.cancel-course-button:hover {
   background-color: rgba(244, 67, 54, 0.1);
 }
 
