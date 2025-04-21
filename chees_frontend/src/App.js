@@ -223,7 +223,7 @@ function App() {
           <Route path="books/:id" element={<BookDetail />} />
           <Route path="books/:id/order" element={<OrderForm />} />
           <Route path="authors" element={<Authors />} />
-          {/* <Route path="myOrderes" element={<MemberOrders/>} /> */}
+          <Route path="myOrderes" element={<MemberOrders/>} />
           <Route path="authors/:id" element={<ViewAuthor/>} />
           <Route path="orders/:id" element={<OrderDetails />} />
 
