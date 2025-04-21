@@ -313,23 +313,23 @@ const CoachDashboardOverview = () => {
         <div className="quick-actions">
           <h2>Quick Actions</h2>
           <div className="action-buttons">
-            <Link to="/coach/dashboard/upcoming-sessions" className="action-button sessions-action">
+            <Link to="/coach/dashboard/upcoming-sessions" className="action-button dash-icon sessions-action">
               <FiCalendar />
               <span>Manage Sessions</span>
             </Link>
-            <Link to="/coach/dashboard/coachavailability" className="action-button orders-action">
+            <Link to="/coach/dashboard/coachavailability" className="action-button dash-icon orders-action">
               <FiClock />
               <span>View Availability</span>
             </Link>
-            <Link to="/coach/dashboard/creatavailability" className="action-button users-action">
+            <Link to="/coach/dashboard/creatavailability" className="action-button dash-icon users-action">
               <FiPlusCircle />
               <span>Add Availability</span>
             </Link>
-            <Link to="/coach/dashboard/registrations" className="action-button events-action">
+            <Link to="/coach/dashboard/registrations" className="action-button dash-icon events-action">
               <FiInfo />
               <span>Event Registrations</span>
             </Link>
-            <Link to="/coach/dashboard/courses" className="action-button courses-action">
+            <Link to="/coach/dashboard/courses" className="action-button dash-icon courses-action">
               <FiFileText />
               <span>Course Content</span>
             </Link>
