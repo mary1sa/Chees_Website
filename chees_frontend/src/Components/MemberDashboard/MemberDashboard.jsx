@@ -129,7 +129,12 @@ const MemberDashboard = () => {
           title: "My Orders", 
           path: "/member/dashboard/myOrderes",
           icon: <FiShoppingCart className="submenu-icon" />
-        }
+        },
+        { 
+          title: "Wishlist", 
+          path: "/member/dashboard/books/wishlist",
+          icon: <FiHeart className="submenu-icon" />
+        },
       ]
     },
     {

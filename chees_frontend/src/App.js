@@ -86,11 +86,12 @@ import BookDetail from './Components/MemberDashboard/BookStor/BookDetail';
 import OrderForm from './Components/MemberDashboard/BookStor/OrderForm';
 import BookStoreDashboard from './Components/BookStore/BookStoreDashboard';
 import Authors from './Components/MemberDashboard/BookStor/Authors';
-// import MemberOrders from './Components/MemberDashboard/BookStor/MemberOrders';
+import MemberOrders from './Components/MemberDashboard/BookStor/MemberOrders';
 import OrderDetails from './Components/MemberDashboard/BookStor/OrderDetails';
 import ReviewTable from './Components/Coatches/Admin/ReviewTable';
 import ProfileCoach from './Components/CoatchDashboard/ProfileCoach';
 import UpdateCoachProfile from './Components/CoatchDashboard/UpdateCoachProfile';
+import BookWishlist from './Components/MemberDashboard/BookStor/BookWishlist';
 
 
 function App() {
@@ -208,6 +209,7 @@ function App() {
           <Route path="myOrderes" element={<MemberOrders/>} />
           <Route path="authors/:id" element={<ViewAuthor/>} />
           <Route path="orders/:id" element={<OrderDetails />} />
+          <Route path="books/wishlist" element={<BookWishlist />} />
 
           {/* Session Routes */}
           <Route path="upcoming-sessions" element={<UpcomingSessions />} />

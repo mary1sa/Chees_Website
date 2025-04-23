@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiBook, FiShoppingCart, FiSearch, FiFilter } from 'react-icons/fi';
+import { FiBook, FiShoppingCart, FiSearch, FiFilter, FiHeart } from 'react-icons/fi';
+import { FaHeart } from 'react-icons/fa';
 import axiosInstance from '../../config/axiosInstance';
 import PageLoading from '../../PageLoading/PageLoading';
-import './Books.css'
+import './Books.css';
 
 const Books = () => {
   const [books, setBooks] = useState([]);
@@ -17,27 +18,93 @@ const Books = () => {
     maxPrice: ''
   });
   const [showFilters, setShowFilters] = useState(false);
-
-  // Extract unique categories and authors from books data
+  const [wishlistUpdating, setWishlistUpdating] = useState({});
+  const [wishlistedBooks, setWishlistedBooks] = useState([]);
   const categories = [...new Set(books.map(book => book.category?.name).filter(Boolean))];
   const authors = [...new Set(books.map(book => book.author?.name).filter(Boolean))];
-
   useEffect(() => {
-    const fetchBooks = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axiosInstance.get('/books');
-        setBooks(response.data);
-        setLoading(false);
+        setLoading(true);
+        
+        // Fetch books
+        const booksResponse = await axiosInstance.get('/books');
+        setBooks(booksResponse.data);
+        
+        // Fetch wishlist if user is authenticated
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (token && user?.id) {
+          try {
+            const wishlistResponse = await axiosInstance.get(`/users/${user.id}/wishlist`);
+            if (wishlistResponse.data.success) {
+              const bookWishlist = wishlistResponse.data.data
+                .filter(item => item.item_type === 'book')
+                .map(item => item.item_id);
+              setWishlistedBooks(bookWishlist);
+            }
+          } catch (wishlistError) {
+            console.error('Error fetching wishlist:', wishlistError);
+          }
+        }
       } catch (err) {
         setError(err.message);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchBooks();
+    fetchData();
   }, []);
 
-  const handleSearchChange = (e) => {
+  const toggleWishlist = async (bookId, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    if (wishlistUpdating[bookId]) return;
+    
+    try {
+      setWishlistUpdating(prev => ({ ...prev, [bookId]: true }));
+      
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      if (!token || !user?.id) {
+        setError('Please log in to add books to your wishlist');
+        return;
+      }
+      
+      // Optimistically update UI
+      const isWishlisted = wishlistedBooks.includes(bookId);
+      setWishlistedBooks(prev => 
+        isWishlisted 
+          ? prev.filter(id => id !== bookId)
+          : [...prev, bookId]
+      );
+      
+      // Make API call
+      await axiosInstance.post(`/wishlists/toggle/${bookId}`, {
+        item_type: 'book'
+      });
+      
+    } catch (err) {
+      setError('Error updating wishlist');
+      // Revert on error
+      setWishlistedBooks(prev => 
+        wishlistedBooks.includes(bookId)
+          ? prev.filter(id => id !== bookId)
+          : [...prev, bookId]
+      );
+    } finally {
+      setWishlistUpdating(prev => ({ ...prev, [bookId]: false }));
+    }
+  };
+
+
+const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
@@ -94,7 +161,6 @@ const Books = () => {
 
   if (loading) return <PageLoading />;
   if (error) return <div className="book-error">Error: {error}</div>;
-
   return (
     <div className="books-container">
       <div className="books-header">
@@ -109,14 +175,20 @@ const Books = () => {
               onChange={handleSearchChange}
             />
           </div>
-          <button 
-            className="filter-toggle"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <FiFilter /> Filters
-          </button>
+          <div className="header-actions">
+            <button 
+              className="filter-toggle"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <FiFilter /> Filters
+            </button>
+            <Link to="/member/dashboard/books/wishlist" className="wishlist-link">
+              <FaHeart /> My Wishlist
+            </Link>
+          </div>
         </div>
       </div>
+
 
       {showFilters && (
         <div className="filters-panel">
@@ -177,7 +249,7 @@ const Books = () => {
         </div>
       )}
 
-      <div className="books-grid">
+<div className="books-grid">
         {filteredBooks.length > 0 ? (
           filteredBooks.map(book => (
             <div key={book.id} className="book-card">
@@ -193,6 +265,12 @@ const Books = () => {
                       <FiBook size={48} />
                     </div>
                   )}
+                  <button 
+                    className={`heart-button ${wishlistedBooks.includes(book.id) ? 'active' : ''}`}
+                    onClick={(e) => toggleWishlist(book.id, e)}
+                  >
+                    <FaHeart size={30} />
+                  </button>
                 </div>
               </Link>
               <div className="book-details">
@@ -218,11 +296,11 @@ const Books = () => {
                 </p>
                 <Link 
                   to={`/member/dashboard/books/${book.id}/order`}
-                  state={{ book }} // Add this line to pass the book data
+                  state={{ book }}
                   className={`order-button ${book.stock <= 0 ? 'disabled' : ''}`}
                 >
-                <FiShoppingCart /> Order
-              </Link>
+                  <FiShoppingCart /> Order
+                </Link>
               </div>
             </div>
           ))

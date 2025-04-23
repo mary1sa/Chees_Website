@@ -11,34 +11,34 @@ class BookCategoriesTableSeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'Fiction',
-                'description' => 'Novels and stories about imaginary people and events',
+                'name' => 'Cheese History',
+                'description' => 'Books about the origins and evolution of cheese',
                 'parent_id' => null,
             ],
             [
-                'name' => 'Science Fiction',
-                'description' => 'Fiction dealing with futuristic concepts',
-                'parent_id' => 1,
-            ],
-            [
-                'name' => 'Fantasy',
-                'description' => 'Fiction with magic or supernatural elements',
-                'parent_id' => 1,
-            ],
-            [
-                'name' => 'Non-Fiction',
-                'description' => 'Books based on facts and real events',
+                'name' => 'Cheese Making',
+                'description' => 'Guides and manuals for cheese production',
                 'parent_id' => null,
             ],
             [
-                'name' => 'Biography',
-                'description' => 'Accounts of people\'s lives',
-                'parent_id' => 4,
+                'name' => 'French Cheeses',
+                'description' => 'Books focusing on French cheese varieties',
+                'parent_id' => 1,
             ],
             [
-                'name' => 'Technology',
-                'description' => 'Books about computers and technology',
-                'parent_id' => 4,
+                'name' => 'Italian Cheeses',
+                'description' => 'Books focusing on Italian cheese varieties',
+                'parent_id' => 1,
+            ],
+            [
+                'name' => 'Home Cheese Making',
+                'description' => 'Books for amateur cheese makers',
+                'parent_id' => 2,
+            ],
+            [
+                'name' => 'Professional Cheese Making',
+                'description' => 'Advanced cheese production techniques',
+                'parent_id' => 2,
             ],
         ];
 

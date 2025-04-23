@@ -135,7 +135,16 @@ class OrderController extends Controller
             ], 500);
         }
     }
-
+    public function userOrders(Request $request)
+    {
+        // Get authenticated user's orders with relationships
+        $orders = $request->user()->orders()
+            ->with(['items.book']) // Eager load items and their associated books
+            ->latest() // Order by most recent first
+            ->get();
+    
+        return response()->json($orders);
+    }
 
     
 }

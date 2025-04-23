@@ -819,3 +819,50 @@
   .order-items h3 {
     margin-bottom: 15px;
   }
+
+
+  /* Wishlist Button Styles */
+.heart-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  z-index: 2;
+  color: var(--text-light);
+}
+
+.heart-button:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: scale(1.1);
+}
+
+.heart-button.active {
+  color: var(--danger-color);
+}
+
+.wishlist-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--danger-color);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  transition: all var(--transition-speed) ease;
+  border: 1px solid var(--border-color);
+}
+
+.wishlist-link:hover {
+  background: rgba(247, 37, 133, 0.1);
+  border-color: var(--danger-color);
+}

@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Wishlist;
+use App\Models\Book;
 use App\Models\Course;
+use App\Models\Wishlist;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class WishlistController extends Controller
 {
@@ -275,7 +279,7 @@ class WishlistController extends Controller
     public function userWishlist($user)
     {
         try {
-            // Ensure user is authenticated
+            // Authentication and authorization checks (same as before)
             if (!Auth::check()) {
                 return response()->json([
                     'success' => false,
@@ -283,16 +287,9 @@ class WishlistController extends Controller
                 ], 401);
             }
             
-            // Check if the authenticated user matches the requested user
-            // or if the user has permission to view other users' wishlists
             $currentUser = Auth::user();
             $currentUserId = $currentUser->id;
-            
-            // Safely check admin role if applicable
-            $isAdmin = false;
-            if (method_exists($currentUser, 'hasRole')) {
-                $isAdmin = $currentUser->hasRole('admin');
-            }
+            $isAdmin = method_exists($currentUser, 'hasRole') ? $currentUser->hasRole('admin') : false;
             
             if ($currentUserId != $user && !$isAdmin) {
                 return response()->json([
@@ -301,34 +298,52 @@ class WishlistController extends Controller
                 ], 403);
             }
             
-            // Get all wishlist items for this user where item_type is 'course'
+            // Get all wishlist items
             $wishlistItems = Wishlist::where('user_id', $user)
-                ->where('item_type', 'course')
                 ->orderBy('created_at', 'desc')
                 ->get();
                 
-            // Manually attach course data to avoid relationship issues
+            // Enhanced items array
             $enhancedItems = [];
+            
             foreach ($wishlistItems as $item) {
-                $course = Course::find($item->item_id);
-                if ($course) {
-                    $enhancedItem = $item->toArray();
-                    $enhancedItem['course'] = $course;
-                    $enhancedItems[] = $enhancedItem;
+                $enhancedItem = $item->toArray();
+                
+                // Handle each item type
+                switch ($item->item_type) {
+                    case 'book':
+                        $book = Book::with(['author', 'category'])->find($item->item_id);
+                        if ($book) {
+                            $enhancedItem['book'] = $book;
+                            $enhancedItems[] = $enhancedItem;
+                        }
+                        break;
+                        
+                    case 'course':
+                        $course = Course::find($item->item_id);
+                        if ($course) {
+                            $enhancedItem['course'] = $course;
+                            $enhancedItems[] = $enhancedItem;
+                        }
+                        break;
+                        
+                    case 'event':
+                        $event = Event::find($item->item_id);
+                        if ($event) {
+                            $enhancedItem['event'] = $event;
+                            $enhancedItems[] = $enhancedItem;
+                        }
+                        break;
                 }
             }
             
-            // Replace collection with enhanced data
-            $wishlistItems = $enhancedItems;
-            
             return response()->json([
                 'success' => true,
-                'data' => $wishlistItems
+                'data' => $enhancedItems
             ]);
-        } catch (\Exception $e) {
-            // Log the error
-            \Log::error('User wishlist error: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
             
+        } catch (\Exception $e) {
+            \Log::error('User wishlist error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while fetching wishlist items',
