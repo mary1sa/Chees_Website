@@ -26,12 +26,6 @@ import PurchasedCourses from './Components/Courses/PurchasedCourses';
 import CourseProgress from './Components/Courses/CourseProgress';
 import CourseWishlist from './Components/Courses/CourseWishlist';
 
-// Course Package Components - Temporarily commented out
-// import CoursePackageList from './Components/Courses/Packages/CoursePackageList';
-// import CoursePackageDetail from './Components/Courses/Packages/CoursePackageDetail';
-// import CoursePackagePurchase from './Components/Courses/Packages/CoursePackagePurchase';
-// import MyPackages from './Components/Courses/Packages/MyPackages';
-
 // Session Management Components
 import SessionManagement from './Components/AdminDashboard/SessionManagement/SessionManagement';
 import SessionScheduler from './Components/AdminDashboard/SessionManagement/SessionScheduler';
@@ -70,8 +64,6 @@ import CourseForm from './Components/AdminDashboard/CourseManagement/CourseForm'
 import LevelList from './Components/AdminDashboard/CourseLevelManagement/LevelList';
 import LevelForm from './Components/AdminDashboard/CourseLevelManagement/LevelForm';
 import AdminDashboardOverview from './Components/AdminDashboard/AdminDashboardOverview';
-// import EnrollmentList from './Components/AdminDashboard/EnrollmentManagement/EnrollmentList';
-// import EnrollmentForm from './Components/AdminDashboard/EnrollmentManagement/EnrollmentForm';
 import CreateCoacheProfile from './Components/Coatches/Coches/CreateCoacheProfile';
 import UpdateCoach from './Components/Coatches/Admin/UpdateCoach';
 import CreateCoachAvailability from './Components/Coatches/Coches/CreateCoachAvailability';
@@ -158,10 +150,6 @@ function App() {
           <Route path="levels" element={<LevelList />} />
           <Route path="levels/create" element={<LevelForm isEditing={false} />} />
           <Route path="levels/:levelId/edit" element={<LevelForm isEditing={true} />} />
-          {/* Enrollment routes temporarily commented out due to missing components */}
-          {/* <Route path="enrollments" element={<EnrollmentList />} /> */}
-          {/* <Route path="createenrollment" element={<EnrollmentForm isEditing={false} />} /> */}
-          {/* <Route path="enrollments/edit/:enrollmentId" element={<EnrollmentForm isEditing={true} />} /> */}
           
           {/* Course Materials Management Routes */}
           <Route path="course-materials" element={<CourseMaterialList />} />
@@ -211,12 +199,6 @@ function App() {
           <Route path="course-content" element={<CourseContent />} />
           <Route path="course-materials" element={<MemberCourseMaterials />} />
           <Route path="course-materials/:courseId" element={<MemberCourseMaterials />} />
-          
-          {/* Course Package Routes - Temporarily commented out */}
-          {/* <Route path="packages" element={<CoursePackageList />} />
-          <Route path="packages/:id" element={<CoursePackageDetail />} />
-          <Route path="packages/:id/purchase" element={<CoursePackagePurchase />} />
-          <Route path="packages/purchased" element={<MyPackages />} /> */}
           
           {/* book store routes */}
           <Route path="books" element={<Books />} />

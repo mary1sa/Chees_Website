@@ -582,11 +582,11 @@ const MemberDashboardOverview = () => {
         {recentMaterials.length > 0 ? (
           <div className="recent-course">
             {recentMaterials.map(course => (
-              <div className="course-card" key={course.id}>
+              <div className="course-dash-card" key={course.id}>
                 
-                <div className="course-details">
+                <div className="course-dash-details">
                   <h3>{course.title}</h3>
-                  <p className="course-level">
+                  <p className="course-dash-level">
                     {course.level ? (
                       typeof course.level === 'string' ? course.level : 
                       (course.level && course.level.name) ? course.level.name : 
@@ -594,13 +594,13 @@ const MemberDashboardOverview = () => {
                     ) : "All Levels"}
                   </p>
                   {course.description && (
-                    <p className="course-description">{typeof course.description === 'string' ? course.description : JSON.stringify(course.description)}</p>
+                    <p className="course-dash-description">{typeof course.description === 'string' ? course.description : JSON.stringify(course.description)}</p>
                   )}
-                  <p className="course-purchased">
+                  <p className="course-dash-purchased">
                     Purchased Recently
                   </p>
                 </div>
-                <a href={`/member/dashboard/courses/${course.id}`} className="view-course-btn">
+                <a href={`/member/dashboard/courses/${course.id}`} className="view-course-btn dash-course">
                   View Course
                 </a>
               </div>
@@ -618,7 +618,7 @@ const MemberDashboardOverview = () => {
         <Link to="/member/dashboard/courses" className="view-all-link">
           Browse all courses <FiArrowRight />
         </Link>
-      </div>
+      </div>  
       
       {/* Upcoming Events */}
       <div className="upcoming-events-section">
@@ -640,7 +640,7 @@ const MemberDashboardOverview = () => {
                   <p className="event-fee">Registration: {typeof event.registration_fee === 'string' ? event.registration_fee : 'Contact us'}</p>
                 </div>
                 <div className="event-actions">
-                  <Link to={`/member/dashboard/events/${event.id}`} className="event-link">
+                  <Link to={`/member/dashboard/events/${event.id}`} className="event-link dash-event">
                     More Info
                   </Link>
                 </div>
@@ -672,7 +672,7 @@ const MemberDashboardOverview = () => {
                   <p className="book-price">{book.price}</p>
                 </div>
                 <div className="book-actions">
-                  <Link to={`/member/dashboard/books/${book.id}`} className="book-link">
+                  <Link to={`/member/dashboard/books/${book.id}`} className="book-link dash-book">
                     View Book
                   </Link>
                 </div>
@@ -694,19 +694,19 @@ const MemberDashboardOverview = () => {
       <div className="quick-actions">
         <h2>Quick Actions</h2>
         <div className="action-buttons">
-          <Link to="/member/dashboard/upcoming-sessions" className="action-button sessions-action">
+          <Link to="/member/dashboard/upcoming-sessions" className="action-button dash-icon sessions-action">
             <FiCalendar />
             <span>Upcoming Sessions</span>
           </Link>
-          <Link to="/member/dashboard/events" className="action-button events-action">
+          <Link to="/member/dashboard/events" className="action-button dash-icon events-action">
             <FiActivity />
             <span>Club Events</span>
           </Link>
-          <Link to="/member/dashboard/courses/catalog" className="action-button materials-action">
+          <Link to="/member/dashboard/courses/catalog" className="action-button dash-icon materials-action">
             <FiFileText />
             <span>Course Catalog</span>
           </Link>
-          <Link to="/member/dashboard/books" className="action-button books-action">
+          <Link to="/member/dashboard/books" className="action-button dash-icon books-action">
             <FiShoppingBag />
             <span>Chess Books</span>
           </Link>

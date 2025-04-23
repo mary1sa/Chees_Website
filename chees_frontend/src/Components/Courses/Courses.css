@@ -115,12 +115,11 @@
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background-color: white;
   display: flex;
   flex-direction: column;
   text-decoration: none;
   color: inherit;
-  height: 100%;
+  background-color: #f8f9fa !important;
 }
 
 .course-card:hover {
@@ -963,11 +962,10 @@
 }
 
 .course-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  max-width: 350px;
+  display: flex !important; 
+  align-items: center !important;
+  gap: 1rem !important;
+  width: 100% !important;
 }
 
 .course-thumbnail {

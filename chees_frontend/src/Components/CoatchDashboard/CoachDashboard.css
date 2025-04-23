@@ -1,4 +1,37 @@
-/* Coach Dashboard Styles */
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3f37c9;
+  --success-color: #4cc9f0;
+  --danger-color: #f72585;
+  --warning-color: #f8961e;
+  --info-color: #4895ef;
+  --light-color: #f8f9fa;
+  --dark-color: #181a1b;
+  --card-bg: #fff;
+  --card-bg-dark: #23272f;
+  --input-bg: #fff;
+  --input-bg-dark: #23272f;
+  --hover-bg: #f1f3f5;
+  --hover-bg-dark: #23272f;
+  --text-color: #222;
+  --text-color-dark: #f1f3f5;
+  --text-muted: #6c757d;
+  --text-muted-dark: #adb5bd;
+  --border-color: #e9ecef;
+  --border-color-dark: #343a40;
+  --transition-speed: 0.3s;
+}
+
+.dark {
+  --light-color: #181a1b;
+  --dark-color: #23272f;
+  --card-bg: var(--card-bg-dark);
+  --input-bg: var(--input-bg-dark);
+  --hover-bg: var(--hover-bg-dark);
+  --text-color: var(--text-color-dark);
+  --text-muted: var(--text-muted-dark);
+  --border-color: var(--border-color-dark);
+}
 
 /* --- Dashboard Overview & Stat Cards (from AdminDashboard.css) --- */
 .coach-dashboard-overview {
@@ -15,7 +48,7 @@
 }
 
 .stat-cards {
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(67,97,238,0.07);
   display: flex;
@@ -25,7 +58,7 @@
   min-height: 120px;
   flex: 1;
   gap: 1.5rem;
-  transition: box-shadow 0.2s;
+  transition: all var(--transition-speed) ease, background-color var(--transition-speed), color var(--transition-speed);
 }
 
 .stat-cards:hover {
@@ -56,23 +89,25 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
+  color: var(--text-color);
 }
 
-.stat-count {
+/* .stat-count {
   font-size: 2.1rem;
   font-weight: 700;
   margin: 0.5rem 0 0.25rem 0;
-}
+  color: var(--text-color);
+} */
 
 .stat-label {
-  color: var(--text-light);
+  color: var(--text-muted);
   font-size: 0.98rem;
   margin: 0;
 }
 
 .dashboard-error {
-  color: #f72585;
-  background: #fff0f6;
+  color: var(--text-muted);
+  background: var(--card-bg);
   padding: 1rem 2rem;
   border-radius: 10px;
   margin-bottom: 2rem;
@@ -86,7 +121,7 @@
 .quick-actions {
   margin-top: 2rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: var(--card-bg);
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(67,97,238,0.07);
   position: relative;
@@ -136,16 +171,16 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem 0.5rem;
-  background-color: white;
+  background-color: var(--card-bg);
   color: var(--text-color);
   border-radius: 10px;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all var(--transition-speed) ease, background-color var(--transition-speed), color var(--transition-speed);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
   text-align: center;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
 }
 
 /* Action button different colors */
@@ -244,6 +279,7 @@
   margin: 0 0 5px 0;
   font-size: 16px;
   font-weight: 500;
+  color: var(--text-color);
 }
 
 .quick-link-text p {
@@ -282,7 +318,7 @@
 
 .filter-select, .search-input {
   padding: 8px 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   background-color: var(--input-bg);
   color: var(--text-color);
@@ -333,6 +369,7 @@
 .session-title h3 {
   margin: 0;
   font-size: 16px;
+  color: var(--text-color);
 }
 
 .session-date {
@@ -342,6 +379,7 @@
 
 .date {
   font-weight: 500;
+  color: var(--text-color);
 }
 
 .time {
@@ -354,6 +392,7 @@
   align-items: center;
   gap: 5px;
   font-size: 14px;
+  color: var(--text-color);
 }
 
 .online-indicator {
@@ -382,6 +421,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  color: var(--text-color);
 }
 
 .session-countdown {
@@ -416,6 +456,7 @@
   font-size: 24px;
   font-weight: 500;
   margin-top: 5px;
+  color: var(--text-color);
 }
 
 .no-sessions {
@@ -424,6 +465,7 @@
   text-align: center;
   border-radius: 8px;
   margin-bottom: 20px;
+  color: var(--text-color);
 }
 
 .clear-filters-btn {
@@ -504,10 +546,11 @@
 .session-header h3 {
   margin: 0;
   font-size: 18px;
+  color: var(--text-color);
 }
 
 .countdown-timer {
-  background-color: #fff3e0;
+  background-color: var(--card-bg);
   color: #f57c00;
   padding: 4px 8px;
   border-radius: 4px;
@@ -522,18 +565,18 @@
 }
 
 .session-card {
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 14px;
   box-shadow: 0 2px 10px 0 rgba(0,0,0,0.07);
   padding: 28px 28px 20px 28px;
   margin-bottom: 28px;
-  transition: box-shadow 0.2s;
-  border: 1px solid #f1f1f1;
+  transition: box-shadow 0.2s, background-color var(--transition-speed), color var(--transition-speed);
+  border: 1px solid var(--border-color);
   position: relative;
 }
 .session-card:hover {
   box-shadow: 0 6px 24px 0 rgba(44,62,80,0.12);
-  border-color: #e0e0e0;
+  border-color: var(--border-color);
 }
 
 .session-header {

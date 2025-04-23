@@ -1,4 +1,38 @@
-/* Member Dashboard Styles */
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3f37c9;
+  --success-color: #4cc9f0;
+  --danger-color: #f72585;
+  --warning-color: #f8961e;
+  --info-color: #4895ef;
+  --light-color: #f8f9fa;
+  --dark-color: #181a1b;
+  --card-bg: #fff;
+  --card-bg-dark: #23272f;
+  --input-bg: #fff;
+  --input-bg-dark: #23272f;
+  --hover-bg: #f1f3f5;
+  --hover-bg-dark: #23272f;
+  --text-color: #222;
+  --text-color-dark: #f1f3f5;
+  --text-muted: #6c757d;
+  --text-muted-dark: #adb5bd;
+  --border-color: #e9ecef;
+  --border-color-dark: #343a40;
+  --transition-speed: 0.3s;
+}
+
+.dark {
+  --light-color: #181a1b;
+  --dark-color: #23272f;
+  --card-bg: var(--card-bg-dark);
+  --input-bg: var(--input-bg-dark);
+  --hover-bg: var(--hover-bg-dark);
+  --text-color: var(--text-color-dark);
+  --text-muted: var(--text-muted-dark);
+  --border-color: var(--border-color-dark);
+}
+
 .member-dashboard-overview {
   padding: 20px;
   max-width: 1200px;
@@ -8,20 +42,20 @@
 .member-dashboard-overview h1 {
   font-size: 28px;
   margin-bottom: 10px;
-  color: var(--primary-color, #1976d2);
+  color: var(--primary-color);
 }
 
 .welcome-message {
   font-size: 16px;
   margin-bottom: 25px;
-  color: var(--text-secondary, #666);
+  color: var(--text-muted);
 }
 
 /* Info Message */
 .info-message {
   background-color: rgba(255, 193, 7, 0.1);
   border-left: 4px solid #ffc107;
-  color: #856404;
+  color: var(--text-muted);
   padding: 12px 15px;
   margin-bottom: 25px;
   border-radius: 4px;
@@ -39,13 +73,13 @@
 }
 
 .stat-cards {
-  background-color: var(--card-bg, #fff);
+  background-color: var(--card-bg);
   border-radius: 8px;
   padding: 1.5rem;
   display: flex;
   align-items: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
   flex: 1;
   min-width: 230px;
   max-width: calc(25% - 15px);
@@ -100,29 +134,30 @@
 .stat-details h3 {
   font-size: 18px;
   margin: 0 0 5px 0;
-  color: var(--text-color, #333);
+  color: var(--text-color);
 }
 
 .stat-count {
   font-size: 2rem;
   font-weight: bold;
   margin: 0.5rem 0;
-  color: var(--primary-color, #4361ee);
+  color: var(--primary-color);
 }
 
 .stat-label {
-  color: var(--text-secondary, #6c757d);
+  color: var(--text-muted);
   font-size: 0.9rem;
   margin: 0;
 }
 
 /* Next Session Widget */
 .next-session-widget {
-  background-color: var(--card-bg, #fff);
+  background-color: var(--card-bg);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 30px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  transition: background-color var(--transition-speed) ease;
 }
 
 .next-session-widget h2 {
@@ -131,11 +166,12 @@
   font-size: 20px;
   margin-top: 0;
   margin-bottom: 20px;
-  color: var(--primary-color, #1976d2);
+  color: var(--text-color);
 }
 
 .next-session-widget h2 svg {
   margin-right: 8px;
+  color: var(--text-muted);
 }
 
 .next-session-content {
@@ -149,12 +185,12 @@
 .session-details h3 {
   font-size: 18px;
   margin: 0 0 5px 0;
-  color: var(--text-primary, #333);
+  color: var(--text-color);
 }
 
 .session-course {
   font-size: 14px;
-  color: var(--text-secondary, #666);
+  color: var(--text-muted);
   margin: 0 0 10px 0;
 }
 
@@ -163,7 +199,7 @@
   align-items: center;
   margin: 10px 0;
   font-size: 15px;
-  color: var(--text-primary, #333);
+  color: var(--text-color);
 }
 
 .session-time .date {
@@ -179,7 +215,7 @@
 
 .countdown-label {
   font-size: 14px;
-  color: var(--text-secondary, #666);
+  color: var(--text-muted);
   margin-right: 10px;
 }
 
@@ -199,7 +235,7 @@
   text-decoration: none;
   font-weight: 500;
   margin-top: 10px;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-speed) ease;
 }
 
 .join-session-btn svg {
@@ -207,7 +243,7 @@
 }
 
 .join-session-btn:hover {
-  background-color: #388e3c;
+  background-color: var(--card-bg);
 }
 
 .location-info {
@@ -227,16 +263,17 @@
 .no-sessions {
   text-align: center;
   padding: 20px;
-  color: var(--text-secondary, #666);
+  color: var(--text-muted);
 }
 
 /* Course Progress Section */
 .course-progress-section {
-  background-color: var(--card-bg, #fff);
+  background-color: var(--card-bg);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 30px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  transition: background-color var(--transition-speed) ease;
 }
 
 .course-progress-section h2 {
@@ -245,7 +282,7 @@
   font-size: 20px;
   margin-top: 0;
   margin-bottom: 20px;
-  color: var(--primary-color, #1976d2);
+  color: var(--primary-color);
 }
 
 .course-progress-section h2 svg {
@@ -261,13 +298,14 @@
 .progress-card {
   padding: 15px;
   border-radius: 6px;
-  background-color: var(--bg-light, #f5f5f5);
+  background-color: var(--card-bg);
+  transition: background-color var(--transition-speed) ease;
 }
 
 .progress-card h3 {
   margin: 0 0 15px 0;
   font-size: 16px;
-  color: var(--text-primary, #333);
+  color: var(--text-color);
 }
 
 .progress-bar-container {
@@ -280,7 +318,7 @@
 
 .progress-bar {
   height: 100%;
-  background-color: #1976d2;
+  background-color: var(--primary-color);
   border-radius: 5px;
 }
 
@@ -292,26 +330,27 @@
 
 .progress-percent {
   font-weight: 600;
-  color: var(--primary-color, #1976d2);
+  color: var(--primary-color);
 }
 
 .progress-sessions {
-  color: var(--text-secondary, #666);
+  color: var(--text-muted);
 }
 
 .no-courses {
   text-align: center;
   padding: 20px;
-  color: var(--text-secondary, #666);
+  color: var(--text-muted);
 }
 
 /* Recent Materials/Course Section */
 .recent-materials-section {
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: background-color var(--transition-speed) ease;
 }
 
 .recent-materials-section h2 {
@@ -319,38 +358,39 @@
   align-items: center;
   font-size: 1.5rem;
   margin-bottom: 16px;
-  color: #2c3e50;
-  border-bottom: 2px solid #f0f2f5;
+  color: var(--text-color);
+  border-bottom: 2px solid var(--border-color);
   padding-bottom: 10px;
 }
 
 .recent-materials-section h2 svg {
   margin-right: 8px;
-  color: #3498db;
+  color: var(--text-muted);
 }
 
 .recent-course {
   margin-top: 15px;
 }
 
-.course-card {
+.course-dash-card {
   display: flex;
   flex-direction: column;
-  background-color: #f8f9fa;
+  background-color: var(--card-bg);
   border-radius: 10px;
-  padding: 20px;
+  padding: 20px !important;
   margin-bottom: 15px;
-  border-left: 4px solid #3498db;
-  transition: all 0.3s ease;
+  border-left: 4px solid #2980b9;
+  transition: all var(--transition-speed) ease;
+  height: 33vh !important;
 }
 
-.course-card:hover {
+.course-dash-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
-.course-card .material-icon {
-  background-color: #3498db;
+.course-dash-card .material-icon {
+  background-color: #2980b9 !important;
   color: white;
   width: 50px;
   height: 50px;
@@ -358,71 +398,71 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 15px;
 }
 
-.course-details {
+.course-dash-details {
   flex: 1;
+  margin-bottom: -500px !important; 
 }
 
-.course-details h3 {
+.course-dash-details h3 {
   font-size: 1.2rem;
-  color: #2c3e50;
-  margin-bottom: 8px;
+  color: var(--text-color);
+  margin-bottom: 20px !important;
 }
 
-.course-level {
+.course-dash-level {
   display: inline-block;
-  background-color: #e9f7fe;
-  color: #3498db;
+  background-color: var(--border-color);
+  color: #2980b9;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.85rem;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
-.course-description {
+.course-dash-description {
   font-size: 0.95rem;
   line-height: 1.4;
-  color: #555;
-  margin-bottom: 15px;
+  color: var(--text-muted);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 10px;
 }
 
-.course-purchased {
+.course-dash-purchased {
   font-size: 0.9rem;
-  color: #777;
-  margin-bottom: 15px;
+  font-family: italic;
+  color: var(--text-muted);
 }
 
 .view-course-btn {
-  background-color: #3498db;
+  background-color: #2980b9;
   color: white;
   padding: 8px 16px;
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  transition: background-color 0.2s;
-  margin-top: 5px;
-  align-self: flex-end;
+  transition: background-color var(--transition-speed) ease;
+  margin-top: -90px;
 }
 
 .view-course-btn:hover {
-  background-color: #2980b9;
+  background-color: #2980b9dd;
 }
 
 /* Upcoming Events Section */
 .upcoming-events-section {
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: background-color var(--transition-speed) ease;
 }
 
 .upcoming-events-section h2 {
@@ -430,14 +470,14 @@
   align-items: center;
   font-size: 1.5rem;
   margin-bottom: 16px;
-  color: #2c3e50;
-  border-bottom: 2px solid #f0f2f5;
+  color: var(--text-color);
+  border-bottom: 2px solid var(--border-color);
   padding-bottom: 10px;
 }
 
 .upcoming-events-section h2 svg {
   margin-right: 8px;
-  color: #e74c3c;
+  color: var(--text-muted);
 }
 
 .events-list {
@@ -449,11 +489,11 @@
 .event-card {
   display: flex;
   flex-direction: column;
-  background-color: #f8f9fa;
+  background-color: var(--card-bg);
   border-radius: 10px;
   padding: 20px;
-  border-left: 4px solid #e74c3c;
-  transition: all 0.3s ease;
+  border-left: 4px solid #c0392b;
+  transition: all var(--transition-speed) ease;
 }
 
 .event-card:hover {
@@ -463,14 +503,14 @@
 
 .event-details h3 {
   font-size: 1.2rem;
-  color: #2c3e50;
+  color: var(--text-color);
   margin-bottom: 8px;
 }
 
 .event-description {
   font-size: 0.95rem;
   line-height: 1.4;
-  color: #555;
+  color: var(--text-muted);
   margin-bottom: 15px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -484,7 +524,7 @@
   display: flex;
   align-items: center;
   font-size: 0.9rem;
-  color: #777;
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 
@@ -494,14 +534,14 @@
 
 .event-location {
   font-size: 0.9rem;
-  color: #777;
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 
 .event-fee {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-color);
   margin-bottom: 15px;
 }
 
@@ -511,28 +551,28 @@
 
 .event-link {
   display: inline-block;
-  background-color: #e74c3c;
+  background-color: #c0392b !important;
   color: white;
   padding: 8px 16px;
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-speed) ease;
 }
 
 .event-link:hover {
-  background-color: #c0392b;
+  background-color: #c0392bdd !important;
 }
 
 .more-info-btn {
-  background-color: #e74c3c;
+  background-color: #2980b9;
   color: white;
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-speed) ease;
 }
 
 .more-info-btn:hover {
@@ -544,10 +584,10 @@
   text-align: center;
   margin-top: 20px;
   margin-bottom: 10px;
-  color: #3498db;
+  color: #2980b9;
   text-decoration: none;
   font-weight: 600;
-  transition: color 0.2s;
+  transition: color var(--transition-speed) ease;
 }
 
 .view-all-link svg {
@@ -561,11 +601,12 @@
 
 /* Book Recommendations Section */
 .book-recommendations-section {
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: background-color var(--transition-speed) ease;
 }
 
 .book-recommendations-section h2 {
@@ -573,14 +614,14 @@
   align-items: center;
   font-size: 1.5rem;
   margin-bottom: 16px;
-  color: #2c3e50;
-  border-bottom: 2px solid #f0f2f5;
+  color: var(--text-color);
+  border-bottom: 2px solid var(--border-color);
   padding-bottom: 10px;
 }
 
 .book-recommendations-section h2 svg {
   margin-right: 8px;
-  color: #9b59b6; /* Purple color for book icon */
+  color: var(--text-muted);
 }
 
 .books-list {
@@ -592,11 +633,11 @@
 .book-cards {
   display: flex;
   flex-direction: column;
-  background-color: #f8f9fa;
+  background-color: var(--card-bg);
   border-radius: 10px;
   padding: 20px;
-  border-left: 4px solid #9b59b6 !important; /* Purple left border */
-  transition: all 0.3s ease;
+  border-left: 4px solid #8d44ad;
+  transition: all var(--transition-speed) ease;
 }
 
 .book-cards:hover {
@@ -606,21 +647,21 @@
 
 .book-details h3 {
   font-size: 1.2rem;
-  color: #2c3e50;
+  color: var(--text-color);
   margin-bottom: 8px;
 }
 
 .book-author {
   font-size: 0.95rem;
   font-style: italic;
-  color: #555;
+  color: var(--text-muted);
   margin-bottom: 10px;
 }
 
 .book-description {
   font-size: 0.95rem;
   line-height: 1.4;
-  color: #555;
+  color: var(--text-muted);
   margin-bottom: 15px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -633,7 +674,7 @@
 .book-price {
   font-size: 1rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-color);
   margin-bottom: 15px;
 }
 
@@ -643,17 +684,28 @@
 
 .book-link {
   display: inline-block;
-  background-color: #9b59b6;
+  background-color: var(--primary-color);
   color: white;
   padding: 8px 16px;
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-speed) ease;
 }
 
-.book-link:hover {
-  background-color: #8e44ad;
+.dash-book {
+  display: inline-block;
+  background-color: #8d44ad !important;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color var(--transition-speed) ease;
+}
+
+.dash-book:hover {
+  background-color: #8d44addd ;
 }
 
 /* Responsive Adjustments */

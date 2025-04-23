@@ -454,7 +454,7 @@ const CourseForm = ({ isEditing = false, isViewOnly = false }) => {
             <>
               <button 
                 type="button" 
-                className="cancel-button" 
+                className="cancel-course-button" 
                 onClick={() => navigate('/admin/dashboard/courses')}
               >
                 <FiX /> Back to Courses
@@ -472,7 +472,7 @@ const CourseForm = ({ isEditing = false, isViewOnly = false }) => {
             <>
               <button 
                 type="button" 
-                className="cancel-button" 
+                className="cancel-course-button" 
                 onClick={() => navigate('/admin/dashboard/courses')}
                 disabled={loading}
               >

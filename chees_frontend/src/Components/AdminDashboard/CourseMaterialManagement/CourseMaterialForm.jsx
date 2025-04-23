@@ -711,7 +711,7 @@ const CourseMaterialForm = ({ isEditing = false }) => {
           <button
             type="button"
             onClick={() => navigate('/admin/dashboard/course-materials')}
-            className="cancel-button"
+            className="cancel-course-button"
             disabled={isSubmitting}
           >
             <FiX /> Cancel

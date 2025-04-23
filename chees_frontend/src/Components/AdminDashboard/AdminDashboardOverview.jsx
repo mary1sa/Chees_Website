@@ -291,32 +291,32 @@ const AdminDashboardOverview = () => {
       
       <div className="quick-actions">
         <h2>Quick Actions</h2>
-        <div className="action-buttons">
-          <a href="/admin/dashboard/createuser" className="action-button users-action">
+        <div className="action-buttons dash-icon">
+          <a href="/admin/dashboard/createuser" className="action-button dash-icon users-action">
             <FiUsers />
             <span>Add New User</span>
           </a>
-          <a href="/admin/dashboard/courses/create" className="action-button courses-action">
+          <a href="/admin/dashboard/courses/create" className="action-button dash-icon courses-action">
             <FiBook />
             <span>Create Course</span>
           </a>
-          <a href="/admin/dashboard/sessions/schedule" className="action-button sessions-action">
+          <a href="/admin/dashboard/sessions/schedule" className="action-button dash-icon sessions-action">
             <FiCalendar />
             <span>Schedule Session</span>
           </a>
-          <a href="/admin/dashboard/events" className="action-button events-action">
+          <a href="/admin/dashboard/events" className="action-button dash-icon events-action">
             <FiActivity />
             <span>Manage Events</span>
           </a>
-          <a href="/admin/dashboard/course-materials/create" className="action-button materials-action">
+          <a href="/admin/dashboard/course-materials/create" className="action-button dash-icon materials-action">
             <FiShoppingBag />
             <span>Add Materials</span>
           </a>
-          <a href="/admin/dashboard/books/create" className="action-button books-action">
+          <a href="/admin/dashboard/books/create" className="action-button dash-icon books-action">
             <FiBookOpen />
             <span>Add Book</span>
           </a>
-          <a href="/admin/dashboard/books/dashboard" className="action-button orders-action">
+          <a href="/admin/dashboard/books/dashboard" className="action-button dash-icon orders-action">
             <FiShoppingBag />
             <span>Manage Orders</span>
           </a>
