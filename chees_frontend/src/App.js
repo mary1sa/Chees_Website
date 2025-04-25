@@ -16,7 +16,6 @@ import UpdateUser from './Components/AdminDashboard/UpdateUser';
 import CreateUser from './Components/AdminDashboard/CreateUser';
 
 // Course Components
-import CourseContent from './Components/MemberDashboard/CourseContent/CourseContent';
 import CourseCatalog from './Components/Courses/CourseCatalog';
 import CourseDetail from './Components/Courses/CourseDetail';
 import MemberCourseMaterials from './Components/MemberDashboard/CourseContent/MemberCourseMaterials';
@@ -197,7 +196,6 @@ function App() {
           <Route path="courses/wishlist" element={<CourseWishlist />} />
           <Route path="courses/purchased" element={<PurchasedCourses />} />
 
-          <Route path="course-content" element={<CourseContent />} />
           <Route path="course-materials" element={<MemberCourseMaterials />} />
           <Route path="course-materials/:courseId" element={<MemberCourseMaterials />} />
           
@@ -254,7 +252,6 @@ function App() {
   {/* Course Content Routes */}
   <Route path="courses" element={<CoachCourseCatalog />} />
   <Route path="courses/:courseId" element={<CoachCourseDetail />} />
-  <Route path="course-content" element={<CourseContent />} />
   <Route path="course-materials" element={<MemberCourseMaterials />} />
   <Route path="course-materials/:courseId" element={<MemberCourseMaterials />} />
   <Route index element={<CoachDashboardOverview />} />

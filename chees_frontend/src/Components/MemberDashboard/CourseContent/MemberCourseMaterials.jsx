@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { FiArrowLeft, FiFilter, FiSearch, FiBookOpen, FiDownload, FiExternalLink } from 'react-icons/fi';
+import { FiArrowLeft, FiBookOpen } from 'react-icons/fi';
 import axiosInstance from '../../../api/axios';
 import MaterialList from './MaterialList';
 import PageLoading from '../../PageLoading/PageLoading';
