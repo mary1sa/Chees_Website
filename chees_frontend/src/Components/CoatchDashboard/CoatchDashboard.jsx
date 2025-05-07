@@ -7,7 +7,9 @@ import {
   FiLogOut, FiBell, FiSearch, FiSun, FiMoon,
   FiChevronDown, FiChevronRight, FiChevronLeft,
   FiCreditCard, FiFileText, FiList,
-  FiAward, FiBook,FiStar
+  FiAward, FiBook,FiStar,
+  FiLock,
+  FiEdit
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -135,7 +137,18 @@ const CoatchDashboard = () => {
     {
       title: "Settings",
       icon: <FiSettings />,
-      path: "/coach/dashboard/settings"
+       submenus: [
+        {
+          title: "change password",
+             path: "change-password",
+          icon: <FiLock className="submenu-icon" />
+        },
+        {
+          title: "update user",
+          path: "UpdateCoachPers",
+          icon: <FiEdit className="submenu-icon" />
+        }
+      ]
     }
   ];
 

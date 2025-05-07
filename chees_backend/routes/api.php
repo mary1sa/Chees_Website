@@ -45,6 +45,9 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::group(['middleware' => 'jwt.auth'], function() {
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
+});
 Route::middleware('auth:api')->group(function () {
     Route::get('/user/orders', [OrderController::class, 'userOrders']);
 });
@@ -68,7 +71,6 @@ Route::get('/users/{id}', [UserController::class, 'getUserById']);
 Route::post('/users', [UserController::class, 'createUser']);
 Route::put('/users/{id}', [UserController::class, 'updateUser']);
 Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
-
 // Get coaches for course creation
 Route::get('/coaches', [UserController::class, 'getCoaches']);
 // Route::get('/coachesbyuser/{id}', [UserController::class, 'getCoachByIdUser']);

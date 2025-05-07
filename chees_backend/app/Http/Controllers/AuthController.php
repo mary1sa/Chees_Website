@@ -122,5 +122,49 @@ public function login(Request $request)
             return response()->json(['error' => 'Failed to logout'], 500);
         }
     }
+    public function changePassword(Request $request)
+    {
+        try {
+          
+            $user = JWTAuth::parseToken()->authenticate();
+            
+            if (!$user) {
+                return response()->json([
+                    'error' => 'Unauthenticated. Please login again.'
+                ], 401);
+            }
 
+           
+            $request->validate([
+                'current_password' => 'required|string',
+                'new_password' => 'required|string|min:6|confirmed',
+            ]);
+
+            
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'errors' => [
+                        'current_password' => ['The provided password does not match our records']
+                    ]
+                ], 422);
+            }
+
+          
+            $user->update([
+                'password' => Hash::make($request->new_password)
+            ]);
+
+          
+            JWTAuth::invalidate(JWTAuth::getToken());
+
+            return response()->json([
+                'message' => 'Password changed successfully. Please login again.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Password change failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
