@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../config/axiosInstance';
 import SuccessAlert from '../Alerts/SuccessAlert';
 import ErrorAlert from '../Alerts/ErrorAlert';
-
+import "./ChangePassword.css"
 const ChangePassword = () => {
   const navigate = useNavigate();
   const [passwords, setPasswords] = useState({
@@ -56,58 +56,58 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-6">Change Password</h2>
+    <div className="create-user-container">
+      <h2 className="create-user-title">Change Password</h2>
       
       {success && <SuccessAlert message={success} />}
       {errors.general && <ErrorAlert message={errors.general} />}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Current Password</label>
+      <form onSubmit={handleSubmit} className="formpassword">
+        <div className='grouppassword'>
+          <label className="labelpassword">Current Password</label>
           <input
             type="password"
             name="current_password"
             value={passwords.current_password}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="inputpassword"
             autoComplete="current-password"
           />
-          {errors.current_password && <span className="text-red-500 text-sm">{errors.current_password}</span>}
+          {errors.current_password && <span className="errorpassword">{errors.current_password}</span>}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">New Password</label>
+        <div className='grouppassword'>
+          <label className="labelpassword">New Password</label>
           <input
             type="password"
             name="new_password"
             value={passwords.new_password}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="inputpassword"
             autoComplete="new-password"
           />
-          {errors.new_password && <span className="text-red-500 text-sm">{errors.new_password}</span>}
+          {errors.new_password && <span className="errorpassword">{errors.new_password}</span>}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Confirm New Password</label>
+        <div className='grouppassword'>
+          <label className="labelpassword">Confirm New Password</label>
           <input
             type="password"
             name="new_password_confirmation"
             value={passwords.new_password_confirmation}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="inputpassword"
             autoComplete="new-password"
           />
           {errors.new_password_confirmation && (
-            <span className="text-red-500 text-sm">{errors.new_password_confirmation}</span>
+            <span className="errorpassword">{errors.new_password_confirmation}</span>
           )}
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400"
+          className="submit-button password"
         >
           {isSubmitting ? 'Changing...' : 'Change Password'}
         </button>
