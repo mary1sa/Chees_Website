@@ -185,14 +185,13 @@ const navigate=useNavigate()
 
       <div className="imageuploadsection">
   <label 
-    htmlFor="profilepicture" 
+    htmlFor="profile_picture" 
     className={`filelabel ${previewImage ? 'has-image' : ''}`}
   >
     <input
       type="file"
       name="profile_picture"
-      id="profile_picture"
-      onChange={handleFileChange}
+      id="profile_picture"      onChange={handleFileChange}
       className="file-input"
       accept="image/*"
     />

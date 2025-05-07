@@ -87,30 +87,22 @@ class CoachesController extends Controller
             'video_introduction_url' => 'nullable|string|max:255',
             'social_media_links' => 'nullable|array',
             'status' => 'required|in:approved,pending',
-
         ]);
-
-        $validated['preferred_languages'] = json_encode($request->preferred_languages);
-        $validated['teaching_formats'] = json_encode($request->teaching_formats);
-        $validated['communication_methods'] = json_encode($request->communication_methods);
-        $validated['social_media_links'] = json_encode($request->social_media_links);
-
-       
-      
-
+    
         $coach = Coach::create($validated);
-
+    
         return response()->json([
             'message' => 'Demande envoyée avec succès.',
             'data' => $coach,
         ], 201);
     }
+    
 
     // Admin & Coach: Update a coach profile
     public function update(Request $request, $id)
     {
         $coach = Coach::findOrFail($id);
-
+    
         $validated = $request->validate([
             'title' => 'nullable|string|max:50',
             'fide_id' => 'nullable|string|max:50',
@@ -129,20 +121,15 @@ class CoachesController extends Controller
             'video_introduction_url' => 'nullable|string|max:255',
             'social_media_links' => 'nullable|array',
         ]);
-
-        $validated['preferred_languages'] = json_encode($request->preferred_languages);
-        $validated['teaching_formats'] = json_encode($request->teaching_formats);
-        $validated['communication_methods'] = json_encode($request->communication_methods);
-        $validated['social_media_links'] = json_encode($request->social_media_links);
-
+    
         $coach->update($validated);
-
+    
         return response()->json([
             'message' => 'Coach mis à jour avec succès.',
             'data' => $coach,
         ]);
     }
-
+    
     // Admin: Delete a coach profile
     public function destroy($id)
     {

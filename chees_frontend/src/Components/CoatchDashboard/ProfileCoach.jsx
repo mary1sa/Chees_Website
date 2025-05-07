@@ -90,7 +90,19 @@ return (
         <div className="coach-profile-content">
         
           <div className="coach-personal-info">
-            <h3 className="coach-section-title">Personal Details</h3>
+            <h3 className="coach-section-title">Personal Details  <Link style={{color:"black"}}
+                        to={`/coach/dashboard/UpdateCoachPers`}
+                        className="update-coach"
+                        title="Update"
+                      >
+                        <FiEdit className="icon" />
+                      </Link></h3>
+              
+           
+         
+
+
+
             <div className="coach-info-grid">
               <div className="coach-info-item">
                 <FaEnvelope className="info-icon" />
@@ -129,7 +141,16 @@ return (
               <h3 className="coach-section-title">Biography</h3>
               <p className="coach-bio">{user.bio || 'No biography available'}</p>
             </div>
-            <h3 className="coach-section-title">Professional Information</h3>
+            <h3 className="coach-section-title">Professional Information{coachDetails &&(<div><Link
+                        to={`/coach/dashboard/UpdateCoachProfile/${coachDetails.id}`}
+                        className="update-coach"
+                        title="Update"
+                        style={{color:"black"}}
+                      >
+                        <FiEdit className="icon" />
+                      </Link></div>)}  
+              
+            </h3>
 
             {coachDetails && (
                 

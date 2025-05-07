@@ -91,6 +91,7 @@ import ReviewTable from './Components/Coatches/Admin/ReviewTable';
 import ProfileCoach from './Components/CoatchDashboard/ProfileCoach';
 import UpdateCoachProfile from './Components/CoatchDashboard/UpdateCoachProfile';
 import BookWishlist from './Components/MemberDashboard/BookStor/BookWishlist';
+import UpdateCoachPers from './Components/CoatchDashboard/UpdateCoachPers';
 
 
 function App() {
@@ -240,6 +241,7 @@ function App() {
 
   <Route path="CreateProfile" element={<CreateCoacheProfile />} />
   <Route path="UpdateCoachProfile/:id" element={<UpdateCoachProfile />} />
+  <Route path="UpdateCoachPers" element={<UpdateCoachPers />} />
 
   <Route path="creatavailability" element={<CreateCoachAvailability />} />
   <Route path="coachavailability" element={<CoachAvailability />} />
