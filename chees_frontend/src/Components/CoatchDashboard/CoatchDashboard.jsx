@@ -21,11 +21,17 @@ const CoatchDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const adminData = {
-    name: "Admin Name",
-    avatar: "/admin-avatar.jpg",
-    role: "Super Admin"
-  };
+    const [adminData, setAdminData] = useState({});
+  
+    useEffect(() => {
+      const storedAdminData = JSON.parse(localStorage.getItem('user'));
+  
+      if (storedAdminData && storedAdminData.role === 'coach') {
+        setAdminData(storedAdminData);
+      } else {
+        navigate('/login');
+      }
+    }, [navigate]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -177,10 +183,14 @@ const CoatchDashboard = () => {
           </div>
 
           <div className="admin-profile">
-            <img src={adminData.avatar} alt={adminData.name} className="admin-avatar" />
+          <img src={
+              adminData.profile_picture
+                ? `http://localhost:8000/storage/${adminData.profile_picture}`
+                : '/anony.jpg'
+            } alt={adminData.name} className="admin-avatar" />
             <div className="profile-info">
-              <span className="admin-name">{adminData.name}</span>
-              <span className="admin-role">{adminData.role}</span>
+            <span className="admin-name">{adminData.first_name} {adminData.last_name}</span>
+            <span className="admin-role">{adminData.role}</span>
             </div>
           </div>
         </div>
