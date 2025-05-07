@@ -22,7 +22,7 @@ import MemberCourseMaterials from './Components/MemberDashboard/CourseContent/Me
 import CoachCourseCatalog from './Components/CoatchDashboard/Courses/CoachCourseCatalog';
 import CoachCourseDetail from './Components/CoatchDashboard/Courses/CoachCourseDetail';
 import PurchasedCourses from './Components/Courses/PurchasedCourses';
-import CourseProgress from './Components/Courses/CourseProgress';
+// import CourseProgress from './Components/Courses/CourseProgress';
 import CourseWishlist from './Components/Courses/CourseWishlist';
 
 // Session Management Components
@@ -192,7 +192,7 @@ function App() {
           <Route path="courses" element={<CourseCatalog />} /> {/* Added this route to fix navigation */}
           <Route path="courses/catalog" element={<CourseCatalog />} />
           <Route path="courses/:courseId" element={<CourseDetail />} />
-          <Route path="courses/progress" element={<CourseProgress />} />
+          {/* <Route path="courses/progress" element={<CourseProgress />} /> */}
           <Route path="courses/wishlist" element={<CourseWishlist />} />
           <Route path="courses/purchased" element={<PurchasedCourses />} />
 
