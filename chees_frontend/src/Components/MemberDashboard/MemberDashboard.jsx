@@ -10,7 +10,9 @@ import {
   FiUser,
   FiStar
 
-  , FiShoppingCart
+  , FiShoppingCart,
+  FiEdit,
+  FiLock
 } from 'react-icons/fi';
 import '../AdminDashboard/AdminDashboard.css';
 
@@ -67,6 +69,11 @@ const MemberDashboard = () => {
       icon: <FiHome />,
       path: "/member/dashboard"
     },
+    {
+          title: "profile Member",
+          icon: <FiUsers />,
+          path: "profilemember"
+        },
     {
       title: "My Courses",
       icon: <FiBook />,
@@ -152,10 +159,21 @@ const MemberDashboard = () => {
       icon: <FiCalendar />,
       path: "/member/dashboard/bookingcoach"
     },
-    {
+   {
       title: "Settings",
       icon: <FiSettings />,
-      path: "/member/dashboard/settings"
+       submenus: [
+        {
+          title: "change password",
+             path: "change-password",
+          icon: <FiLock className="submenu-icon" />
+        },
+        {
+          title: "update user",
+          path: "UpdateMemberProfile",
+          icon: <FiEdit className="submenu-icon" />
+        }
+      ]
     }
   ];
 

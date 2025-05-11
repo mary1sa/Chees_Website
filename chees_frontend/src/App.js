@@ -93,6 +93,8 @@ import UpdateCoachProfile from './Components/CoatchDashboard/UpdateCoachProfile'
 import BookWishlist from './Components/MemberDashboard/BookStor/BookWishlist';
 import UpdateCoachPers from './Components/CoatchDashboard/UpdateCoachPers';
 import ChangePassword from './Components/CoatchDashboard/ChangePassword';
+import ProfileMember from './Components/MemberDashboard/ProfileMember';
+import UpdateMemberProfile from './Components/MemberDashboard/UpdateMemberProfile';
 
 
 function App() {
@@ -188,7 +190,10 @@ function App() {
           }>
           <Route path="registrations" element={<UserEventRegistrations />} />
 
-        
+          <Route path="profilemember" element={<ProfileMember />} />
+  <Route path="UpdateMemberProfile" element={<UpdateMemberProfile />} />
+  <Route path="change-password" element={<ChangePassword />} />
+
           <Route path="profile" element={<MemberProfile />} />
           {/* Course Routes */}
           <Route path="courses" element={<CourseCatalog />} /> {/* Added this route to fix navigation */}
