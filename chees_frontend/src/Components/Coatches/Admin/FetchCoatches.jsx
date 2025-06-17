@@ -29,13 +29,13 @@ const Createnew=()=>{
 
     if (firstNameFilter) {
       result = result.filter(coach =>
-        coach.first_name?.toLowerCase().includes(firstNameFilter.toLowerCase())
+        coach.user.first_name?.toLowerCase().includes(firstNameFilter.toLowerCase())
       );
     }
 
     if (lastNameFilter) {
       result = result.filter(coach =>
-        coach.last_name?.toLowerCase().includes(lastNameFilter.toLowerCase())
+        coach.user.last_name?.toLowerCase().includes(lastNameFilter.toLowerCase())
       );
     }
 

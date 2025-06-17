@@ -190,7 +190,7 @@ const UpdateMemberProfile = () => {
 
   return (
     <div className="create-user-container">
-      <h1 className="create-user-title">Update Coach Profile</h1>
+      <h1 className="create-user-title">Update Member Profile</h1>
 
       {successMessage && <SuccessAlert message={successMessage} onClose={handleCloseAlert} />}
       {errors.form && <ErrorAlert message={errors.form} onClose={handleCloseAlert} />}

@@ -17,8 +17,9 @@ const ShowUser = () => {
         setUser(response.data);
         
         if (response.data.role.name === 'coach') {
-          const coachResponse = await axiosInstance.get(`/coaches/${id}`);
+          const coachResponse = await axiosInstance.get(`/coachby-user/${id}`);
           setCoachDetails(coachResponse.data);
+          console.log(coachResponse.data)
         }
       } catch (error) {
         console.error('Error fetching user:', error);
@@ -113,6 +114,61 @@ const ShowUser = () => {
       <span className="coach-detail-label">Video URL:</span>
       <span className="coach-detail-value">{coachDetails.video_introduction_url}</span>
     </div>
+
+        <div className="coach-detail-field">
+      <span className="coach-detail-label">Primary Specialization:</span>
+      <span className="coach-detail-value">
+        {coachDetails.primary_specialization?.name || coachDetails.primary_specialization_id || '—'}
+      </span>
+    </div>
+
+    <div className="coach-detail-field">
+      <span className="coach-detail-label">Secondary Specialization:</span>
+      <span className="coach-detail-value">
+        {coachDetails.secondary_specialization?.name || coachDetails.secondary_specialization_id || '—'}
+      </span>
+    </div>
+
+    <div className="coach-detail-field">
+      <span className="coach-detail-label">Preferred Languages:</span>
+       <span className="coach-detail-value">
+    {(coachDetails.preferred_languages && coachDetails.preferred_languages.length > 0)
+      ? coachDetails.preferred_languages.join(', ')
+      : '—'}
+  </span>
+    </div>
+
+    <div className="coach-detail-field">
+      <span className="coach-detail-label">Teaching Formats:</span>
+      <span className="coach-detail-value">
+        {(coachDetails.teaching_formats || []).join(', ') || '—'}
+      </span>
+    </div>
+
+    <div className="coach-detail-field">
+      <span className="coach-detail-label">Communication Methods:</span>
+      <span className="coach-detail-value">
+        {(coachDetails.communication_methods || []).join(', ') || '—'}
+      </span>
+    </div>
+
+    <div className="coach-detail-field">
+      <span className="coach-detail-label">Social Media Links:</span>
+      <span className="coach-detail-value">
+        {coachDetails.social_media_links
+          ? Object.entries(coachDetails.social_media_links).map(([platform, url]) => (
+              <div key={platform}>
+                <strong>{platform}:</strong> <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>
+              </div>
+            ))
+          : '—'}
+      </span>
+    </div>
+
+    
+
+   
+
   </div>
 )}
 

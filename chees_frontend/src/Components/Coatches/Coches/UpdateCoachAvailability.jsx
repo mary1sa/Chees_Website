@@ -155,9 +155,12 @@ const UpdateCoachAvailability = () => {
             onChange={handleChange}
             className={`form-input ${errors.availability_type ? 'is-invalid' : ''}`}
           >
-            <option value="regular">Regular Session</option>
-            <option value="workshop">Workshop</option>
-            <option value="event">Special Event</option>
+               <option value="">Sélectionner le type de disponibilité</option>
+            <option value="regular">Régulière</option>
+            <option value="special">Spéciale</option>
+            <option value="blocked">Bloquée</option>
+            <option value="holiday">Fériée</option>
+            <option value="limited">Limitée</option>
           </select>
           {errors.availability_type && <div className="error-message">{errors.availability_type}</div>}
         </div>

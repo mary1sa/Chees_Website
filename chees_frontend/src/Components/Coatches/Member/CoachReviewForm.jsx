@@ -14,7 +14,7 @@ const CoachReviewForm = () => {
   const [formData, setFormData] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [selectedCoachId, setSelectedCoachId] = useState(null);
-  const [editingReviewId, setEditingReviewId] = useState(null); 
+  const [editingReviewId, setEditingReviewId] = useState(null);
   const [expandedReview, setExpandedReview] = useState({});
   const [message, setMessage] = useState('');
   const [alertType, setAlertType] = useState('');
@@ -130,7 +130,8 @@ const CoachReviewForm = () => {
                 [ratingType]: parseInt(e.target.value),
               },
             }))
-          }>
+          }
+        >
           {[5, 4, 3, 2, 1].map(r => (
             <option key={r} value={r}>{r} Stars</option>
           ))}
@@ -142,10 +143,24 @@ const CoachReviewForm = () => {
     </div>
   );
 
+  const renderStars = (rating) => {
+    return (
+      <div className="star-rating-display">
+        {[...Array(5)].map((_, i) => (
+          <StarIcon
+            key={i}
+            className={`star-icon ${i < rating ? 'text-amber-400' : 'text-gray-200'}`}
+          />
+        ))}
+        <span className="numeric-rating">({rating}/5)</span>
+      </div>
+    );
+  };
+
   const openModal = (coachId) => {
     setSelectedCoachId(coachId);
     setShowForm(true);
-    setEditingReviewId(null); 
+    setEditingReviewId(null);
   };
 
   const closeModal = () => {
@@ -184,6 +199,7 @@ const CoachReviewForm = () => {
     setSelectedCoachId(coachId);
     setShowForm(true);
   };
+
   const handleDeleteClick = (coachId, coachName) => {
     setReviewToDelete({ coachId, coachName });
     setShowDeleteModal(true);
@@ -203,10 +219,10 @@ const CoachReviewForm = () => {
       setMessage('Review deleted successfully!');
       setAlertType('success');
       fetchReviews(reviewToDelete.coachId);
-      setShowDeleteModal(false);
     } catch (err) {
       setMessage(err.response?.data?.message || 'Error deleting review.');
       setAlertType('error');
+    } finally {
       setShowDeleteModal(false);
     }
   };
@@ -215,7 +231,7 @@ const CoachReviewForm = () => {
 
   return (
     <div className="coach-review-container">
-      <h2 className="coach-review-title">Coach Reviews</h2>
+      <h1 className="coach-review-title">Coach Reviews</h1>
 
       {coaches?.length > 0 ? (
         <div className="coach-grid">
@@ -260,17 +276,12 @@ const CoachReviewForm = () => {
                                 setExpandedReview(prev => ({
                                   ...prev,
                                   [review.id]: !prev[review.id],
-                                }))}>
+                                }))
+                              }
+                            >
                               <div className="review-rating">
-                              <h3 className='namemember'>{review?.user.first_name} {review?.user.last_name}</h3>
-                                <div className="review-stars">
-                                  {[...Array(5)].map((_, i) => (
-                                    <StarIcon
-                                      key={i}
-                                      className={`star-icon ${i < (review?.rating || 0) ? 'text-amber-400' : 'text-gray-200'}`}
-                                    />
-                                  ))}
-                                </div>
+                                <h3 className='namemember'>{review?.user.first_name} {review?.user.last_name}</h3>
+                                {renderStars(review.rating)}
                                 <span className="review-date">
                                   {review?.created_at ? new Date(review.created_at).toLocaleDateString('en-US', {
                                     year: 'numeric',
@@ -279,43 +290,53 @@ const CoachReviewForm = () => {
                                   }) : '--/--/----'}
                                 </span>
                               </div>
-                             
 
                               <p className="review-text">"{review?.review_text}"</p>
+
                               {isExpanded && (
                                 <div className="review-breakdown">
-                                  <p>Teaching Clarity: {review?.teaching_clarity_rating} / 5</p>
-                                  <p>Communication: {review?.communication_rating} / 5</p>
-                                  <p>Knowledge Depth: {review?.knowledge_depth_rating} / 5</p>
+                                  <div className="breakdown-item">
+                                    <span>Teaching Clarity:</span>
+                                    {renderStars(review.teaching_clarity_rating)}
+                                  </div>
+                                  <div className="breakdown-item">
+                                    <span>Communication:</span>
+                                    {renderStars(review.communication_rating)}
+                                  </div>
+                                  <div className="breakdown-item">
+                                    <span>Knowledge Depth:</span>
+                                    {renderStars(review.knowledge_depth_rating)}
+                                  </div>
                                 </div>
                               )}
+
                               {isMyReview && (
-  <div className="review-actions">
-    <button
-      className="edit-btn"
-      onClick={(e) => {
-        e.stopPropagation();
-        startEditReview(coach.id, review);
-      }}
-      title="Edit Review"
-    >
-      <FiEdit className="pen-icon-with-border" />
-    </button>
-    <button
-    className="delete_btn"
-    onClick={(e) => {
-      e.stopPropagation();
-      handleDeleteClick(
-        coach.id,
-        `${coach.user?.first_name} ${coach.user?.last_name}`
-      );
-    }}
-    title="Delete Review"
-  >
-    <FiTrash2 className="trash-icon-with-border" />
-  </button>
-  </div>
-)}
+                                <div className="review-actions">
+                                  <button
+                                    className="edit-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      startEditReview(coach.id, review);
+                                    }}
+                                    title="Edit Review"
+                                  >
+                                    <FiEdit className="pen-icon-with-border" />
+                                  </button>
+                                  <button
+                                    className="delete_btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteClick(
+                                        coach.id,
+                                        `${coach.user?.first_name} ${coach.user?.last_name}`
+                                      );
+                                    }}
+                                    title="Delete Review"
+                                  >
+                                    <FiTrash2 className="trash-icon-with-border" />
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           );
                         })
@@ -325,17 +346,21 @@ const CoachReviewForm = () => {
                   </div>
 
                   {reviews[coach.id]?.length > 1 && (
-                    <button className="show-more-btn" onClick={() => openAllReviewsModal(coach.id)}>
+                    <button
+                      className="show-more-btn"
+                      onClick={() => openAllReviewsModal(coach.id)}
+                    >
                       Show More Reviews ...
                     </button>
                   )}
-                </div>
 
-                <button
-                  className="toggle-form-btn"
-                  onClick={() => openModal(coach.id)}>
-                  Write a Review
-                </button>
+                  <button
+                    className="toggle-form-btn"
+                    onClick={() => openModal(coach.id)}
+                  >
+                    Write a Review
+                  </button>
+                </div>
               </div>
             )
           ))}
@@ -361,8 +386,13 @@ const CoachReviewForm = () => {
       {showForm && selectedCoachId && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <button className="modal-close-btn" onClick={closeModal}>X</button>
-            <form onSubmit={(e) => handleSubmit(selectedCoachId, e)} className="review-form">
+            <button className="modal-close-btn" onClick={closeModal}>
+              ×
+            </button>
+            <form
+              onSubmit={(e) => handleSubmit(selectedCoachId, e)}
+              className="review-form"
+            >
               <textarea
                 className="review-textarea"
                 placeholder="Share your experience..."
@@ -380,12 +410,28 @@ const CoachReviewForm = () => {
               />
 
               <div className="ratings-container">
-                <RatingDropdown coachId={selectedCoachId} label="Overall Rating" ratingType="rating" />
+                <RatingDropdown
+                  coachId={selectedCoachId}
+                  label="Overall Rating"
+                  ratingType="rating"
+                />
                 <div className="rating-columns">
-                  <RatingDropdown coachId={selectedCoachId} label="Teaching Clarity" ratingType="teaching_clarity_rating" />
-                  <RatingDropdown coachId={selectedCoachId} label="Communication" ratingType="communication_rating" />
+                  <RatingDropdown
+                    coachId={selectedCoachId}
+                    label="Teaching Clarity"
+                    ratingType="teaching_clarity_rating"
+                  />
+                  <RatingDropdown
+                    coachId={selectedCoachId}
+                    label="Communication"
+                    ratingType="communication_rating"
+                  />
                 </div>
-                <RatingDropdown coachId={selectedCoachId} label="Knowledge Depth" ratingType="knowledge_depth_rating" />
+                <RatingDropdown
+                  coachId={selectedCoachId}
+                  label="Knowledge Depth"
+                  ratingType="knowledge_depth_rating"
+                />
               </div>
 
               <button type="submit" className="submit-button-review">
@@ -397,56 +443,61 @@ const CoachReviewForm = () => {
         </div>
       )}
 
-      
       {showAllModal && modalCoachId && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <button className="modal-close-btn" onClick={closeAllReviewsModal}>X</button>
+            <button className="modal-close-btn" onClick={closeAllReviewsModal}>
+              ×
+            </button>
             <h3 className="modal-title">All Reviews</h3>
-            {reviews[modalCoachId]?.map((review) => (
-              <div key={review.id} className="review-item">
-                <div className="review-rating">
-                  <div className="review-stars">
-                    {[...Array(5)].map((_, i) => (
-                      <StarIcon
-                        key={i}
-                        className={`star-icon ${i < (review?.rating || 0) ? 'text-amber-400' : 'text-gray-200'}`}
-                      />
-                    ))}
+            <div className="all-reviews-container">
+              {reviews[modalCoachId]?.map((review) => (
+                <div key={review.id} className="review-item">
+                  <div className="review-rating">
+                    <h4 className="reviewer-name">
+                      {review.user?.first_name} {review.user?.last_name}
+                    </h4>
+                    {renderStars(review.rating)}
+                    <span className="review-date">
+                      {new Date(review.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
                   </div>
-                  <span className="review-date">
-                    {review?.created_at ? new Date(review.created_at).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    }) : '--/--/----'}
-                  </span>
+                  <p className="review-text">"{review.review_text}"</p>
+                  <div className="review-breakdown">
+                    <div className="breakdown-item">
+                      <span>Teaching Clarity:</span>
+                      {renderStars(review.teaching_clarity_rating)}
+                    </div>
+                    <div className="breakdown-item">
+                      <span>Communication:</span>
+                      {renderStars(review.communication_rating)}
+                    </div>
+                    <div className="breakdown-item">
+                      <span>Knowledge Depth:</span>
+                      {renderStars(review.knowledge_depth_rating)}
+                    </div>
+                  </div>
                 </div>
-                <p className="review-text">"{review?.review_text}"</p>
-                <div className="review-breakdown">
-                  <p>Teaching Clarity: {review.teaching_clarity_rating} / 5</p>
-                  <p>Communication: {review.communication_rating} / 5</p>
-                  <p>Knowledge Depth: {review.knowledge_depth_rating} / 5</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-        
       )}
 
-{showDeleteModal && (
-  <ConfirmDelete
-    isOpen={showDeleteModal}
-    onClose={() => setShowDeleteModal(false)}
-    onConfirm={confirmDelete}
-    itemName={`your review for ${reviewToDelete?.coachName || 'this coach'}`}
-  />
-)}
+      {showDeleteModal && (
+        <ConfirmDelete
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={confirmDelete}
+          itemName={`your review for ${reviewToDelete?.coachName || 'this coach'}`}
+        />
+      )}
     </div>
-    
   );
-  
 };
 
 export default CoachReviewForm;

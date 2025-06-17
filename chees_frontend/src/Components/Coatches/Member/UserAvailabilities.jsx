@@ -20,8 +20,7 @@ const UserAvailabilities = () => {
   const [uniqueTypes, setUniqueTypes] = useState([]);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-const [availabilityToBook, setAvailabilityToBook] = useState(null);
-
+  const [availabilityToBook, setAvailabilityToBook] = useState(null);
   const [selectedAvailability, setSelectedAvailability] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -65,15 +64,18 @@ const [availabilityToBook, setAvailabilityToBook] = useState(null);
         endMinute
       );
   
-      console.log('Final session date:', sessionDate.toString());
-  
       return sessionDate < new Date();
     } catch (err) {
       console.error("Failed to parse session date:", err);
       return false;
     }
   };
-  
+
+  const isUnbookableType = (availability) => {
+    return ['holiday', 'blocked'].includes(
+      availability.availability_type.toLowerCase()
+    );
+  };
 
   const filterAvailabilities = () => {
     let filtered = [...availabilities];
@@ -98,6 +100,14 @@ const [availabilityToBook, setAvailabilityToBook] = useState(null);
 
   const handleBooking = async (availabilityId) => {
     if (!availabilityToBook) return;
+
+    // Check for unbookable types
+    if (isUnbookableType(availabilityToBook)) {
+      setErrorMessage('This session type is not available for booking');
+      setShowConfirmModal(false);
+      setAvailabilityToBook(null);
+      return;
+    }
 
     try {
       const user = JSON.parse(localStorage.getItem('user'));
@@ -239,6 +249,13 @@ const [availabilityToBook, setAvailabilityToBook] = useState(null);
               <span>{availability.booking_notes}</span>
             </div>
 
+            {isUnbookableType(availability) && (
+              <div className="detailitem unbookable-message">
+                <label>Note:</label>
+                <span>This session type ({availability.availability_type}) is not available for booking.</span>
+              </div>
+            )}
+
             {isPastSession(availability) && (
               <div className="detailitem expired-message">
                 <label>Note:</label>
@@ -299,6 +316,9 @@ const [availabilityToBook, setAvailabilityToBook] = useState(null);
           {isPastSession(availability) && (
             <div className="expired-note">Session Expired</div>
           )}
+          {isUnbookableType(availability) && (
+            <div className="unbookable-note">Not Bookable</div>
+          )}
         </div>
       </div>
 
@@ -308,19 +328,20 @@ const [availabilityToBook, setAvailabilityToBook] = useState(null);
           onClick={() => {
             setSelectedAvailability(availability);
             setShowViewModal(true);
-
           }}
         >
           <FiEye /> Details
         </button>
         <button
           className="book-now-btn"
-          onClick={() => { setAvailabilityToBook(availability); 
-            setShowConfirmModal(true); ;}}
-          
+          onClick={() => { 
+            setAvailabilityToBook(availability); 
+            setShowConfirmModal(true);
+          }}
           disabled={
             availability.current_bookings >= availability.max_students ||
-            isPastSession(availability)
+            isPastSession(availability) ||
+            isUnbookableType(availability)
           }
         >
           <FiBookOpen /> Book Now
@@ -389,15 +410,17 @@ const [availabilityToBook, setAvailabilityToBook] = useState(null);
         }}
         availability={selectedAvailability}
       />
-<ConfirmAction
-  isOpen={showConfirmModal}
-  onClose={() => {
-    setShowConfirmModal(false);
-    setAvailabilityToBook(null);
-  }}
-  onConfirm={handleBooking}
-  actionDescription="réserver cette session"
-/>
+
+      <ConfirmAction
+        isOpen={showConfirmModal}
+        onClose={() => {
+          setShowConfirmModal(false);
+          setAvailabilityToBook(null);
+        }}
+        onConfirm={handleBooking}
+        actionDescription="réserver cette session"
+      />
+
       {successMessage && <SuccessAlert message={successMessage} onClose={() => setSuccessMessage('')} />}
       {errorMessage && <ErrorAlert message={errorMessage} onClose={() => setErrorMessage('')} />}
     </div>

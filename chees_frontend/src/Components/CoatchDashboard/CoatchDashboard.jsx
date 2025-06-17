@@ -150,7 +150,7 @@ const CoatchDashboard = () => {
           icon: <FiLock className="submenu-icon" />
         },
         {
-          title: "update user",
+          title: "update your profile",
           path: "UpdateCoachPers",
           icon: <FiEdit className="submenu-icon" />
         }

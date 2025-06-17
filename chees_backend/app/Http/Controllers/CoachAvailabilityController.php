@@ -9,7 +9,7 @@ class CoachAvailabilityController extends Controller
 {
     public function index()
     {
-        $availability = CoachAvailability::with('coach') 
+        $availability = CoachAvailability::with('coach.user') 
                             ->orderBy('date')
                             ->get();
         

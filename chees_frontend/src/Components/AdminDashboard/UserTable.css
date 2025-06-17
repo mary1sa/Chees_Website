@@ -550,3 +550,170 @@
     max-width: 100%;
   }
 }
+
+
+
+
+
+.btn-primary{
+  background: #008552 !important;
+}
+
+
+.dark .table-container {
+  background-color: #1e1e1e;
+}
+
+.dark .table-title {
+  color: #ffffff;
+  border-bottom: 1px solid #333;
+}
+
+.dark .filter-controls {
+  background-color: #2a2a2a;
+}
+
+.dark .filter-input,
+.dark .filter-select {
+  background-color: #1c1c1c;
+  border: 1px solid #444;
+  color: #e0e0e0;
+}
+
+.dark .data-table {
+  background-color: #1c1c1c;
+  border: 1px solid #333;
+}
+
+.dark .table-header {
+  background-color: #2b2b2b;
+  color: #bbb;
+}
+
+.dark .header-cell {
+  color: #a0aec0;
+}
+
+.dark .table-row {
+  border-bottom: 1px solid #2f2f2f;
+}
+
+.dark .table-row:hover {
+  background-color: #2e3b3f;
+}
+
+.dark .table-cell {
+  color: #d1d5db;
+}
+
+.dark .user-name {
+  color: #e2e8f0;
+}
+
+.dark .user-id {
+  background-color: #2c2c2c;
+  color: #a0aec0;
+}
+
+.dark .profile-image {
+  border: 2px solid #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark .status-badge.active {
+  background-color: #234c36;
+  color: #4caf50;
+}
+
+.dark .status-badge.inactive {
+  background-color: #4b1e1e;
+  color: #f87171;
+}
+
+.dark .status-badge.pending {
+  background-color: #4c3d21;
+  color: #fbbf24;
+}
+
+.dark .status-badge.on-sale {
+  background-color: #1e3a5f;
+  color: #3b82f6;
+}
+
+.dark .status-badge.bouncing {
+  background-color: #3c225d;
+  color: #a78bfa;
+}
+
+.dark .action-btn {
+  background-color: transparent;
+  color: #a0aec0;
+}
+
+.dark .action-btn:hover {
+  background-color: #2a2a2a;
+}
+
+.dark .update-btn:hover {
+  color: #3b82f6;
+  background-color: #1e3a5f;
+}
+
+.dark .delete-btn:hover {
+  color: #ef4444;
+  background-color: #4b1e1e;
+}
+
+.dark .view-btn:hover {
+  color: #22c55e;
+  background-color: #1e3f30;
+}
+
+.dark .no-results {
+  color: #888;
+}
+
+.dark .pagination-button {
+  background-color: #1f2937;
+  border: 1px solid #374151;
+  color: #d1d5db;
+}
+
+.dark .pagination-button:hover:not(:disabled, .active) {
+  background-color: #374151;
+}
+
+.dark .pagination-button.active {
+  background-color: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.dark .pagination-button:disabled {
+  color: #4b5563;
+  background-color: #1f2937;
+}
+
+.dark .add-author-btn {
+  background-color: #10b981;
+  color: white;
+}
+
+.dark .add-author-btn:hover {
+  background-color: #059669;
+}
+
+.dark .add-author-btn:active {
+  background-color: #047857;
+}
+
+.dark .add-author-btn.action-style {
+  background-color: transparent;
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.dark .add-author-btn.action-style:hover {
+  background-color: #1e3f30;
+  color: #059669;
+}

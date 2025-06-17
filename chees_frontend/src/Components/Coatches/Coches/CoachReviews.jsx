@@ -81,13 +81,13 @@ const CoachReviews = () => {
 
   return (
     <div className="coach-review-container">
-      <h2 className="coach-review-title">Client Feedback</h2>
+      <h2 className="coach-review-title">Member Feedback</h2>
 
       <div className="filter-controls">
         <div className="filter-group">
         <input
           type="text"
-          placeholder="Search by client name..."
+          placeholder="Search by  name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
            className="filter-input"

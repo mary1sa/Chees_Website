@@ -150,13 +150,15 @@ const navigate=useNavigate()
               &times;
             </button>
           </div>
-          
           <div className="modalbody">
             <div className="detail-item">
               <label>Date:</label>
               <span>{new Date(availability.date).toLocaleDateString()}</span>
             </div>
-
+<div className="detailitem">
+              <label>Name</label>
+              <span>{availability.coach?.user?.first_name} {availability.coach?.user?.last_name}</span>
+            </div>
             <div className="detailitem">
               <label>Start Time:</label>
               <span>{availability.start_time}</span>
@@ -268,10 +270,10 @@ const navigate=useNavigate()
 
       <div className="data-table">
         <div className="table-header">
+          <div>Name</div>
           <div>Date</div>
           <div>Time</div>
           <div>Type</div>
-          <div>Location</div>
           <div>Capacity</div>
           <div>Actions</div>
         </div>
@@ -279,12 +281,15 @@ const navigate=useNavigate()
         {currentItems.length > 0 ? (
           currentItems.map(avail => (
             <div key={avail.id} className="table-row">
+               <div className="table-cell">
+      {avail.coach?.user?.first_name}-{avail.coach?.user?.last_name}
+    </div>
               <div className="table-cell">{new Date(avail.date).toLocaleDateString()}</div>
               <div className="table-cell">
                 {avail.start_time} - {avail.end_time}
               </div>
+
               <div className="table-cell">{avail.availability_type}</div>
-              <div className="table-cell">{avail.location || 'Not specified'}</div>
               <div className="table-cell">{avail.max_students || 'Unlimited'}</div>
               <div className="table-cell actions">
                 <Link to={`/admin/dashboard/updateavailability/${avail.id}`} className="action-btn update-btn" title="Update">

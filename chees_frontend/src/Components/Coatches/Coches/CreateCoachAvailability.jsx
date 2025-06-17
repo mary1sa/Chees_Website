@@ -156,7 +156,7 @@ const CreateCoachAvailability = () => {
 
   return (
     <div className="create-user-container">
-      <h1 className="create-user-title">Créer une Disponibilité du Coach</h1>
+      <h1 className="create-user-title">Create Availability </h1>
 
       {successMessage && <SuccessAlert message={successMessage} onClose={handleCloseAlert} iconType="check" />}
       {errors.form && <ErrorAlert message={errors.form} onClose={handleCloseAlert} />}

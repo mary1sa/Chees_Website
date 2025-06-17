@@ -157,7 +157,7 @@ const navigate=useNavigate()
           'Content-Type': 'multipart/form-data',
         },
         params: {
-          _method: 'PUT'
+          _method: ''
         }
       });
 
